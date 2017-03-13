@@ -31,7 +31,7 @@ OBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 OBJS+= $(patsubst %.cpp,%.o,$(wildcard */*.cpp))
 OBJS+= $(patsubst %.cpp,%.o,$(wildcard */*/*.cpp))
 
-HEADERS = $(shell find include/ -type f -name '*.h')
+HEADERS = $(shell find include/ -type f -name '*.hpp')
 
 .PHONY: compile run clean
 

@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <kernel/gdt.h>
+#include <kernel/gdt.hpp>
 
 struct gdt_info gdt[5];
 struct gdtr gp;
