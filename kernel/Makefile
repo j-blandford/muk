@@ -43,7 +43,7 @@ ASMOBJS = $(patsubst %.s,%.o,$(wildcard *.s))
 
 compile: ${OBJS} ${ASMOBJS}
 	@${NASM} ${NASM_FLAGS} boot.s
-	@${GPP} -T linker.ld ${CPPFLAGS} -o kernel.elf ${ASMOBJS} ${OBJS}
+	@${GPP} -T linker.ld ${CPPFLAGS} -o ../build/boot/kernel.elf ${ASMOBJS} ${OBJS}
 	@${INFO} "---->" "Kernel built..."
 
 # This provides the object files

@@ -27,5 +27,6 @@
 *.out
 *.app
 
-build/
+*.img
+*.iso
 *.elf
