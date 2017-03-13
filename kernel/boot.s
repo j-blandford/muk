@@ -21,7 +21,6 @@ mb_header:
 
     dd mb_header
     dd code
-    dd kernel_main
     dd bss
     dd end
     dd __boot
