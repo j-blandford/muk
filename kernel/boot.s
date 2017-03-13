@@ -47,6 +47,8 @@ __boot:
 
 .end:
 
+%include "gdt-flush.s"
+
 section .bss
 align 16
   resb STACK_LENGTH

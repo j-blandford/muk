@@ -33,23 +33,28 @@ OBJS+= $(patsubst %.cpp,%.o,$(wildcard */*/*.cpp))
 
 HEADERS = $(shell find include/ -type f -name '*.h')
 
-ASMOBJS = $(patsubst %.s,%.o,$(wildcard *.s))
-
-.PHONY: compile run
+.PHONY: compile run clean
 
 .SECONDARY:
 
 .SUFFIXES:
 
-compile: ${OBJS} ${ASMOBJS}
+compile: ${OBJS}
 	@${NASM} ${NASM_FLAGS} boot.s
-	@${GPP} -T linker.ld ${CPPFLAGS} -o ../build/boot/kernel.elf ${ASMOBJS} ${OBJS}
+	@${GPP} -T linker.ld ${CPPFLAGS} -o ../build/boot/kernel.elf boot.o ${OBJS}
 	@${INFO} "---->" "Kernel built..."
 
 # This provides the object files
 %.o: %.cpp ${KERNEL_HEADERS}
 	@${GPP} ${CPPFLAGS} -g -c -I./../include -o $@ $< ${ERRORS}
 
-# Compiles .s (boot.s, etc.) into object files with NASM
-boot.o:
-	@${NASM} ${NASM_FLAGS} boot.s
+# # Compiles .s (boot.s, etc.) into object files with NASM
+# boot.o:
+# 	@${NASM} ${NASM_FLAGS} boot.s
+
+
+clean:
+	@-rm -f *.o
+	@-rm -f */*.o
+	@-rm -f */*/*.o
+	@-rm -f build/boot/*.elf
