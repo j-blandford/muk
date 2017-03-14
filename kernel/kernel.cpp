@@ -6,6 +6,7 @@
 #include <kernel/tty.hpp>
 #include <kernel/gdt.hpp>
 #include <kernel/idt.hpp>
+#include <kernel/timer.hpp>
 
 extern "C"
 void kernel_main(multiboot_info_t * mb_info, uint32_t stack_size, uintptr_t esp) {
@@ -13,6 +14,9 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t stack_size, uintptr_t esp)
 
     gdt_install();
     idt_install();
+
+    Timer::initTimer();
+    Timer::testTimer();
 
     while(true) { }
 }

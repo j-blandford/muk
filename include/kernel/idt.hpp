@@ -38,7 +38,9 @@ typedef struct registers {
 
 void idt_install();
 
-typedef void (* isr_t)(registers_t *); // allows us to easily use a function pointer (type named "isr_t")
+//typedef void (* isr_t)(registers_t *);
+
+using isr_t = void(*)(registers_t *); // allows us to easily use a function pointer (type named "isr_t")
 
 void set_isr_handler(uint8_t i, isr_t handler);
 #define set_irq_handler(i, h) (set_isr_handler((i)+32, (h))) // +32 because we are remapping the PIC's overlapping interrupt #s
