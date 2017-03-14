@@ -47,6 +47,8 @@ __boot:
 .end:
 
 %include "asm/gdt.s"
+%include "asm/idt.s"
+%include "asm/interrupts.s"
 
 section .bss
 align 16

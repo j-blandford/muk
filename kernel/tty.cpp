@@ -25,7 +25,7 @@ void init_tty() {
 			terminal_buffer[index] = vga_entry(' ', terminal_color);
 		}
 	}
-	terminal_writestring("[TTY] Initialised");
+	terminal_writestring("[TTY] Initialised\n");
 }
 
 void terminal_writestring(const char* data) {
