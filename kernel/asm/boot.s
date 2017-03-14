@@ -46,7 +46,7 @@ __boot:
 
 .end:
 
-%include "gdt-flush.s"
+%include "asm/gdt.s"
 
 section .bss
 align 16
