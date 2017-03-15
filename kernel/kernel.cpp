@@ -15,8 +15,12 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t stack_size, uintptr_t esp)
     gdt_install();
     idt_install();
 
+    // IRQ0
     Timer::initTimer();
     Timer::testTimer();
+
+    // IRQ1
+    // kb code here
 
     while(true) { }
 }
