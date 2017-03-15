@@ -1,7 +1,6 @@
-#pragma once
-
 #include <stddef.h>
 #include <stdint.h>
+#include <std.hpp>
 
 #include <kernel/fs.hpp>
 #include <kernel/fs/ramdisk.hpp>
@@ -14,6 +13,7 @@ static bool ramdisk_read(fs_device_t* device, uint8_t *buffer, size_t offset, si
     return true;
 }
 static bool ramdisk_write(fs_device_t* device, uint8_t *buffer, size_t offset, size_t size) {
+    // for the moment, ramdisks are read-only
     return true;
 }
 
@@ -25,8 +25,8 @@ static void ramdisk_close(fs_device_t* device) {
     return;
 }
 
-fs_device_t* ramdisk_create(uintptr_t ptr, size_t capacity) {
-    fs_device_t device = new fs_device_t();
+fs_device_t * ramdisk_create(uintptr_t ptr, size_t capacity) {
+    fs_device_t * device = new fs_device_t("RAMDISK");
 
     device->ptr = ptr;
     device->capacity = capacity;
