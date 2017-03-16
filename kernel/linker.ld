@@ -1,5 +1,5 @@
 ENTRY(start)
-phys = 0x00100000; /* 1MiB kernel load */
+
 SECTIONS
 {
       /* put the multiboot header FIRST so it sits at < 8KiB for GRUB to locate it */
@@ -7,32 +7,37 @@ SECTIONS
         *(.mb_header)
       }
 
-      . = 1M;
+      . = 0xC0100000; /* 3GiB + 1MiB kernel load (Higher Half kernel) */
+      kernel_virt_start = .;
+      kernel_phys_start = . - 0xC0000000;
 
       start = .;
 
-      .text phys : AT(phys)
+      .text ALIGN(0x1000) : AT(ADDR(.text) - 0xC0000000)
       {
         code = .;
         *(.text)
       }
 
-      .rodata : ALIGN(4096)
+      .rodata ALIGN(0x1000) : AT(ADDR(.rodata) - 0xC0000000)
       {
         *(.rodata)
       }
 
-      .bss : ALIGN(4096)
+      .data ALIGN(0x1000) : AT(ADDR(.data) - 0xC0000000)
+      {
+        *(.data)
+      }
+
+      .bss ALIGN(0x1000) : AT(ADDR(.bss) - 0xC0000000)
       {
         bss = .;
         *(COMMON)
         *(.bss)
       }
 
-      .data : ALIGN(4096)
-      {
-        *(.data)
-      }
-
       end = .;
+
+      kernel_virt_end = .;
+      kernel_phys_end = . - 0xC0000000;
 }
