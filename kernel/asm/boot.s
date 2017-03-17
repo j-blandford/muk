@@ -40,7 +40,7 @@ mb_header:
     dd 480
     dd 32
 
-; thanks to Connor Stack for the higher-half implementation!
+; thanks to Connor Stack for the tutorial on higher-half implementation!
 section .data
 align 0x1000
 global PDVirtualAddress
@@ -48,11 +48,12 @@ PDVirtualAddress:
     ; 0x83 = 10000011 (bit 7, 1, 0 are all set)
     ; used as a temporary map for our kernel so that after paging is enabled,
     ; we can keep the program running!
-
     dd 0x00000083   ; [4MB page] | [r/w] | [present]
+
     times (KERNEL_PAGE_NUMBER -1) dd 0 ; blank pages before the 4mb on
 
     dd 0x00000083   ; page entry for kernel 4mb page
+
     times (1024 - KERNEL_PAGE_NUMBER -1) dd 0 ; entry for rest of pages
 
 
@@ -78,14 +79,20 @@ bootstrapper equ (_bootstrapper - KERNEL_VIRTUAL_OFFSET)
     or eax, 0x80000000              ; which is bit 31
     mov cr0, eax
 
-    lea eax, [_boot]
-    jmp eax
+    lea ecx, [_boot]
+    jmp ecx
 
 _boot:
     cli                         ; disable interrupts at the moment
     finit
 
-    mov esp, stack + STACK_LENGTH ; setup stack pointer (end of memory area)
+    ; Succesfully moved the kernel into the upper half :)
+    ;mov dword [PDVirtualAddress], 0
+
+    ; we have an extra page-table (0) that we can now remove.
+    invlpg [0]
+
+    mov esp, stack               ; setup stack pointer (end of memory area)
 
     add ebx, KERNEL_VIRTUAL_OFFSET ; ebx contains our GRUB pointer, which needs to be a virtualised address
 
@@ -94,7 +101,9 @@ _boot:
     push ebx                    ; multiboot header struct (param 1)
     call kernel_main            ; now we can call our main kernel function
 
+    ; hang the computer if kernel main loop returns
     cli
+    hlt
 
 .end:
 
