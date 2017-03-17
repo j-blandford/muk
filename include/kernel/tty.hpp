@@ -43,4 +43,6 @@ void terminal_writestring(const char* data);
 void terminal_putentryat(const char c, size_t x, size_t y);
 void terminal_putchar(const char c);
 
+void terminal_printf(const char* fmt, ...);
+
 void update_cursor(int row, int col);

@@ -17,10 +17,12 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t stack_size, uintptr_t esp)
 
     // IRQ0
     Timer::initTimer();
-    Timer::testTimer();
+//    Timer::testTimer();
 
     // IRQ1
     // kb code here
+
+    terminal_printf("Memory Address: %x\n", &kernel_main);
 
     while(true) { }
 }

@@ -1,6 +1,16 @@
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
+#include <stdarg.h>
+
+// Structs for stdlib
+typedef struct {
+    short quot, rem;
+} div_t;
+
+typedef struct {
+    long quot, rem;
+} ldiv_t;
 
 // C++ dynamic memory allocation operators
 void *operator new(size_t size);
@@ -13,3 +23,29 @@ inline void *operator new(size_t, void *p)     throw() { return p; }
 inline void *operator new[](size_t, void *p)   throw() { return p; }
 inline void  operator delete  (void *, void *) throw() { };
 inline void  operator delete[](void *, void *) throw() { };
+
+
+// "String" functions
+int strlen( char * ptr );
+char *strcat(char *dest, const char *source);
+int strcmp(const char *s1, const char *s2);
+int strncmp(const char *s1, const char *s2, size_t n);
+void strncpy( char * ptr_dest, char * ptr_src, int n );
+char * strpbrk(const char *s, const char *accept);
+size_t strspn (const char *s, const char *accept);
+char * strtok(char *str, const char *delim);
+char tolower(char upper);
+
+int putchar(int);
+
+//int printf(const char* __restrict, ...);
+int sprintf(char* buffer, const char* fmt, ...);
+int vsprintf(char* buffer, const char* format, va_list parameters);
+
+// Long-functions
+ldiv_t ldiv (unsigned long numerator, unsigned long denominator );
+char* ltoa(unsigned long long value, char* buffer, int radix );
+
+// Integer functions
+int itoa(int value, char *sp, int radix);
+int atoi(char* str);

@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <std.hpp>
 #include <kernel/tty.hpp>
 
 static const size_t VGA_WIDTH = 80;
@@ -67,6 +68,16 @@ void terminal_putchar(const char c) {
 	}
 
 	update_cursor(terminal_row, terminal_column);
+}
+
+void terminal_printf(const char* fmt, ...) {
+	va_list parameters;
+	char temp_buffer[80] = {0};
+
+	va_start(parameters, fmt);
+	vsprintf(temp_buffer, fmt, parameters);
+	terminal_writestring((char*)temp_buffer);
+	va_end(parameters);
 }
 
 void update_cursor(int row, int col) {
