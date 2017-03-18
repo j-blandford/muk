@@ -4,6 +4,9 @@
 #include <std.hpp>
 
 // TODO: Fix string class
+int strlen( char * ptr );
+int strcmp(const char *s1, const char *s2);
+void strncpy( char * ptr_dest, char * ptr_src, int n );
 
 class string {
 	int length;               // length of the string

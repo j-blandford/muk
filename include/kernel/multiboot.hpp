@@ -18,6 +18,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 /* Macros. */
 #pragma once
 
+#include <stdint.h>
+
 /* The magic number for the Multiboot header. */
 #define MULTIBOOT_HEADER_MAGIC          0x1BADB002
 
@@ -126,6 +128,18 @@ typedef struct multiboot_info {
 		};
 	};
 }multiboot_info_t;
+
+typedef struct multiboot_mmap_entry {
+    uint32_t size;
+    uint32_t addr_low;
+    uint32_t addr_high;
+    uint32_t length_low;
+    uint32_t length_high;
+    #define MULTIBOOT_MEMORY_AVAILABLE              1
+    #define MULTIBOOT_MEMORY_RESERVED               2
+    uint32_t type;
+} __attribute__((packed)) multiboot_mmap_entry_t ;
+
 
 /* The module structure. */
 typedef struct module {

@@ -1,0 +1,10 @@
+#pragma once
+
+#define KERNEL_VIRT_BASE 0xC000000
+
+#define PMM_STACK_PTR 0xF0000000
+
+#define PAGE_SIZE 4096
+#define PAGE_PTR_MASK 0xFFFFF000
+#define PAGE_FLAGS_MASK 0xFFF
+#define STACK_PTR_PER_PAGE 0x400

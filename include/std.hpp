@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#include <std/ctype.hpp>
+#include <std/string.hpp>
+
 // Structs for stdlib
 typedef struct {
     short quot, rem;
@@ -11,6 +14,9 @@ typedef struct {
 typedef struct {
     long quot, rem;
 } ldiv_t;
+
+template<class T>
+void swap(T x, T y);
 
 // C++ dynamic memory allocation operators
 void *operator new(size_t size);
@@ -26,11 +32,11 @@ inline void  operator delete[](void *, void *) throw() { };
 
 
 // "String" functions
-int strlen( char * ptr );
+
 char *strcat(char *dest, const char *source);
-int strcmp(const char *s1, const char *s2);
+
 int strncmp(const char *s1, const char *s2, size_t n);
-void strncpy( char * ptr_dest, char * ptr_src, int n );
+
 char * strpbrk(const char *s, const char *accept);
 size_t strspn (const char *s, const char *accept);
 char * strtok(char *str, const char *delim);
