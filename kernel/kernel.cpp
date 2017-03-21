@@ -24,9 +24,19 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t stack_size, uintptr_t esp)
     // IRQ1
     // kb code here
 
-    //terminal_printf("kernel_main address: %x\n", &kernel_main);
-
     pmm_setup(mb_info);
+
+    //uint32_t a = pmm_allocate();
+    // uint32_t b = pmm_allocate();
+    // uint32_t c = pmm_allocate();
+    // pmm_free(b);
+    // uint32_t d = pmm_allocate();
+
+    // terminal_printf("\na:%x\nb:%x\nc:%x\nd:%x",a,b,c,d);
+
+
+    terminal_printf("kernel_main address: %x\n", &kernel_main);
+
 
     while(true) { }
 }
