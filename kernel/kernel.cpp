@@ -26,6 +26,8 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t stack_size, uintptr_t esp)
 
     pmm_setup(mb_info);
 
+    pg_directory_setup(); // set up the page tables
+
     //uint32_t a = pmm_allocate();
     // uint32_t b = pmm_allocate();
     // uint32_t c = pmm_allocate();

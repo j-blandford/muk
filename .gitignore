@@ -32,3 +32,5 @@
 *.elf
 
 \.vscode/
+
+*.backuphpp

@@ -9,7 +9,7 @@ MB_CHECKSUM equ -(MB_HEADER_MAGIC + MB_FLAGS)
 STACK_LENGTH equ 32768
 
 KERNEL_VIRTUAL_OFFSET equ 0xC0000000
-KERNEL_PAGE_NUMBER equ (KERNEL_VIRTUAL_OFFSET >> 22) ; this is what the kernel's offset is in the page directory
+KERNEL_PAGE_NUMBER equ (KERNEL_VIRTUAL_OFFSET >> 22) ; this is what the kernel's offset is in the page directory = 768
 
 ; below are the functions+sections from .ld that we have to declare here to use them in our kernel boot process
 extern kernel_main
@@ -87,9 +87,9 @@ _boot:
     finit
 
     ;; Succesfully moved the kernel into the upper half :)
-    ;mov dword [PDVirtualAddress], 0
+    mov dword [PDVirtualAddress], 0
     ;; we have an extra page-table (0) that we can now remove.
-    ;invlpg [0]
+    invlpg [0]
 
     mov esp, stack               ; setup stack pointer (end of memory area)
     
