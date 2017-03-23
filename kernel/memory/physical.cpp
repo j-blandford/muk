@@ -5,98 +5,82 @@
 #include <kernel/memory/physical.hpp>
 #include <kernel/memory/virtual.hpp>
 
-#define DEFAULT_PD_FLAGS 1; // "PRESENT" flag is only one set
+#define PAGE_DIRECTORY_OFFSET_BITS 10
+#define PAGE_TABLE_OFFSET_BITS 10
+#define PAGE_OFFSET_BITS 12
 
+#define BITMAP_SIZE 4096	// enough for 4096*8 = 32mb of RAM
+
+uint32_t pg_num_free;
+uint32_t pg_free_bmp[BITMAP_SIZE];
+
+void pg_mark_free(uint32_t pg_num) {
+	pg_free_bmp[pg_num << 5] |= (1 << (pg_num & 0x1F));
+
+	pg_num_free++;
+}
+
+void pg_mark_taken(uint32_t pg_num) {
+	pg_free_bmp[pg_num << 5] &= ~(1 << (pg_num & 0x1F));
+
+	pg_num_free--;
+}
 
 /**
- * "pmm_*" functions 
- * 	You have a hunk of memory (located at PMM_STACK_PTR) which is initialised from the GRUB 
- * 	memory map. Each free page of memory is added to this stack and then just popped off as needed. 
- * 	We don't have to worry about the memory being discontinuous, as our VMM will map it so it looks
- * 	like one contiguous block of memory to the user processes.
- * 	Pointers for the stack are stored in the pages which are being used. The beauty of this is that 
- * 	we can disregard the memory size of the stack itself, as the stack cleans up after itself!
- */
-
-uintptr_t pmm_curr;
-uintptr_t* pmm_stack_ptr = reinterpret_cast<uintptr_t*>(PMM_STACK_PTR);
-uintptr_t* pmm_stack_end_ptr = reinterpret_cast<uintptr_t*>(PMM_STACK_PTR);
-
-void pmm_free(uintptr_t page) {
-	page &= PAGE_PTR_MASK; // cuts off the last 3 bytes (0xFFF) which is used for the flags (also 4kb aligns the address)
-
-	if(pmm_stack_ptr >= pmm_stack_end_ptr) { 
-		// our stack isn't large enough, let's allocate more memory to accomodate this
-		pmm_stack_end_ptr += STACK_PTR_PER_PAGE;
-	}
-	else {
-		// an existing page has been freed, lets just push it to the stack
-		pmm_stack_end_ptr = reinterpret_cast<uintptr_t*>(page);
-		pmm_stack_end_ptr++;
-	}
-}
-
-uintptr_t pmm_allocate() {
-	pmm_stack_ptr--;
-
-	if(pmm_stack_ptr < (pmm_stack_end_ptr - STACK_PTR_PER_PAGE)) {
-		pmm_stack_end_ptr -= STACK_PTR_PER_PAGE;
-
-		uintptr_t new_pg_ptr = vmm_pg_get(reinterpret_cast<uintptr_t>(pmm_stack_end_ptr) & PAGE_PTR_MASK);
-		vmm_pg_set(new_pg_ptr, 0);
-		return new_pg_ptr;
-	}
-
-	return *pmm_stack_ptr;
-}
-
+* 	Function which initialises the memory bitmap from the GRUB boot information
+*/
 void pmm_setup(multiboot_info_t *mboot) {
-	terminal_printf("[INFO] Starting PMM...\n");
 	terminal_printf("[INFO] Total memory:  %d kb\n",mboot->mem_upper + mboot->mem_lower);
 
-	pmm_curr = (mboot->mem_upper + PAGE_SIZE) & PAGE_PTR_MASK;
-
-//	terminal_printf("[PMM] Physical page stack is at %x\n", pmm_stack_ptr);
+	pg_num_free = 0;
 
 	// GRUB provides the kernel with a struct containing the map of memory
 	// let's parse this to get a list of free physical memory pages
-	uintptr_t mmap_ptr = mboot->mmap_addr;
-	uintptr_t mmap_end_ptr = mboot->mmap_addr + mboot->mmap_length;
+	memory_map_t * mmap = (memory_map_t*)(mboot->mmap_addr + KERNEL_VIRT_BASE);
+	size_t mmap_entries = mboot->mmap_length / sizeof(memory_map_t);
 
 	terminal_printf("[PMM] Physical memory layout is: ");
+	for(size_t index = 0; index < mmap_entries; index++) {
 
-	// while(mmap_ptr < mmap_end_ptr) {
-	// 	multiboot_mmap_entry_t *mmap = (multiboot_mmap_entry_t *)mmap_ptr;
+		if(mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
+			// the memory page is free! let's mark each bit of the bitmap "free"
 
-	// 	if(mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
-	// 		// the memory page is free! let's push this to the "free" stack page by page
+			// as each mem page is larger than our PMM page size, we need to individually 
+			// loop over the mmap's memory space and mark each as "free"
+			uint32_t first_pg = (mmap->base_addr_low & 0xFFFFF000) >> PAGE_OFFSET_BITS;
+			uint32_t end_pg = ((mmap->base_addr_low + mmap->length_low) & 0xFFFFF000) >> PAGE_OFFSET_BITS;
 
-	// 		// as each mem page is larger than our PMM page size, we need to individually 
-	// 		// loop over the mmap's memory space and add each to the stack of free memory.
+			for(uint32_t pg_index = first_pg; pg_index < end_pg; pg_index++) {
+				pg_mark_free(pg_index);
+			}
 
-	// 		// for(uintptr_t pg_ptr = mmap->addr_low; pg_ptr < mmap->addr_low+mmap->length_low; pg_ptr += PAGE_SIZE) {
-	// 		// 	pmm_free(pg_ptr); // add this page to our stack of free pages
-	// 		// }
+			terminal_printf("(%x)", mmap->length_low / PAGE_SIZE);
+		}
 
-	// 		terminal_printf("(%x)", mmap->length_low / PAGE_SIZE);
-	// 	}
-		
-	// 	mmap_ptr+= sizeof(multiboot_mmap_entry_t);
-	// }
+		mmap ++;
+	}
 
-	terminal_printf("\n[PMM] Initialised physical page stack.\n");
+	terminal_printf("\n[PMM] Initialised physical page stack. Pages free=%d\n", pg_num_free);
 }
 
+/**
+* 	Sets up recursive page directory to allow us to change the PDEs during runtime
+*/
 page_directory_t pg_directory_setup() {
-	terminal_printf("[PGT] PD Virtual address: %x\n", &PDVirtualAddress);
-	terminal_printf("[PGT] PD Physical address: %x\n", &PDPhysicalAddress);
 
-	page_directory_t page_dir = reinterpret_cast<page_directory_t>(&PDVirtualAddress); // PDVirtualAddress is defined in boot.s
+	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress; // PDVirtualAddress is defined in boot.s
 
-	//terminal_printf("[PGT] page_dir[768]: %x\n", page_dir[768]);
+	uint32_t recursive_pde = (uint32_t)&PDPhysicalAddress;
+	recursive_pde |= (1);			// PRESENT
+	recursive_pde |= (1 << 1);		// READ/WRITE
+	recursive_pde |= (1 << 2);		// ALL ACCESS
+	recursive_pde |= (1 << 5);		// CACHE DISABLE
 
-	//						|phys addr  | pres|  r/w     |  access  | no cache|
-	page_dir[1023] = &PDPhysicalAddress | (1) | (1 << 1) | (1 << 2) | (1 << 5);//*; // last page directory points to itself
+	page_dir[1023] = recursive_pde; //** last page directory points to itself (which is virtual address 0xFFFFF000**//
+
+	// Now we set up the kernel's memory space
+
+	terminal_printf("[PGT] Recursive Page Tables setup successful\n");
 
 	return page_dir;
 }

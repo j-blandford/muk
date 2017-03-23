@@ -132,16 +132,6 @@ typedef struct multiboot_info {
 	};
 }multiboot_info_t;
 
-typedef struct multiboot_mmap_entry {
-    uint32_t size;
-    uint32_t addr_low;
-    uint32_t addr_high;
-    uint32_t length_low;
-    uint32_t length_high;
-    uint32_t type;
-} __attribute__((packed)) multiboot_mmap_entry_t ;
-
-
 /* The module structure. */
 typedef struct module {
     unsigned long mod_start;
@@ -159,7 +149,7 @@ typedef struct memory_map {
     unsigned long length_low;
     unsigned long length_high;
     unsigned long type;
-}memory_map_t;
+} __attribute__((packed)) memory_map_t;
 
 
 #endif

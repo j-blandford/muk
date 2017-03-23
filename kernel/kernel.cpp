@@ -28,13 +28,13 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t stack_size, uintptr_t esp)
 
     pg_directory_setup(); // set up the page tables
 
-    //uint32_t a = pmm_allocate();
+    // uint32_t a = pmm_allocate();
     // uint32_t b = pmm_allocate();
     // uint32_t c = pmm_allocate();
-    // pmm_free(b);
+    // pg_mark_free(b);
     // uint32_t d = pmm_allocate();
 
-    // terminal_printf("\na:%x\nb:%x\nc:%x\nd:%x",a,b,c,d);
+    // terminal_printf("a:%x\nb:%x\nc:%x\nd:%x\n",a,b,c,d);
 
 
     terminal_printf("kernel_main address: %x\n", &kernel_main);

@@ -86,17 +86,19 @@ _boot:
     cli                         ; disable interrupts at the moment
     finit
 
-    ;; Succesfully moved the kernel into the upper half :)
+    ; Succesfully moved the kernel into the upper half :)
     mov dword [PDVirtualAddress], 0
-    ;; we have an extra page-table (0) that we can now remove.
+    ; we have an extra page-table (0) that we can now remove.
     invlpg [0]
+
+    add ebx, KERNEL_VIRTUAL_OFFSET ; ebx contains our GRUB pointer, which needs to be a virtualised address
 
     mov esp, stack               ; setup stack pointer (end of memory area)
     
     push stack                  ; stack pointer (param 3)
     push STACK_LENGTH           ; stack size (param 2)
-    add ebx, KERNEL_VIRTUAL_OFFSET ; ebx contains our GRUB pointer, which needs to be a virtualised address
     push ebx                    ; multiboot header struct (param 1)
+    
     call kernel_main            ; now we can call our main kernel function
 
     ; hang the computer if kernel main loop returns

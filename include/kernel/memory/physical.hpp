@@ -14,5 +14,6 @@ page_directory_t pg_directory_setup();
 
 // Page Allocation functions
 void pmm_setup(multiboot_info_t *mboot);
-uintptr_t pmm_allocate();
-void pmm_free(uintptr_t page);
+void pg_mark_free(uint32_t pg_num);
+void pg_mark_taken(uint32_t pg_num);
+void* page_allocate();
