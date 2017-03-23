@@ -95,8 +95,8 @@ _boot:
 
     mov esp, stack               ; setup stack pointer (end of memory area)
     
-    push stack                  ; stack pointer (param 3)
-    push STACK_LENGTH           ; stack size (param 2)
+    push kernel_phys_end
+    push kernel_phys_start
     push ebx                    ; multiboot header struct (param 1)
     
     call kernel_main            ; now we can call our main kernel function

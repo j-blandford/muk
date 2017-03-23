@@ -11,7 +11,7 @@
 #include <kernel/memory/physical.hpp>
 
 extern "C"
-void kernel_main(multiboot_info_t * mb_info, uint32_t stack_size, uintptr_t esp) {
+void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_phys_end) {
     init_tty();
 
     gdt_install();
@@ -24,7 +24,7 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t stack_size, uintptr_t esp)
     // IRQ1
     // kb code here
 
-    pmm_setup(mb_info);
+    pmm_setup(mb_info, k_phys_start, k_phys_end);
 
     pg_directory_setup(); // set up the page tables
 
