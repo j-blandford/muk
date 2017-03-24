@@ -61,7 +61,7 @@ void pmm_setup(multiboot_info_t *mboot, uint32_t k_phys_start, uint32_t k_phys_e
 	for(size_t index = 0; index < mmap_entries; index++) {
 
 		if(mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
-			// the memory page is free! let's mark each bit of the bitmap "free"
+			// the memory page is free! let's mark each bit of the bitmap "free".
 			// as each mem page is larger than our PMM page size, we need to individually 
 			// loop over the mmap's memory space and mark each as "free"
 
@@ -72,7 +72,8 @@ void pmm_setup(multiboot_info_t *mboot, uint32_t k_phys_start, uint32_t k_phys_e
 				pg_mark_free(pg_index);
 			}
 
-			terminal_printf("(%x)", mmap->length_low / PAGE_SIZE);
+			// Print how many pages we have in this chunk
+			terminal_printf("(%d)", mmap->length_low / PAGE_SIZE);
 		}
 
 		mmap ++;
@@ -83,8 +84,8 @@ void pmm_setup(multiboot_info_t *mboot, uint32_t k_phys_start, uint32_t k_phys_e
 	for(uint32_t pg_index = first_kernel_pg; pg_index < end_kernel_pg; pg_index++) {
 		pg_mark_taken(pg_index);
 	}
-
-	terminal_printf("\n[PMM] Initialised physical page stack. Pages free=%d\n", pg_num_free);
+	// terminal_printf("\n[PMM] kernel_start=%x, kernel_end=%x\n", k_phys_start, k_phys_end);
+	terminal_printf("\n[PMM] Initialised physical page bitmap.\n");
 }
 
 void* pg_virtual_addr(uint16_t pg_num) {
@@ -110,33 +111,6 @@ page_directory_t pg_directory_setup() {
 	recursive_pde |= (1 << 2);		// ALL ACCESS
 	recursive_pde |= (1 << 5);		// CACHE DISABLE
 	page_dir[1023] = recursive_pde; //** last page directory points to itself (which is virtual address 0xFFFFF000) **//
-
-	// Now we set up the kernel's memory space
-	uint32_t kernel_pde = (uint32_t)page_allocate();
-	kernel_pde |= (1);			// PRESENT
-	kernel_pde |= (1 << 1);		// READ/WRITE
-	kernel_pde |= (1 << 2);		// ALL ACCESS
-	kernel_pde |= (1 << 5);		// CACHE DISABLE
-	page_dir[KERNEL_PAGE_IDX] = kernel_pde;
-
-	// Let's fill the kernel page table with it's data
-	page_table_t kernel_page_table = (page_table_t)pg_virtual_addr(KERNEL_PAGE_IDX);
-	for(size_t table = 0; table < 1024; table++) { // 1024 entries of the kernel's page directory need to be filled (giving us 4mib)
-		void* page_phys = page_allocate();
-
-	//	terminal_printf("%x ", page_phys);
-
-		uint32_t pte = (uint32_t)page_phys;
-		pte |= (1);			// PRESENT
-		pte |= (1 << 1);		// READ/WRITE
-		pte |= (1 << 2);		// ALL ACCESS
-		pte |= (1 << 5);		// CACHE DISABLE
-
-		kernel_page_table[table] = pte;
-	}
-
-
-	//terminal_printf("[PGT] Kernel PD: %x\n", kernel_pde);
 
 	terminal_printf("[PGT] Recursive Page Tables setup successful\n");
 

@@ -2,7 +2,7 @@ import sys, getopt
 
 from subprocess import call
 
-solutions = ["kernel"]
+solutions = ["kernel", "modules"]
 
 for opt in sys.argv:
     if opt == "build" or opt == "run" or opt == "bochs":
