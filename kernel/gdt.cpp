@@ -3,10 +3,10 @@
 
 #include <kernel/gdt.hpp>
 
-struct gdt_info gdt[5];
-struct gdtr gp;
+gdt_info gdt[6]; // our table
+gdtr gp;	// this is what points to our table. we point our CPU to this variable.
 
-extern "C" void gdt_flush(gdtr* gp); // ASM function
+tss_info tss; // global TSS struct
 
 void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran) {
 	#pragma GCC diagnostic push
@@ -24,7 +24,7 @@ void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned cha
 }
 
 void gdt_install() {
-	gp.limit = (sizeof(struct gdt_info) * 5) - 1;
+	gp.limit = (sizeof(gdt_info) * 6) - 1;
 	gp.base = (uint32_t) &gdt;
 
 	gdt_set_gate(0, 0, 0, 0, 0); // first gate is ALWAYS null
@@ -32,9 +32,15 @@ void gdt_install() {
 	gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xC0); // 0x92 corresponds to  ring 0 DATA memory segments
 	gdt_set_gate(3, 0, 0xFFFFFFFF, 0xF8, 0xC0); // User Code (r3) segment maybe these 2 shouldn't overlap with the ring 0...
   	gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xC0); // User Data (r3) segment
-  //	gdt_set_gate(5, (uint32_t)&tss, sizeof(struct gdt_tss_entry), 0x89, 0x40); // TSS segment
-
-    // to be included: TSS GDT gates.... watch this space
 
 	gdt_flush(&gp);
+}
+
+void tss_install() {
+	gdt_set_gate(5, (uint32_t)&tss, sizeof(tss_info), 0x89, 0x40); // TSS segment
+
+	tss.ss0 = 0x10; // 0x10 = kernel data segment
+	tss.iomap = sizeof(tss_info);
+
+	tss_flush(0x28);
 }

@@ -6,10 +6,22 @@
 #include <kernel/idt.hpp>
 #include <kernel/timer.hpp>
 
+#include <kernel/proc/scheduler.hpp>
+
 volatile uint64_t timer_ticks;
+volatile uint32_t timer_tenths;
 
 static void timer_irq0(struct registers * registers) {
     timer_ticks++;
+    timer_tenths++;
+
+    if(timer_tenths > 10) {
+        // __asm__ volatile("int $0x82 \n");
+        // schedule();
+
+        timer_tenths = 0;
+    }
+
     return;
 }
 
@@ -33,6 +45,8 @@ void Timer::sleep(int ticks) {
 
 void Timer::initTimer() {
     timer_ticks = 0;
+    timer_tenths = 0;
+    
     Timer::setCount(1000);
 
     set_irq_handler(0, timer_irq0);

@@ -3,6 +3,10 @@
 *.lo
 *.o
 *.obj
+*.bin
+*.img
+*.iso
+*.elf
 
 # Precompiled Headers
 *.gch
@@ -27,12 +31,4 @@
 *.out
 *.app
 
-*.img
-*.iso
-*.elf
-
 \.vscode/
-
-*.backuphpp
-
-*.backupcpp

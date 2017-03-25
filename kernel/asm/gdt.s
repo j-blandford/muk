@@ -12,3 +12,9 @@ gdt_flush:  mov eax, [esp + 4]              ; retrive the 1st argument
             jmp 0x08:.flush                 ; long jump to apply the new GDT
 .flush:                                           ; simple long jump which returns from the function in C
             ret
+
+global tss_flush
+tss_flush:  mov eax, [esp+4]                ; first argument
+            ltr ax                       ; "load task register"
+.flush:
+            ret

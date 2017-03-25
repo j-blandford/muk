@@ -122,3 +122,4 @@ extern "C" void isr46(); // ata 0,0 (14)
 extern "C" void isr47(); // ata 0,1 (15)
 
 extern "C" void isr128(); // syscall (0x80, or 0x60 + 32)
+extern "C" void isr130(); // interrupt scheduler
