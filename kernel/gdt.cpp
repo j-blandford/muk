@@ -32,12 +32,12 @@ void gdt_install() {
 	gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xC0); // 0x92 corresponds to  ring 0 DATA memory segments
 	gdt_set_gate(3, 0, 0xFFFFFFFF, 0xF8, 0xC0); // User Code (r3) segment maybe these 2 shouldn't overlap with the ring 0...
   	gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xC0); // User Data (r3) segment
+	gdt_set_gate(5, (uint32_t)&tss, sizeof(tss_info), 0x89, 0x40); // TSS segment
 
 	gdt_flush(&gp);
 }
 
 void tss_install() {
-	gdt_set_gate(5, (uint32_t)&tss, sizeof(tss_info), 0x89, 0x40); // TSS segment
 
 	tss.ss0 = 0x10; // 0x10 = kernel data segment
 	tss.iomap = sizeof(tss_info);

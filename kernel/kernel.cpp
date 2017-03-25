@@ -18,8 +18,9 @@ extern "C"
 void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_phys_end) {
     init_tty();
 
-    tss_install();
     gdt_install();
+    tss_install();
+    
     idt_install();
 
     // IRQ0
