@@ -10,6 +10,12 @@ extern size_t terminal_column;
 extern uint8_t terminal_color;
 extern uint16_t* terminal_buffer;
 
+typedef struct {
+    int x;
+    int y;
+} vec2;
+
+
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
 	VGA_COLOR_BLUE = 1,

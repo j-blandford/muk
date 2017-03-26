@@ -10,6 +10,8 @@
 #include <kernel/idt.hpp>
 #include <kernel/timer.hpp>
 
+#include <kernel/drivers/keyboard.hpp>
+
 #include <kernel/proc/scheduler.hpp>
 
 #include <kernel/memory/physical.hpp>
@@ -20,15 +22,15 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
 
     gdt_install();
     tss_install();
-    
+
     idt_install();
 
     // IRQ0
     Timer::initTimer();
-    Timer::testTimer();
+    // Timer::testTimer();
 
     // IRQ1
-    // kb code here
+    keyboard_install();
 
     pmm_setup(mb_info, k_phys_start, k_phys_end);
     pg_directory_setup(); // set up the page tables

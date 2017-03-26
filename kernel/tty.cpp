@@ -2,6 +2,8 @@
 #include <stdint.h>
 
 #include <std.hpp>
+
+#include <kernel/cpu.hpp>
 #include <kernel/tty.hpp>
 
 static const size_t VGA_WIDTH = 80;
@@ -12,6 +14,8 @@ size_t terminal_row;
 size_t terminal_column;
 uint8_t terminal_color;
 uint16_t* terminal_buffer;
+
+static vec2 cursor_pos = { 0, 0 };
 
 
 void init_tty() {
@@ -63,6 +67,7 @@ void terminal_putchar(const char c) {
 	terminal_putentryat(c, terminal_column, terminal_row);
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
+		
 		if (++terminal_row == VGA_HEIGHT)
 			terminal_row = 0;
 	}
@@ -83,15 +88,15 @@ void terminal_printf(const char* fmt, ...) {
 void update_cursor(int row, int col) {
 	unsigned short position=(row*80) + col;
 
-	// cursor_pos.x = col+1;
-	// cursor_pos.y = row;
+	cursor_pos.x = col+1;
+	cursor_pos.y = row;
 
-	// // cursor LOW port to vga INDEX register
-	// outportb(0x3D4, 0x0F);
-	// outportb(0x3D5, (unsigned char)(position&0xFF));
-	//
-	// // cursor HIGH port to vga INDEX register
-	// outportb(0x3D4, 0x0E);
-	// outportb(0x3D5, (unsigned char )((position>>8)&0xFF));
+	// cursor LOW port to vga INDEX register
+	outportb(0x3D4, 0x0F);
+	outportb(0x3D5, (unsigned char)(position&0xFF));
+	
+	// cursor HIGH port to vga INDEX register
+	outportb(0x3D4, 0x0E);
+	outportb(0x3D5, (unsigned char )((position>>8)&0xFF));
 
 }
