@@ -44,6 +44,7 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
 }
 
 void init_tty();
+void tty_update();
 
 void terminal_writestring(const char* data);
 void terminal_putentryat(const char c, size_t x, size_t y);
@@ -52,3 +53,6 @@ void terminal_putchar(const char c);
 void terminal_printf(const char* fmt, ...);
 
 void update_cursor(int row, int col);
+
+size_t tty_get_cursor_x();
+void tty_set_cursor_x(size_t x);

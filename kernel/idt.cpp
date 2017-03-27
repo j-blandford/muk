@@ -94,8 +94,13 @@ void idt_install() {
   idt_set_gate(46, (uint32_t)isr46, 0x08, 0x8E);
   idt_set_gate(47, (uint32_t)isr47, 0x08, 0x8E);
 
+  for (int i = 49; i <= 255; i++) {
+    // FIXME: create a special dummy handler
+    idt_set_gate(i, (uint32_t)isr0, 0x08, 0x8E);
+  }
+
   idt_set_gate(0x80, (uint32_t)isr128, 0x08, 0x8E);
-  idt_set_gate(0x82, (uint32_t)isr130, 0x08, 0x8E); // SCHEDULE INTERRUPT
+  //idt_set_gate(0x82, (uint32_t)isr130, 0x08, 0x8E); // SCHEDULE INTERRUPT
 
   idt_p.limit = sizeof(struct idt_entry) * 256 - 1;
   idt_p.base = (uint32_t)&idt_entries;
@@ -111,15 +116,15 @@ void set_isr_handler(uint8_t i, isr_t handler) {
   isr_handlers[i] = handler;
 }
 
-extern "C" registers_t * isr_handler(registers_t * registers) {
-  registers_t * new_registers = registers;
+extern "C" struct registers * isr_handler(registers_t * registers) {
+  struct registers * new_registers = registers;
 
   if ((registers->isr_num >= IRQ0) && (registers->isr_num <= IRQ15)) { // IRQ
     if (registers->isr_num >= IRQ8) { // IRQ originated from the slave PIC
-      outportb(PIC2_COMMAND, PIC_EOI); // aknownledge the interrupt
+      outportb(PIC2_COMMAND, PIC_EOI);
     }
 
-    outportb(PIC1_COMMAND, PIC_EOI); // aknownledge the interrupt
+    outportb(PIC1_COMMAND, PIC_EOI);
   }
 
   // Call the handler if any

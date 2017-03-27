@@ -6,6 +6,8 @@
 #include <kernel/cpu.hpp>
 #include <kernel/tty.hpp>
 
+#include <kernel/drivers/keyboard.hpp>
+
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
 static uint16_t* const VGA_MEMORY = (uint16_t*) 0xC00B8000; // 0xB8000 is actually now in the upper half! 
@@ -17,6 +19,7 @@ uint16_t* terminal_buffer;
 
 static vec2 cursor_pos = { 0, 0 };
 
+char kb_buffer[1024];
 
 void init_tty() {
 	terminal_row = 0;
@@ -67,7 +70,7 @@ void terminal_putchar(const char c) {
 	terminal_putentryat(c, terminal_column, terminal_row);
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
-		
+
 		if (++terminal_row == VGA_HEIGHT)
 			terminal_row = 0;
 	}
@@ -99,4 +102,33 @@ void update_cursor(int row, int col) {
 	outportb(0x3D4, 0x0E);
 	outportb(0x3D5, (unsigned char )((position>>8)&0xFF));
 
+}
+
+size_t tty_get_cursor_x() {
+	return terminal_column;
+}
+
+void tty_set_cursor_x(size_t x) {
+	terminal_column = x;
+
+	update_cursor(terminal_row, x);
+}
+
+
+void tty_update() {
+	// terminal_writestring("[", RGBA(0xe4e4c8));
+	// terminal_writestring((char*)ENV::get("user"), RGBA(0xff6064));
+	// terminal_writestring("@", RGBA(0xff6064));
+	// terminal_writestring((char*)ENV::get("comp-name"), RGBA(0xff6064));
+	// terminal_writestring(" ", RGBA(0xff6064));
+
+	// terminal_writestring("0:", RGBA(0x288acc));
+	// terminal_writestring((char*)ENV::get("cd"), RGBA(0x288acc));
+	
+	// terminal_writestring("] ", RGBA(0xe4e4c8));
+	// update_buffer(false);
+
+	getsn(&kb_buffer[0], 1024);
+
+//	Command::Parse(kb_buffer);
 }

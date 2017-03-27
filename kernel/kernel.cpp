@@ -24,19 +24,16 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
     tss_install();
 
     idt_install();
-
+   // IRQ1
+    keyboard_install();
     // IRQ0
     Timer::initTimer();
-    // Timer::testTimer();
-
-    // IRQ1
-    keyboard_install();
 
     pmm_setup(mb_info, k_phys_start, k_phys_end);
     pg_directory_setup(); // set up the page tables
 
     // ISR130
-    scheduler_init();
+    // scheduler_init();
 
     // void_fn module_one = get_module_funct(mb_info, 0); // should execute our "basic_program.s" file...
     // terminal_printf("module_one address: %x\n", module_one);
@@ -45,5 +42,9 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
 
     terminal_printf("kernel_main address: %x\n", &kernel_main);
 
-    while(true) { }
+    interrupts_enable();
+
+    while(true) { 
+        tty_update();
+    }
 }
