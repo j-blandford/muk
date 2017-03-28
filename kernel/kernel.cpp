@@ -13,6 +13,7 @@
 #include <kernel/drivers/keyboard.hpp>
 
 #include <kernel/proc/scheduler.hpp>
+#include <kernel/proc/process.hpp>
 
 #include <kernel/memory/physical.hpp>
 
@@ -24,25 +25,28 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
     tss_install();
 
     idt_install();
-   // IRQ1
-    keyboard_install();
+
     // IRQ0
     Timer::initTimer();
+    // IRQ1
+    keyboard_install();
 
     pmm_setup(mb_info, k_phys_start, k_phys_end);
-    pg_directory_setup(); // set up the page tables
+    page_directory_t kernel_pd = pg_directory_setup(); // set up the page tables
 
     // ISR130
-    // scheduler_init();
+    scheduler_init();
 
     // void_fn module_one = get_module_funct(mb_info, 0); // should execute our "basic_program.s" file...
     // terminal_printf("module_one address: %x\n", module_one);
     // MAGIC_BREAK;
     // module_one();
 
-    terminal_printf("kernel_main address: %x\n", &kernel_main);
+    // terminal_printf("kernel_main address: %x\n\n", &kernel_main);
 
     interrupts_enable();
+
+    init_kthreads();
 
     while(true) { 
         tty_update();

@@ -128,6 +128,4 @@ static void keyboard_irq1(registers *r) {
 
 void keyboard_install() {
     set_irq_handler(1, (isr_t)&keyboard_irq1); // install the keyboard irq handler
-
-	terminal_printf("kb_buffer: %x\n",&keyboard_buffer);
 }

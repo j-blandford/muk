@@ -100,7 +100,7 @@ void idt_install() {
   }
 
   idt_set_gate(0x80, (uint32_t)isr128, 0x08, 0x8E);
-  //idt_set_gate(0x82, (uint32_t)isr130, 0x08, 0x8E); // SCHEDULE INTERRUPT
+  idt_set_gate(0x82, (uint32_t)isr130, 0x08, 0x8E); // SCHEDULE INTERRUPT
 
   idt_p.limit = sizeof(struct idt_entry) * 256 - 1;
   idt_p.base = (uint32_t)&idt_entries;

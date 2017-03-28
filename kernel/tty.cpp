@@ -116,17 +116,7 @@ void tty_set_cursor_x(size_t x) {
 
 
 void tty_update() {
-	// terminal_writestring("[", RGBA(0xe4e4c8));
-	// terminal_writestring((char*)ENV::get("user"), RGBA(0xff6064));
-	// terminal_writestring("@", RGBA(0xff6064));
-	// terminal_writestring((char*)ENV::get("comp-name"), RGBA(0xff6064));
-	// terminal_writestring(" ", RGBA(0xff6064));
-
-	// terminal_writestring("0:", RGBA(0x288acc));
-	// terminal_writestring((char*)ENV::get("cd"), RGBA(0x288acc));
-	
-	// terminal_writestring("] ", RGBA(0xe4e4c8));
-	// update_buffer(false);
+	terminal_writestring("kernel> ");
 
 	getsn(&kb_buffer[0], 1024);
 

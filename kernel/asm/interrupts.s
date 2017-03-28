@@ -278,9 +278,9 @@ isr128:       cli
               push byte 128
               jmp isr_common_stub
 
-; ; let us have 0x82 as our schedule interrupt
-; global isr130
-; isr130:       cli
-;               push byte 0
-;               push byte 130
-;               jmp isr_common_stub
+; let us have 0x82 as our schedule interrupt
+global isr130
+isr130:       cli
+              push byte 0
+              push byte 130
+              jmp isr_common_stub

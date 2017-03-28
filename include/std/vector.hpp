@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 
-#include <kernel/std.hpp>
+#include <std.hpp>
 
 namespace std {
 	template<class T> 

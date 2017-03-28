@@ -7,17 +7,17 @@
 #include <kernel/timer.hpp>
 
 #include <kernel/proc/scheduler.hpp>
+#include <kernel/proc/thread.hpp>
 
 volatile uint64_t timer_ticks;
 volatile uint32_t timer_tenths;
 
-static void timer_irq0(struct registers * registers) {
+static void timer_irq0(struct registers * r) {
     timer_ticks++;
     timer_tenths++;
 
-    if(timer_tenths > 10) {
-        // __asm__ volatile("int $0x82 \n");
-        // schedule();
+    if(timer_tenths > 2) {
+        schedule_next(r);
 
         timer_tenths = 0;
     }

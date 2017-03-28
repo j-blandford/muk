@@ -1,11 +1,24 @@
 #pragma once
 
+#include <std/vector.hpp>
 #include <kernel/idt.hpp>
-#include <kernel/proc/process.hpp>
+
+using void_fn = void(*)(void);
 
 class Thread {
 public:
-	registers_t reg;
+	registers_t * r;
 	size_t thread_id;
-	Process *proc;
+	void_fn entry_ptr;
+	char *title;
+
+	bool ran;
+
+	Thread() : ran(false), title(new char[255]) {}
 };
+
+extern std::vector<Thread *> thread_list;
+
+void start_thread(char* title);
+
+void init_kthreads();
