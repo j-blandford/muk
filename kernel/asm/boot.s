@@ -6,7 +6,7 @@ MB_VIDEO_MODE equ 1<<2           ; request a video mode
 MB_FLAGS equ (MB_PAGE_ALIGN | MB_MEMORY_INFO | MB_VIDEO_MODE)
 MB_CHECKSUM equ -(MB_HEADER_MAGIC + MB_FLAGS)
 
-STACK_LENGTH equ 32768
+KERNEL_STACK_LENGTH equ 32768
 
 KERNEL_VIRTUAL_OFFSET equ 0xC0000000
 KERNEL_PAGE_NUMBER equ (KERNEL_VIRTUAL_OFFSET >> 22) ; this is what the kernel's offset is in the page directory = 768
@@ -92,8 +92,7 @@ _boot:
     invlpg [0]
 
     add ebx, KERNEL_VIRTUAL_OFFSET ; ebx contains our GRUB pointer, which needs to be a virtualised address
-
-    mov esp, stack               ; setup stack pointer (end of memory area)
+    mov esp, kstack               ; setup stack pointer (end of memory area)
     
     push kernel_phys_end
     push kernel_phys_start
@@ -113,8 +112,8 @@ _boot:
 %include "asm/interrupts.s"
 %include "asm/memory.s"
 
-global stack
+global kstack
 section .bss
     align 16
-    stack:
-        resb STACK_LENGTH
+    kstack:
+        resb KERNEL_STACK_LENGTH

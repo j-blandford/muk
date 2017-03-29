@@ -43,6 +43,7 @@ void start_thread(char* title, void_fn entry) {
 	thread->thread_id = next_tid;
 
 	thread->entry_ptr = entry;
+	thread->eip = (uint32_t)entry;
 
 	thread_list.push_back(thread);
 

@@ -27,3 +27,4 @@ __attribute__((noreturn)) void halt();
 #define BochsBreak() outportl(0x8A00,0x8A00); outportl(0x8A00,0x08AE0);
 
 void BochsConsolePrint(char *s);
+void bcprintf(const char* fmt, ...);

@@ -28,23 +28,41 @@ void set_ip (uintptr_t eip) {
 }
 
 void schedule_next(struct registers * r) {
+	bcprintf("\n>>>>>>>>>>>>>>>>> schedule_next()");
+
+	bcprintf("\ncTask: %d\n", cTask);
+	//thread_list[cTask]->r = r;
+
+	// save the current instruction pointer
+	if(cTask == 0) {
+		if(thread_list[thread_list.size()-1]->ran) {
+			thread_list[thread_list.size()-1]->eip = r->eip;
+			bcprintf("       Setting cTask [%d]->eip=%x\n",thread_list.size()-1,r->eip);
+		}
+			
+	} 
+	else {
+		if(thread_list[cTask-1]->ran) {
+			thread_list[cTask-1]->eip = r->eip;
+			bcprintf("       Setting cTask [%d]->eip=%x\n",cTask-1,r->eip);
+		}
+	}
+	bcprintf("task[-1]->eip: %x\n", r->eip);
+	bcprintf("task[]->eip: %x\n", thread_list[cTask]->eip);
+
+	// set the instruction pointer directly (maybe unsafe.. look into this)
+	r->eip = thread_list[cTask]->eip;
+	thread_list[cTask]->ran = true;
+
+	cTask++;
+
 	if(cTask >= thread_list.size()) {
 		cTask = 0;
 	}
 
-	//MAGIC_BREAK;
+	bcprintf("<<<<<<<<<<<<<<<<< schedule_next()\n");
 
-	// BochsConsolePrintChar( cTask+'0');
-
-	thread_list[cTask]->r = r;
-	thread_list[cTask]->r->eip = (uint32_t)thread_list[cTask]->entry_ptr;
-
-	//	set_ip(thread_list[cTask]->r->eip);
-
-	//	MAGIC_BREAK;
-
-	cTask++;
-
+	MAGIC_BREAK;
 	
 }
 

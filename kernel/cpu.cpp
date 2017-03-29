@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <std.hpp>
 
 #include <kernel/cpu.hpp>
 
@@ -44,4 +45,14 @@ void BochsConsolePrint(char *s){
         outportb(0xe9 ,*s);
         s++;
     } while( *s != 0);
+}
+
+void bcprintf(const char* fmt, ...) {
+	va_list parameters;
+	char temp_buffer[80] = {0};
+
+	va_start(parameters, fmt);
+	vsprintf(temp_buffer, fmt, parameters);
+	BochsConsolePrint((char*)temp_buffer);
+	va_end(parameters);
 }
