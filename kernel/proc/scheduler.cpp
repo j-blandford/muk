@@ -28,18 +28,7 @@ static void task_idle() {
 		__asm__ volatile("sti;hlt");
 }
 
-void set_ip (uintptr_t eip) {
-	__asm__ __volatile__ ( "jmp %0 \n" : : "r"(eip) );
-}
-
 void schedule_next(struct registers * r) {
-	
-	MAGIC_BREAK;
-
-	bcprintf("\n>>>>>>>>>>>>>>>>> schedule_next()");
-
-	bcprintf("\ncTask: %d (eip=%x)\n", cTask, r->eip);
-
 	if(!init_base_r) {
 		memcpy(&base_reg, r, sizeof(registers));
 		init_base_r = true;
@@ -48,37 +37,26 @@ void schedule_next(struct registers * r) {
 	if(!thread_list[cTask]->ran) {
 		memcpy(&thread_list[cTask]->state_reg, &base_reg, sizeof(registers));
 		thread_list[cTask]->state_reg.eip = (uint32_t)thread_list[cTask]->entry_ptr;
+		thread_list[cTask]->ran = true;
 	}
-
-	bcprintf("task[-1]->eip: %x\n", r->eip);
-	bcprintf("task[]->eip: %x\n", thread_list[cTask]->state_reg.eip);
 	
-	// Set the general process registers
-	r->eax = thread_list[cTask]->state_reg.eax;
-	r->edx = thread_list[cTask]->state_reg.edx;
+	int lastThread = cTask - 1;
 
-	// we also need to set eflags for loop continuations
-	r->eflags = thread_list[cTask]->state_reg.eflags;
+	if(cTask == 0)
+		lastThread = thread_list.size()-1;
 
-	// set the instruction pointers directly (maybe unsafe.. look into this)
-	r->eip = thread_list[cTask]->state_reg.eip;
-	r->esp = thread_list[cTask]->state_reg.esp;
+	// save the previous threads state
+	memcpy(&thread_list[lastThread]->state_reg, r, sizeof(registers));
 
-	thread_list[cTask]->ran = true;
-
-	// LOOK HERE:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	// try set_ip so we dont corrupt the instrunction pointer!!!!
-	// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	// set the registers from the current thread's saved state
+	memcpy(r, &thread_list[cTask]->state_reg, sizeof(registers));
 
 	cTask++;
 
+	// Loop
 	if(cTask >= thread_list.size()) {
 		cTask = 0;
 	}
-
-	bcprintf("<<<<<<<<<<<<<<<<< schedule_next()\n");
-
-	//MAGIC_BREAK;
 	
 }
 

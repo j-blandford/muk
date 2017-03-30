@@ -20,6 +20,7 @@ static int next_tid = 1;
 
 static void test_thread() {
 	//MAGIC_BREAK;
+	BochsConsolePrintChar('A');
 	for(;;) {
 		BochsConsolePrintChar('a');
 	}
@@ -28,6 +29,7 @@ static void test_thread() {
 
 static void test_thread2() {
 	//MAGIC_BREAK;
+	BochsConsolePrintChar('B');
 	for(;;) {
 		BochsConsolePrintChar('b');
 	}
