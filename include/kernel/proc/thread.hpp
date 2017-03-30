@@ -16,12 +16,12 @@ public:
 	//registers_t * r;
 	size_t thread_id;
 	char *title;
-	
+
 	void_fn entry_ptr;
-	uint32_t eip;
+	registers state_reg;
 	bool ran;
 
-	Thread() : title(new char[255]), eip(NULL), ran(false) {}
+	Thread() : title(new char[255]), ran(false) {}
 };
 
 extern std::vector<Thread *> thread_list;

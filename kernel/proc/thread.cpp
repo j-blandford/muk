@@ -19,6 +19,7 @@ std::vector<Thread *> thread_list = std::vector<Thread *>();
 static int next_tid = 1;
 
 static void test_thread() {
+	//MAGIC_BREAK;
 	for(;;) {
 		BochsConsolePrintChar('a');
 	}
@@ -26,6 +27,7 @@ static void test_thread() {
 }
 
 static void test_thread2() {
+	//MAGIC_BREAK;
 	for(;;) {
 		BochsConsolePrintChar('b');
 	}
@@ -43,7 +45,7 @@ void start_thread(char* title, void_fn entry) {
 	thread->thread_id = next_tid;
 
 	thread->entry_ptr = entry;
-	thread->eip = (uint32_t)entry;
+	thread->state_reg.eip = (uint32_t)entry;
 
 	thread_list.push_back(thread);
 
