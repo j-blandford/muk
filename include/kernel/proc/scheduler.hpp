@@ -6,6 +6,16 @@
 
 #define set_kstack(stack) tss.esp0 = (uint32_t)(stack)
 
-void set_ip(uintptr_t eip);
-void schedule_next(struct registers * r);
-void scheduler_init();
+class Scheduler {
+	static int task_idx;
+	static registers base_state;
+	static bool has_initialised;
+	static bool running;
+	
+public:
+	static void next(registers* r);
+	static bool pause();
+	static bool resume();
+	
+	static void init();
+};

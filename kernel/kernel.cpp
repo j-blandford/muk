@@ -35,7 +35,7 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
     page_directory_t kernel_pd = pg_directory_setup(); // set up the page tables
 
     // ISR130
-    scheduler_init();
+    // scheduler_init();
 
     // void_fn module_one = get_module_funct(mb_info, 0); // should execute our "basic_program.s" file...
     // terminal_printf("module_one address: %x\n", module_one);
@@ -48,7 +48,7 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
 
     init_kthreads();
 
-    while(true) { 
-        tty_update();
-    }
+    // This does nothing apart from stop our kmain function from returning
+    // Every process is now a thread (running almost asynchronously)
+    while(true) { }
 }

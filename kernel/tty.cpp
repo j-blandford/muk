@@ -61,11 +61,11 @@ void terminal_putchar(const char c) {
 		return;
 	}
 
-	// if(c == '\t') {
-	// 	// support tabs
-	// 	terminal_column += TAB_WIDTH - terminal_column % TAB_WIDTH;
-	// 	return;
-	// }
+	if(c == '\t') {
+		// support tabs
+		terminal_column += TAB_WIDTH - terminal_column % TAB_WIDTH;
+		return;
+	}
 
 	terminal_putentryat(c, terminal_column, terminal_row);
 	if (++terminal_column == VGA_WIDTH) {
@@ -119,6 +119,4 @@ void tty_update() {
 	terminal_writestring("kernel> ");
 
 	getsn(&kb_buffer[0], 1024);
-
-//	Command::Parse(kb_buffer);
 }

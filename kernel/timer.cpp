@@ -16,8 +16,8 @@ static void timer_irq0(struct registers * r) {
     timer_ticks++;
     timer_tenths++;
 
-    if(timer_tenths > 2) {
-        schedule_next(r);
+    if(timer_tenths > 10) {
+        Scheduler::next(r);
 
         timer_tenths = 0;
     }

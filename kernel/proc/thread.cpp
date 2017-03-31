@@ -19,22 +19,20 @@ std::vector<Thread *> thread_list = std::vector<Thread *>();
 static int next_tid = 1;
 
 static void test_thread() {
-	//MAGIC_BREAK;
-	BochsConsolePrintChar('A');
 	for(;;) {
 		BochsConsolePrintChar('a');
 	}
 		//terminal_printf("1");
 }
 
-static void test_thread2() {
-	//MAGIC_BREAK;
-	BochsConsolePrintChar('B');
-	for(;;) {
-		BochsConsolePrintChar('b');
-	}
-		//terminal_printf("2");
-}
+// static void test_thread2() {
+// 	//MAGIC_BREAK;
+// 	BochsConsolePrintChar('B');
+// 	for(;;) {
+// 		BochsConsolePrintChar('b');
+// 	}
+// 		//terminal_printf("2");
+// }
 
 /**
 *  This is the hub of the process list. For the moment, this function is only called
@@ -55,8 +53,8 @@ void start_thread(char* title, void_fn entry) {
 }
 
 void init_kthreads() {
+	start_thread("tty_update", &tty_update);
 	start_thread("test", &test_thread);
-	start_thread("test2", &test_thread2);
 
 	terminal_writestring("Kernel Threads:\n");
 
