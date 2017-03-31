@@ -56,11 +56,4 @@ void start_thread(char* title, void_fn entry) {
 void init_kthreads() {
 	start_thread("tty_update", &tty_update);
 	start_thread("test", &test_thread);
-
-	terminal_writestring("Kernel Threads:\n");
-
-	for(auto x : thread_list) {
-		terminal_printf("  > '%s' @ %x\n", x->title, &x->entry_ptr);
-	}
-	//proc_list[0]
 }

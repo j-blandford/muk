@@ -52,6 +52,8 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
 
     init_kthreads();
 
+    terminal_writestring("\n");
+
     // This does nothing apart from stop our kmain function from returning
     // Every process is now a thread (running almost asynchronously)
     while(true) { }

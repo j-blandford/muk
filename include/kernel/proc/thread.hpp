@@ -15,13 +15,14 @@ class Thread {
 public:
 	//registers_t * r;
 	size_t thread_id;
+	size_t proc_id;
 	char *title;
 
 	void_fn entry_ptr;
 	registers state_reg;
 	bool ran;
 
-	Thread() : title(new char[255]), ran(false) {}
+	Thread() : proc_id(1), title(new char[255]), ran(false) {}
 };
 
 extern std::vector<Thread *> thread_list;
