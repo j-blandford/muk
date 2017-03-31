@@ -17,6 +17,8 @@
 
 #include <kernel/memory/physical.hpp>
 
+#include <kernel/user/env.hpp>
+
 extern "C"
 void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_phys_end) {
     init_tty();
@@ -33,6 +35,8 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
 
     pmm_setup(mb_info, k_phys_start, k_phys_end);
     page_directory_t kernel_pd = pg_directory_setup(); // set up the page tables
+
+    ENV::setup();
 
     // ISR130
     // scheduler_init();

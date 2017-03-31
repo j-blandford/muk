@@ -67,6 +67,10 @@ void Scheduler::next(registers * r) {
 	}
 }
 
+// this is used to allow threads to perform blocking I/O calculations.
+// it stops schedule_next from switching context to another thread until
+// resume() is called. 
+// Note: this can HANG THE KERNEL if used improperly!!!!!
 bool Scheduler::pause() {
 	if(running) {
 		running = false;

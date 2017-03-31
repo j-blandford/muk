@@ -5,8 +5,11 @@
 
 #include <kernel/cpu.hpp>
 #include <kernel/tty.hpp>
+#include <kernel/command.hpp>
 
 #include <kernel/drivers/keyboard.hpp>
+
+#include <kernel/user/env.hpp>
 
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
@@ -116,7 +119,22 @@ void tty_set_cursor_x(size_t x) {
 
 
 void tty_update() {
-	terminal_writestring("kernel> ");
+	for(;;) {
+		//BochsConsolePrint(">>>>>>>>>>>>>>>>>>>>> tty_update\n");
+		terminal_writestring("[");
+		terminal_writestring((char*)ENV::get("user"));
+		terminal_writestring("@");
+		terminal_writestring((char*)ENV::get("comp-name"));
+		terminal_writestring(" ");
 
-	getsn(&kb_buffer[0], 1024);
+		terminal_writestring("0:");
+		terminal_writestring((char*)ENV::get("cd"));
+		
+		terminal_writestring("] ");
+
+		getsn(&kb_buffer[0], 1024);
+
+		Command::Parse(kb_buffer);
+		//BochsConsolePrint("<<<<<<<<<<<<<<<<<<<<<<<<< tty_update\n");
+	}
 }

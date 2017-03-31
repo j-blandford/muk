@@ -20,7 +20,8 @@ static int next_tid = 1;
 
 static void test_thread() {
 	for(;;) {
-		BochsConsolePrintChar('a');
+		bool hello = true;
+		//BochsConsolePrintChar('a');
 	}
 		//terminal_printf("1");
 }
