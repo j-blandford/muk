@@ -2,6 +2,8 @@
 
 A very basic microkernel. This isn't meant to be a full-featured kernel+OS, but as a test bed for understanding and implementing task scheduling (with daemon processes) and using ramdisks.
 
+![muk](https://raw.githubusercontent.com/prasoc/muk/master/pic-1.png)
+
 ## Current Features
 * Written in C++ and a small amount of ASM
     * A very fragile, tiny version of libstd++ is included
