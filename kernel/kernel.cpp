@@ -9,14 +9,11 @@
 #include <kernel/gdt.hpp>
 #include <kernel/idt.hpp>
 #include <kernel/timer.hpp>
-
 #include <kernel/drivers/keyboard.hpp>
-
+#include <kernel/fs/fat16.hpp>
 #include <kernel/proc/scheduler.hpp>
 #include <kernel/proc/process.hpp>
-
 #include <kernel/memory/physical.hpp>
-
 #include <kernel/user/env.hpp>
 
 extern "C"
@@ -53,6 +50,8 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
     init_kthreads();
 
     terminal_writestring("\n");
+
+    FAT16* main_hdd = new FAT16(0,0);
 
     // This does nothing apart from stop our kmain function from returning
     // Every process is now a thread (running almost asynchronously)

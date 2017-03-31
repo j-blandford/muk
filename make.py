@@ -17,7 +17,7 @@ for opt in sys.argv:
 
     if opt == "run":
         # run with Qemu
-        call(["qemu-system-i386 -s -cdrom muk.iso -m 32 -monitor stdio -vga cirrus"], shell=True)
+        call(["qemu-system-i386 -s -cdrom muk.iso -m 32 -drive file=disk.img,format=raw -boot d -monitor stdio -vga cirrus"], shell=True)
     
     if opt == "bochs":
         call(["bochs"], shell=True)

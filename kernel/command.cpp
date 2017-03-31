@@ -18,7 +18,6 @@ static void ps_p(int proc_id) {
 static void ps(std::vector<string>  args) {
 	terminal_writestring("PID\tTID\tTIME\tSTR\n");
 
-
 	for(int i = 1; i < args.size(); i++) {
 		if(strncmp(args[i], "-p", 2) == 0) {
 			ps_p(atoi((char*)args[i+1]));
