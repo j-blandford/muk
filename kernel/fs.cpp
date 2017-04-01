@@ -1,10 +1,11 @@
 #include <kernel/fs.hpp>
+#include <kernel/fs/fat16.hpp>
 
 namespace Filesystem {
-	std::vector<FAT16 *> devices = std::vector<FAT16 *>();
+	std::vector<IDevice*> devices = std::vector<IDevice*>();
 
 	void initialise() {
-		Filesystem::devices.push_back(new FAT16(0,0));
+		devices.push_back(new FAT16(0,0));
 	}
 }
 

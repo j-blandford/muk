@@ -3,9 +3,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define interrupts_disable() __asm__ __volatile__ ("cli")
-#define interrupts_enable() __asm__ __volatile__ ("sti")
-
+inline void interrupts_disable() {
+	__asm__ __volatile__ ("cli");
+}
+inline void interrupts_enable() {
+	__asm__ __volatile__ ("sti");
+}
 
 uint8_t inportb (uint16_t port);
 void outportb (uint16_t port, uint8_t data);
@@ -22,9 +25,15 @@ __attribute__((noreturn)) void halt();
 #define MAGIC_BREAK asm volatile ("xchg %bx, %bx;");
 
 //outputs a character to the debug console
-#define BochsConsolePrintChar(c) outportb(0xe9, c)
+inline void BochsConsolePrintChar(char c) {
+	outportb(0xe9, (int)c);
+}
+
 //stops simulation and breaks into the debug console
-#define BochsBreak() outportl(0x8A00,0x8A00); outportl(0x8A00,0x08AE0);
+inline void BochsBreak() {
+	outportl(0x8A00,0x8A00); 
+	outportl(0x8A00,0x08AE0);
+} 
 
 void BochsConsolePrint(char *s);
 void bcprintf(const char* fmt, ...);

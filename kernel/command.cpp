@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <kernel/command.hpp>
+#include <kernel/fs.hpp>
 
 // this function does NOT belong here - TODO create an extendable method for commands
 static void ps_p(int proc_id) {
@@ -15,6 +16,31 @@ static void ps(std::vector<string>  args) {
 		if(strncmp(args[i], "-p", 2) == 0) {
 			ps_p(atoi((char*)args[i+1]));
 		}
+	}
+}
+
+static void ls(std::vector<string> args) {
+	std::vector<Filesystem::DirectoryEntry> dir = Filesystem::devices[0]->readDirectory(512);
+
+	//terminal_writestring("PID\tTID\tTIME\tSTR\n");
+
+	for(auto d : dir) {
+		char* fileType = new char[4];
+
+		if(d.attributes == 0x20) {
+			strncpy(fileType, "FILE", 4);
+		} 
+		else {
+			strncpy(fileType, "DIR", 3);
+		}
+		
+		terminal_printf("%s ", d.name);
+
+		if(strlen(d.name) < 11) {
+			terminal_writestring("\t");
+		}
+
+		terminal_printf("\t %s @ %x\n", fileType, d.location);
 	}
 }
 
@@ -44,46 +70,7 @@ void Command::Parse(char * buffer) {
 	}
 
 	else if(strncmp(tokens[0], "ls", 2) == 0) {
-		// string currentPath;
-
-		// // Is this an absolute or relative path? 
-		// // we need to add the current working directory if it's relative
-		// if(tokens[1][0] == '/') {
-		// 	// absolute path, do nothing to it :)
-		// 	currentPath = tokens[1];
-		// } 
-		// else {
-		// 	// Relative path
-		// 	currentPath = ENV::get("cd");
-		// 	currentPath += tokens[1];
-		// 	currentPath += '/';
-		// }
-
-		// std::vector<Filesystems::DirectoryEntry> dir = ATA::getDirectoryPath(0, currentPath);
-
-		// for(auto it = dir.begin(); it != dir.end(); it++) {
-		// 	char* fileType = new char[4];
-		// 	RGBA col;
-
-		// 	if((*it).attr == Filesystems::FATAttributes::shortNameFile) {
-		// 		strncpy(fileType, "FILE", 4);
-		// 		col = RGBA(0xFFFFFF);
-		// 	} 
-		// 	else {
-		// 		strncpy(fileType, "DIR", 3);
-		// 		col = RGBA(0xc3e88d);
-		// 	}
-			
-		// 	terminal_printf_rgba("%s ", col, (*it).name);
-
-		// 	if(strlen((*it).name) < 11) {
-		// 		terminal_writestring("\t");
-		// 	}
-
-		// 	terminal_printf_rgba("\t %s @ %x\n", col, fileType, (*it).location);
-		// }
-
-		// update_buffer(false);
+		ls(tokens);
 	}
 
 	else if(strncmp(tokens[0], "cd", 2) == 0) {
