@@ -1,11 +1,7 @@
 #pragma once
 
-#include <stddef.h>
-#include <stdint.h>
-
-#include <std.hpp>
-
-#include <kernel/tty.hpp>
+#include <kernel/cpu.hpp>
+#include <kernel/memory/alloc.hpp>
 #include <kernel/drivers/ata.hpp>
 
 typedef struct fat_header {
@@ -35,9 +31,9 @@ public:
 		device = new ATA(bus, drive);
 
 		if(!initialiseDevice()) {
-			terminal_writestring("[FAT16] Device not recognised.");
+			terminal_writestring("[FAT16] Device not recognised.\n");
 		} else {
-			terminal_writestring("[FAT16] Verified FAT header.");
+			terminal_writestring("[FAT16] Verified FAT header.\n");
 		}
 	}
 	~FAT16() { }

@@ -13,12 +13,11 @@ public:
     pair(char* key, string value) : key(key), value(value) { }
 };
 
-class ENV {
-public:
-    static std::vector<pair> environment;
+namespace ENV {
+    extern std::vector<pair> environment;
 
-    static string get(char* envVar);
-    static void set(string envVar, string envVal);
+    string get(char* envVar);
+    void set(string envVar, string envVal);
     
-    static void setup();
+    void initialise();
 };

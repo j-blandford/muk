@@ -9,6 +9,7 @@
 #include <kernel/gdt.hpp>
 #include <kernel/idt.hpp>
 #include <kernel/timer.hpp>
+#include <kernel/fs.hpp>
 #include <kernel/drivers/keyboard.hpp>
 #include <kernel/fs/fat16.hpp>
 #include <kernel/proc/scheduler.hpp>
@@ -22,18 +23,17 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
 
     gdt_install();
     tss_install();
-
     idt_install();
+
+    pmm_setup(mb_info, k_phys_start, k_phys_end);
+    page_directory_t kernel_pd = pg_directory_setup(); // set up the page tables
 
     // IRQ0
     Timer::initTimer();
     // IRQ1
     keyboard_install();
 
-    pmm_setup(mb_info, k_phys_start, k_phys_end);
-    page_directory_t kernel_pd = pg_directory_setup(); // set up the page tables
-
-    ENV::setup();
+    ENV::initialise();
 
     // ISR130
     // scheduler_init();
@@ -43,16 +43,13 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
     // MAGIC_BREAK;
     // module_one();
 
-    // terminal_printf("kernel_main address: %x\n\n", &kernel_main);
-
     interrupts_enable();
 
     init_kthreads();
 
+    Filesystem::initialise();
+
     terminal_writestring("\n");
-
-    FAT16* main_hdd = new FAT16(0,0);
-
     // This does nothing apart from stop our kmain function from returning
     // Every process is now a thread (running almost asynchronously)
     while(true) { }

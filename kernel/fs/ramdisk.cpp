@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <std.hpp>
 
-#include <kernel/fs.hpp>
 #include <kernel/fs/ramdisk.hpp>
 
 #include <kernel/memory/alloc.hpp>

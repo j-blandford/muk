@@ -5,6 +5,10 @@
 #include <std.hpp>
 #include <std/vector.hpp>
 
+#include <kernel/tty.hpp>
+#include <kernel/user/env.hpp>
+#include <kernel/proc/thread.hpp>
+
 class Command {
 public:
     static std::vector<string> split(char* command);

@@ -3,8 +3,19 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <std.hpp>
+#include <std/vector.hpp>
 
+#include <kernel/fs/fat16.hpp>
 #include <kernel/memory/alloc.hpp>
+
+namespace Filesystem {
+	extern std::vector<FAT16 *> devices;
+
+	void initialise();
+}
+
+
+// VVVVVVVVVVVV NEED TO INTEGRATE THIS C CODE VVVVVVVVVVVVVVVVVV
 
 // This is a generic interface for all filesystem devices. To add your own device, just fulfill the 4 function pointers and you're set!
 struct fs_device_t;

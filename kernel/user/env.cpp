@@ -29,7 +29,7 @@ void ENV::set(string envVar, string envVal) {
 	environment.push_back(pair(envVar, envVal));
 }
 
-void ENV::setup() {
+void ENV::initialise() {
 	ENV::set("cd", "/");
 	ENV::set("user", "james");
 	ENV::set("comp-name", "localhost");

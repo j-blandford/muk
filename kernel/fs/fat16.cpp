@@ -1,12 +1,4 @@
-#include <stddef.h>
-#include <std.hpp>
-#include <kernel/tty.hpp>
-#include <kernel/cpu.hpp>
-#include <kernel/timer.hpp>
-#include <kernel/drivers/ata.hpp>
 #include <kernel/fs/fat16.hpp>
-#include <kernel/memory/alloc.hpp>
-
 
 // this function gets called in the object constructor and verifies
 // that the device's header is actually FAT16-compliant.
@@ -35,6 +27,8 @@ bool FAT16::initialiseDevice() {
 					| (*(header_bytes + 40*sizeof(char)) << 8) 
 					| (*(header_bytes + 41*sizeof(char)) << 16) 
 					| (*(header_bytes + 42*sizeof(char)) << 24);
+
+	
 
 	terminal_printf("\tVolume serial: %x\n", volume_serial);
 

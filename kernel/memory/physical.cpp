@@ -1,7 +1,3 @@
-#include <stddef.h>
-
-#include <kernel/multiboot.hpp>
-#include <kernel/tty.hpp>
 #include <kernel/memory/physical.hpp>
 
 #define PAGE_DIRECTORY_OFFSET_BITS 10

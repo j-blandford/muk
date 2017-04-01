@@ -1,10 +1,11 @@
 #pragma once
 
 #include <stddef.h>
-#include <stdint.h>
-
 #include <std.hpp>
 
+#include <kernel/cpu.hpp>
+#include <kernel/timer.hpp>
+#include <kernel/tty.hpp>
 
 #define ATA_BLOCKSIZE 512
 
@@ -50,23 +51,20 @@ class ATA {
 	int drive;
 public: 
 
-	ATA(int bus, int drive) : bus(bus), drive(drive) { }
+	ATA(int bus, int drive) : bus(bus), drive(drive) { 
+		initialise();
+	}
 	~ATA() { }
 
 	// programmed i/o mode (all ATA devices support this)
-	// static uint16_t * readPIO(int bus, int drive, int size);
-	// static void writePIO(int bus, int drive, uint16_t * buffer, int size);
-	// static bool initializeDevice(int bus, int drive);
-	// static void resetATA(int bus, int drive);
+	uint16_t * readPIO(int size);
+	void writePIO(uint16_t * buffer, int size);
+
+	void reset();
+	void initialise();
 
 	bool prepare(int command, size_t num_blocks, int offset); // prepares the device for a command's data packet
 	bool read(uint16_t** buffer, size_t num_blocks, int offset);
 	bool read(uint8_t** buffer, size_t num_blocks, int offset);
 	bool wait(int mask, int waitForState);
-
-	// static void findATA();
-	// static std::vector<Filesystems::DirectoryEntry> getDirectory(int deviceIndex, size_t sectorIndex);
-	// static std::vector<Filesystems::DirectoryEntry> getDirectoryPath(int deviceIndex, char * path);
-	// // todo: ATAPI
-	// // todo: SCSI (maybe...)
 };

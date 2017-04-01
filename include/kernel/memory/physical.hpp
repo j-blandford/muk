@@ -1,6 +1,10 @@
 #pragma once
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include <kernel/multiboot.hpp>
+#include <kernel/tty.hpp>
 
 #define PMM_PAGE_TABLES 0xFFC00000
 #define PMM_PAGE_DIR 0xFFFFF000
