@@ -3,7 +3,7 @@
 
 #include <std.hpp>
 #include <std/string.hpp>
-
+#include <kernel/cpu.hpp>
 #include <kernel/memory/alloc.hpp>
 
 

@@ -19,12 +19,6 @@ namespace Filesystem {
 		void printFAT();
 	};
 
-	enum FATAttributes : uint8_t {
-		noEntry = 0x00,
-		shortNameFile = 0x20,
-		shortName = 0x10,
-		longName = 0x0F
-	};
 
 	struct FATHeader {
 		unsigned short sectorSize;     // sector size, usually 512
@@ -58,7 +52,7 @@ namespace Filesystem {
 			} 
 			else {
 				terminal_writestring("[FAT16] Verified FAT header.\n");
-				
+				this->getFAT();
 			}
 		}
 		~FAT16() { }

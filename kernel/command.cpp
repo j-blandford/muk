@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <kernel/cpu.hpp>
 #include <kernel/command.hpp>
 #include <kernel/fs.hpp>
 
@@ -24,23 +25,23 @@ static void ls(std::vector<string> args) {
 
 	//terminal_writestring("PID\tTID\tTIME\tSTR\n");
 
-	for(auto d : dir) {
-		char* fileType = new char[4];
+	for(auto it = dir.begin(); it != dir.end(); it++) {
+		char* fileType = new char[5];
 
-		if(d.attributes == 0x20) {
-			strncpy(fileType, "FILE", 4);
+		if((*it).attributes == Filesystem::FATAttributes::shortNameFile) {
+			strncpy(fileType, "FILE", 5);
 		} 
 		else {
-			strncpy(fileType, "DIR", 3);
+			strncpy(fileType, "DIR", 4);
 		}
 		
-		terminal_printf("%s ", d.name);
+		terminal_printf("%s ", (*it).name);
 
-		if(strlen(d.name) < 11) {
+		if(strlen((*it).name) < 11) {
 			terminal_writestring("\t");
 		}
 
-		terminal_printf("\t %s @ %x\n", fileType, d.location);
+		terminal_printf("\t %s @ %x\n", fileType, (*it).location);
 	}
 }
 

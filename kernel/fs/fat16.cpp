@@ -86,7 +86,7 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigne
 	while(index < n_sectors*ATA_BLOCKSIZE) {
 		DirectoryEntry* dir_entry = new DirectoryEntry();
 
-		dir_entry->attributes = dir_bytes[index+11];
+		dir_entry->attributes = static_cast<FATAttributes>(dir_bytes[index+11]);
 
 		if(dir_entry->attributes == FATAttributes::shortName || dir_entry->attributes == FATAttributes::shortNameFile) {
 			// Normal short name (8+3) structure
@@ -110,32 +110,35 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigne
 					}
 
 					dir_entry->name[length] = tolower(dirChar);
+
 					length++;
 				} 
 				else {
 					addSeperator = true;
 				}
 			}
+
+			dir_entry->name[length] = '\0';
 		} 
-		else if(dir_entry->attributes == FATAttributes::longName) {
-			// We have found a LONG FOLDERNAME
-			char name[32];
-			int length = 0;
+		// else if(dir_entry->attributes == FATAttributes::longName) {
+		// 	// We have found a LONG FOLDERNAME
+		// 	char name[32];
+		// 	int length = 0;
 
-			// Our foldername is embedded inside 32-bytes. We have to extract it out the long way
-			for(size_t j = 0; j <= 32; j++) {
-				// our bitmask contains a series of 0 and 1s which allow us to extract the name correctly
-				if(bitMask.test(31-j) && dir_bytes[index+j] != 0xFF && dir_bytes[index+j] != 0x00) {
-					dir_entry->name[length] = dir_bytes[index+j];
-					length++;
-				}
-			}
+		// 	// Our foldername is embedded inside 32-bytes. We have to extract it out the long way
+		// 	for(size_t j = 0; j <= 32; j++) {
+		// 		// our bitmask contains a series of 0 and 1s which allow us to extract the name correctly
+		// 		if(bitMask.test(31-j) && dir_bytes[index+j] != 0xFF && dir_bytes[index+j] != 0x00) {
+		// 			dir_entry->name[length] = dir_bytes[index+j];
+		// 			length++;
+		// 		}
+		// 	}
 			
-			// now we grab some details which are located in the short-name entry...
-			index += 32; 
+		// 	// now we grab some details which are located in the short-name entry...
+		// 	index += 32; 
 
-			dir_entry->attributes = dir_bytes[index+11];
-		}
+		// 	dir_entry->attributes = dir_bytes[index+11];
+		// }
 		else if(dir_entry->attributes == FATAttributes::noEntry) {
 			// there isn't a file here, so just skip to the next index entry
 			index += 32;
@@ -143,7 +146,6 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigne
 		}
 
 		dir.push_back(*dir_entry);
-
 		index += 32;
 	}
 

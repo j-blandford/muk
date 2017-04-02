@@ -8,13 +8,19 @@
 #include <kernel/memory/alloc.hpp>
 
 namespace Filesystem {
-    
+	enum FATAttributes : uint8_t {
+		noEntry = 0x00,
+		shortNameFile = 0x20,
+		shortName = 0x10,
+		longName = 0x0F
+	};
+
     class DirectoryEntry {
 	public:
 		char* name;
 		char* altName;     // used in FAT16 for the long-hand name
 
-		short attributes;
+		FATAttributes attributes;
 
 		// TODO: Create a Timestamp class
 		short mod_time;      // modification time (H:m:s)
@@ -24,7 +30,7 @@ namespace Filesystem {
 
 		short location;     // generic "cluster" location
 
-		DirectoryEntry() : name(new char[50]), location(0)  { }
+		DirectoryEntry() : name(new char[11]), location(0)  { memset(name, 0, 11); }
 		DirectoryEntry(char* name) : location(0) { }
 		~DirectoryEntry() {
 			delete name;
