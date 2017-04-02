@@ -6,9 +6,8 @@
 #include <kernel/cpu.hpp>
 #include <kernel/tty.hpp>
 #include <kernel/command.hpp>
-
+#include <kernel/memory/alloc.hpp>
 #include <kernel/drivers/keyboard.hpp>
-
 #include <kernel/user/env.hpp>
 
 static const size_t VGA_WIDTH = 80;
@@ -61,7 +60,13 @@ void terminal_putchar(const char c) {
 	if(c == '\n') {
 		terminal_column = 0;
 		terminal_row++;
+
 		return;
+	}
+
+
+	if(terminal_row == VGA_HEIGHT) {
+		terminal_scrollup();
 	}
 
 	if(c == '\t') {
@@ -89,6 +94,26 @@ void terminal_printf(const char* fmt, ...) {
 	vsprintf(temp_buffer, fmt, parameters);
 	terminal_writestring((char*)temp_buffer);
 	va_end(parameters);
+}
+
+void terminal_clearline(size_t y) {
+	for (size_t x = 0; x < VGA_WIDTH; x++) {
+		const size_t index = y * VGA_WIDTH + x;
+		terminal_buffer[index] = vga_entry(' ', terminal_color);
+	}
+}
+
+void terminal_scrollup() {
+	terminal_row = VGA_HEIGHT-1;
+
+	for(size_t y = 1; y <= VGA_HEIGHT; y++) {
+		int dest_idx = (y-1)*VGA_WIDTH;
+		int src_idx = (y)*VGA_WIDTH;
+
+		terminal_clearline(y-1);
+
+		memcpy(&terminal_buffer[dest_idx], &terminal_buffer[src_idx], VGA_WIDTH * sizeof(uint16_t));
+	}
 }
 
 void update_cursor(int row, int col) {
