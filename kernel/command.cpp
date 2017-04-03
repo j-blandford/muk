@@ -21,7 +21,24 @@ static void ps(std::vector<string>  args) {
 }
 
 static void ls(std::vector<string> args) {
-	std::vector<Filesystem::DirectoryEntry> dir = Filesystem::devices[0]->readDirectory(512);
+	//						this zero should be "ENV::get(drive)"    VV 
+
+	string currentPath;
+
+	// Is this an absolute or relative path? 
+	// we need to add the current working directory if it's relative
+	if(args[1][0] == '/') {
+		// absolute path, do nothing to it :)
+		currentPath = args[1];
+	} 
+	else {
+		// Relative path
+		currentPath = ENV::get("cd");
+		currentPath += args[1];
+		currentPath += '/';
+	}
+
+	std::vector<Filesystem::DirectoryEntry> dir = Filesystem::devices[0]->readDirectory(currentPath);
 
 	//terminal_writestring("PID\tTID\tTIME\tSTR\n");
 

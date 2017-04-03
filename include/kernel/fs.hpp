@@ -30,7 +30,7 @@ namespace Filesystem {
 
 		short location;     // generic "cluster" location
 
-		DirectoryEntry() : name(new char[11]), location(0)  { memset(name, 0, 11); }
+		DirectoryEntry() : name(new char[32]), location(0)  { memset(name, 0, 11); }
 		DirectoryEntry(char* name) : location(0) { }
 		~DirectoryEntry() {
 			delete name;
@@ -45,6 +45,7 @@ namespace Filesystem {
         virtual bool open() = 0;
         virtual void read(uint16_t** buffer, size_t numBytes, size_t offset) = 0;
         virtual std::vector<DirectoryEntry> readDirectory(unsigned int sectorIndex) = 0;
+        virtual std::vector<DirectoryEntry> readDirectory(char* path) = 0;
     };
 
 	extern std::vector<IDevice*> devices;

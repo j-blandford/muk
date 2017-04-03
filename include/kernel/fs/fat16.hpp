@@ -60,7 +60,9 @@ namespace Filesystem {
 		bool open();
 		void read(uint16_t** buffer, size_t numBytes, size_t offset);
 		void getFAT();
+		std::vector<int> walkSectors(uint16_t startSector);
 		std::vector<DirectoryEntry> readDirectory(unsigned int sectorIndex);
+		std::vector<DirectoryEntry> readDirectory(char* path);
 	};
 
 

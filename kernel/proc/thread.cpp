@@ -36,13 +36,13 @@ static void test_thread() {
 // }
 
 /**
-*  This is the hub of the process list. For the moment, this function is only called
-* 	ONCE - for the "kernel" process. Every new thread is attached to this initial
+*  This is the hub of the process list. For the moment, this function only adds 
+*  threads to the "kernel" process. Every new thread is attached to this initial
 *   process for the time being.
 */
 void start_thread(char* title, void_fn entry) {
 	Thread *thread = new Thread();
-	memcpy(thread->title, title, strlen(title));
+	memcpy(thread->title, title, strlen(title)+1);
 	thread->thread_id = next_tid;
 
 	thread->entry_ptr = entry;
