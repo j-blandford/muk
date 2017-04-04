@@ -27,6 +27,6 @@ public:
 
 extern std::vector<Thread *> thread_list;
 
-void start_thread(char* title);
+void start_thread(char* title, void_fn entry);
 
 void init_kthreads();

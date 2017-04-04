@@ -3,6 +3,7 @@
 #include <stddef.h>
 
 #include <std.hpp>
+#include <kernel/cpu.hpp>
 
 namespace std {
 	template<class T> 
@@ -45,7 +46,7 @@ namespace std {
 		void clear();
 		void resize(size_t size);
 		void reserve(size_t capacity);
-		void push_back(const T value);
+		void push_back(T value);
 		void pop_back();
 
 		size_t capacity() const;
@@ -77,7 +78,7 @@ namespace std {
 	vector<T>::~vector() { }
 
 	template<class T> 
-	void vector<T>::push_back(const T value) {
+	void vector<T>::push_back(T value) {
 		if(_size >= _capacity) {
 			reserve(_capacity*1.5+1); // 1.5 is a bit less than the golden ratio, perfect for our memory allocation uses
 		}
@@ -95,12 +96,12 @@ namespace std {
 	template<class T>
 	void vector<T>::reserve(size_t capacity) {
 		T* buffer_new = new T[capacity];
-
 		 _capacity = capacity;
 
 		for(size_t i = 0; i < _size; i++) {
 			buffer_new[i] = buffer[i];
 		}
+
 		//delete[] buffer;
 		buffer = buffer_new;
 	}

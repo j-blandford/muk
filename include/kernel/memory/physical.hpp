@@ -6,6 +6,8 @@
 #include <kernel/multiboot.hpp>
 #include <kernel/tty.hpp>
 
+#define KERNEL_HEAP_START 0xE0000000
+
 #define PMM_PAGE_TABLES 0xFFC00000
 #define PMM_PAGE_DIR 0xFFFFF000
 #define PMM_STACK_PTR 0xF0000000
@@ -23,6 +25,7 @@ extern uint32_t PDPhysicalAddress;
 
 // Page Table functions
 page_directory_t pg_directory_setup();
+void map_vaddr_page(uintptr_t virtual_address);
 
 
 // Page Allocation (bitmap) functions

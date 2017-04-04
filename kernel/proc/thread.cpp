@@ -54,6 +54,5 @@ void start_thread(char* title, void_fn entry) {
 }
 
 void init_kthreads() {
-	start_thread("tty_update", &tty_update);
-	start_thread("test", &test_thread);
+	start_thread("keyboard_driver", &tty_update);
 }

@@ -93,6 +93,17 @@ void* pg_virtual_addr(uint16_t pg_num) {
   return (void*) virt_addr;
 }
 
+static uint32_t pg_dir_offset(void* virtual_address) {
+  return ((uint32_t) virtual_address) >> PAGE_OFFSET_BITS >> PAGE_TABLE_OFFSET_BITS;
+}
+
+static uint32_t pg_table_offset(void* virtual_address) {
+  return (((uint32_t) virtual_address) >> PAGE_OFFSET_BITS) & 0x3FF;
+}
+
+static uint32_t pg_offset(void* addr) {
+  return ((uint32_t) addr & 0x00000FFF);
+}
 
 /**
 * 	Sets up recursive page directory to allow us to change the PDEs during runtime
@@ -111,4 +122,41 @@ page_directory_t pg_directory_setup() {
 	terminal_printf("[PGT] Recursive Page Tables setup successful\n");
 
 	return page_dir;
+}
+
+void map_vaddr_page(uint32_t virtual_address) {
+	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress;
+
+	uint32_t pd_offset = pg_dir_offset((void*)virtual_address);
+	uint32_t pde = page_dir[pd_offset];
+
+	if(!pde & 0x1) { // is the pg dir entry present?
+		// NO! Let's set it up
+		uintptr_t pde_phys_addr = (uintptr_t)page_allocate();
+
+		uint32_t pde = pde_phys_addr;
+		pde |= (1);			// PRESENT
+		pde |= (1 << 1);		// READ/WRITE
+		pde |= (1 << 2);		// ALL ACCESS
+		pde |= (1 << 5);		// CACHE DISABLE
+
+		page_dir[pd_offset] = pde; 
+	}
+
+	page_table_t page_table = (page_table_t)pg_virtual_addr(pd_offset);
+
+	uint32_t pt_offset = pg_table_offset((void*)virtual_address);
+	uint32_t pte = page_table[pt_offset];
+
+	if(!pte & 0x1) { // is the pg table entry present?
+		// NO! Let's set it up
+		uintptr_t pte_phys_addr = (uintptr_t)page_allocate();
+
+		uint32_t pte = pte_phys_addr;
+		pte |= (1);			// PRESENT
+		pte |= (1 << 1);		// READ/WRITE
+		pte |= (1 << 2);		// ALL ACCESS
+
+		page_table[pt_offset] = pte; 
+	}
 }

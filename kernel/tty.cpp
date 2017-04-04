@@ -9,15 +9,16 @@
 #include <kernel/memory/alloc.hpp>
 #include <kernel/drivers/keyboard.hpp>
 #include <kernel/user/env.hpp>
-
-static const size_t VGA_WIDTH = 80;
-static const size_t VGA_HEIGHT = 25;
-static uint16_t* const VGA_MEMORY = (uint16_t*) 0xC00B8000; // 0xB8000 is actually now in the upper half! 
+#include <kernel/gfx/vbe.hpp>
+#include <kernel/gfx/surface.hpp>
 
 size_t terminal_row;
 size_t terminal_column;
 uint8_t terminal_color;
 uint16_t* terminal_buffer;
+
+const int X_FONTWIDTH = 8;
+const int Y_FONTWIDTH = 16; 
 
 static vec2 cursor_pos = { 0, 0 };
 
@@ -53,7 +54,7 @@ void terminal_putentryat(const char c, size_t x, size_t y) {
 
 	terminal_buffer[index] = vga_entry(c, VGA_COLOR_WHITE);
 
-	// drawchar_transparent(c, x*X_FONTWIDTH, y*Y_FONTWIDTH, color);
+//	drawchar_transparent(c, x*X_FONTWIDTH, y*Y_FONTWIDTH, RGBA(0xFFFFFF));
 }
 
 void terminal_putchar(const char c) {
@@ -156,7 +157,7 @@ void tty_update() {
 		terminal_writestring((char*)ENV::get("cd"));
 		
 		terminal_writestring("] ");
-
+		//surface_update();
 		getsn(&kb_buffer[0], 1024);
 
 		Command::Parse(kb_buffer);
