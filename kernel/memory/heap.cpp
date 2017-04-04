@@ -7,7 +7,10 @@ static uintptr_t kheap_top = KERNEL_HEAP_START;
 static mblock_t *kheap_start = 0; // our metadata
 
 void expand_heap(uintptr_t start, size_t size) {
+    bcprintf("expand_heap -------------------->\n");
     while(start+size >= kheap_top) {
+        bcprintf("    kheap_top=%x\n",kheap_top);
+
         map_vaddr_page(kheap_top);
 
         memset((void*)kheap_top, 0, PAGE_SIZE);

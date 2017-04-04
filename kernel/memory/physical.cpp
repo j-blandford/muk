@@ -77,7 +77,7 @@ void pmm_setup(multiboot_info_t *mboot, uint32_t k_phys_start, uint32_t k_phys_e
 
 	uint32_t first_kernel_pg = (k_phys_start & 0xFFFFF000) >> PAGE_OFFSET_BITS;
 	uint32_t end_kernel_pg = (k_phys_end & 0xFFFFF000) >> PAGE_OFFSET_BITS;
-	for(uint32_t pg_index = first_kernel_pg; pg_index < end_kernel_pg; pg_index++) {
+	for(uint32_t pg_index = first_kernel_pg-1; pg_index < end_kernel_pg; pg_index++) {
 		pg_mark_taken(pg_index);
 	}
 	// terminal_printf("\n[PMM] kernel_start=%x, kernel_end=%x\n", k_phys_start, k_phys_end);
@@ -109,6 +109,7 @@ static uint32_t pg_offset(void* addr) {
 * 	Sets up recursive page directory to allow us to change the PDEs during runtime
 */
 page_directory_t pg_directory_setup() {
+	const int KERNEL_PAGE_NUMBER = 768;
 
 	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress; // PDVirtualAddress is defined in boot.s
 
@@ -119,18 +120,42 @@ page_directory_t pg_directory_setup() {
 	recursive_pde |= (1 << 5);		// CACHE DISABLE
 	page_dir[1023] = recursive_pde; //** last page directory points to itself (which is virtual address 0xFFFFF000) **//
 
-	terminal_printf("[PGT] Recursive Page Tables setup successful\n");
+	terminal_printf("[PGT] Recursive paging successful\n");
+
+	uint32_t kernel_pde = (uint32_t)page_allocate();
+	kernel_pde |= (1);			// PRESENT
+	kernel_pde |= (1 << 1);		// READ/WRITE
+	kernel_pde |= (1 << 2);		// ALL ACCESS
+	kernel_pde |= (1 << 5);		// CACHE DISABLE
+	page_dir[KERNEL_PAGE_NUMBER] = kernel_pde;
+
+	page_table_t pt = (page_table_t) pg_virtual_addr(KERNEL_PAGE_NUMBER);
+
+	for (int i = 0; i < 1024; i++) {
+		uint32_t* kernel_phys_addr = reinterpret_cast<uint32_t*>(i * PAGE_SIZE); 
+
+		uint32_t pte = (uint32_t)kernel_phys_addr;
+		pte |= (1);
+		pte |= (1 << 1);		// READ/WRITE
+		pte |= (1 << 2);		// ALL ACCESS
+		pte |= (1 << 5);		// CACHE DISABLE
+
+		pt[i] = pte;
+	}
+
+	terminal_printf("[PGT] Kernel page table installed\n");
 
 	return page_dir;
 }
 
+
 void map_vaddr_page(uint32_t virtual_address) {
 	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress;
 
-	uint32_t pd_offset = pg_dir_offset((void*)virtual_address);
-	uint32_t pde = page_dir[pd_offset];
+	uint32_t pd_index = virtual_address >> 22;
+	uint32_t pde = page_dir[pd_index];
 
-	if(!pde & 0x1) { // is the pg dir entry present?
+	if(!pde & 0b1) { // is the pg dir entry present?
 		// NO! Let's set it up
 		uintptr_t pde_phys_addr = (uintptr_t)page_allocate();
 
@@ -140,15 +165,15 @@ void map_vaddr_page(uint32_t virtual_address) {
 		pde |= (1 << 2);		// ALL ACCESS
 		pde |= (1 << 5);		// CACHE DISABLE
 
-		page_dir[pd_offset] = pde; 
+		page_dir[pd_index] = pde; 
 	}
 
-	page_table_t page_table = (page_table_t)pg_virtual_addr(pd_offset);
+	page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index); // uses recursive pg tables
 
-	uint32_t pt_offset = pg_table_offset((void*)virtual_address);
-	uint32_t pte = page_table[pt_offset];
+	uint32_t pt_index = (virtual_address >> 12) & 0x03FF;
+	uint32_t pte = page_table[pt_index];
 
-	if(!pte & 0x1) { // is the pg table entry present?
+	if(!pte & 0b1) { // is the pg table entry present?
 		// NO! Let's set it up
 		uintptr_t pte_phys_addr = (uintptr_t)page_allocate();
 
@@ -157,6 +182,6 @@ void map_vaddr_page(uint32_t virtual_address) {
 		pte |= (1 << 1);		// READ/WRITE
 		pte |= (1 << 2);		// ALL ACCESS
 
-		page_table[pt_offset] = pte; 
+		page_table[pt_index] = pte; 
 	}
 }

@@ -30,31 +30,38 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
     pmm_setup(mb_info, k_phys_start, k_phys_end);
     page_directory_t kernel_pd = pg_directory_setup(); // set up the page tables
 
-    start_display_driver(mb_info);
+    uint32_t* alloc1 = (uint32_t*)kmalloc(sizeof(uint32_t));
+    *alloc1 = 10;
 
-    // IRQ0
-    Timer::initTimer();
-    // IRQ1
-    keyboard_install();
+    bcprintf("&alloc1=%x, alloc1=%d\n", alloc1, *alloc1);
 
-    ENV::initialise();
+    uint32_t* pd = &PDVirtualAddress;
 
-    // ISR130
-    // scheduler_init();
+    // start_display_driver(mb_info);
 
-    // void_fn module_one = get_module_funct(mb_info, 0); // should execute our "basic_program.s" file...
-    // terminal_printf("module_one address: %x\n", module_one);
-    // MAGIC_BREAK;
-    // module_one();
+    // // IRQ0
+    // Timer::initTimer();
+    // // IRQ1
+    // keyboard_install();
 
-    interrupts_enable();
+    // ENV::initialise();
 
-    init_kthreads();
+    // // ISR130
+    // // scheduler_init();
 
-    Filesystem::initialise();
+    // // void_fn module_one = get_module_funct(mb_info, 0); // should execute our "basic_program.s" file...
+    // // terminal_printf("module_one address: %x\n", module_one);
+    // // MAGIC_BREAK;
+    // // module_one();
 
-    terminal_writestring("\n");
-    // This does nothing apart from stop our kmain function from returning
-    // Every process is now a thread (running almost asynchronously)
+    // interrupts_enable();
+
+    // init_kthreads();
+
+    // Filesystem::initialise();
+
+    // terminal_writestring("\n");
+    // // This does nothing apart from stop our kmain function from returning
+    // // Every process is now a thread (running almost asynchronously)
     while(true) { }
 }
