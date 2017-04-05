@@ -131,6 +131,7 @@ page_directory_t pg_directory_setup() {
 
 	page_table_t pt = (page_table_t) pg_virtual_addr(KERNEL_PAGE_NUMBER);
 
+	// Now we can map 4MiB of kernel memory (phys 0x0 -> 0x3FFFFF) to the virtual space
 	for (int i = 0; i < 1024; i++) {
 		uint32_t* kernel_phys_addr = reinterpret_cast<uint32_t*>(i * PAGE_SIZE); 
 
@@ -143,7 +144,7 @@ page_directory_t pg_directory_setup() {
 		pt[i] = pte;
 	}
 
-	terminal_printf("[PGT] Kernel page table installed\n");
+	//terminal_printf("[PGT] Kernel page table installed\n");
 
 	return page_dir;
 }
