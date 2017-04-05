@@ -35,9 +35,17 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
 
     bcprintf("&alloc1=%x, alloc1=%d\n", alloc1, *alloc1);
 
-    uint32_t* pd = &PDVirtualAddress;
+    MAGIC_BREAK;
+    
+     uint32_t* alloc2 = (uint32_t*)kmalloc(sizeof(uint32_t));
 
-    // start_display_driver(mb_info);
+    bcprintf("&alloc2=%x\n", alloc2);
+
+    bcprintf("got to bottom :)\n");
+
+    //uint32_t* pd = &PDVirtualAddress;
+
+    //start_display_driver(mb_info);
 
     // // IRQ0
     // Timer::initTimer();

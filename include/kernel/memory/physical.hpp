@@ -22,9 +22,11 @@ typedef uint32_t * page_table_t;
 
 extern uint32_t PDVirtualAddress;
 extern uint32_t PDPhysicalAddress;
+extern "C" void tlb_flush();
 
 // Page Table functions
 page_directory_t pg_directory_setup();
+void kernel_pg_setup();
 void map_vaddr_page(uintptr_t virtual_address);
 
 

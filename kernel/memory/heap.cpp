@@ -36,13 +36,21 @@ void* kmalloc(size_t size) {
         //     return free_block
         // }
 
+        bcprintf("        looking for block: %x -> \n",free_block);
+        bcprintf("free_block->size=%d\n",free_block->size);
+        bcprintf("free_block->prev=%x\n",free_block->prev);
+        bcprintf("free_block->next=%x\n",free_block->next);
+
         // traverse the linked list to find the next NULL block (unitialised)
         prev_block = free_block;
         free_block = free_block->next;
+
+        bcprintf("%x\n",free_block);
     }
 
     if(!prev_block) {
         kheap_start = free_block = (mblock_t *)KERNEL_HEAP_START;
+        prev_block = 0;
     }
 
     bcprintf("        free_block=%x\n",free_block);
