@@ -154,13 +154,13 @@ void map_vaddr_page(uint32_t virtual_address) {
 	uint32_t pt_index = (virtual_address >> PAGE_OFFSET_BITS) & 0x03FF;
 	uint32_t pte = page_table[pt_index];
 
-	bcprintf("Page Table Entry creation: pt_index=%d\n", pt_index);
+	//bcprintf("Page Table Entry creation: pt_index=%d\n", pt_index);
 
 	// //if(!(pte & 0b1)) { // is the pg table entry present?
 	// 	// NO! Let's set it up
 		uint32_t* pte_phys_addr = (uint32_t*)page_allocate();
 
-		bcprintf("    &pte_phys_addr=%x\n", pte_phys_addr);
+		//bcprintf("    &pte_phys_addr=%x\n", pte_phys_addr);
 
 		uint32_t pte_new = ((uint32_t)pte_phys_addr);
 		pte_new |= (1);			// PRESENT

@@ -22,7 +22,7 @@ void expand_heap(uintptr_t start, size_t size) {
 
 // kernel heap memory allocation
 void* kmalloc(size_t size) {
-    bcprintf("kmalloc(size=%d) kheap_top=%x\n",size,kheap_top);
+    bcprintf(">>>>>>>>>>> kmalloc(size=%d) kheap_top=%x, blockheader=%d\n",size,kheap_top,sizeof(BlockHeader));
 
     bcprintf("    kheap_start=%x\n",kheap_start);
 
@@ -37,14 +37,11 @@ void* kmalloc(size_t size) {
     }
 
     BlockHeader* found_block = (BlockHeader*)kheap_start;
-    for(; found_block->next != 0 && found_block->next != found_block->prev; found_block = found_block->next) {
-        bcprintf("        looking for block: %x -> \n",found_block); 
-    }
 
-    bcprintf("          found_block=%x\n",found_block);
-    bcprintf("          found_block->size=%d\n",found_block->size);
-    bcprintf("          found_block->prev=%x\n",found_block->prev);
-    bcprintf("          found_block->next=%x\n",found_block->next); 
+    
+    for(; found_block->next && found_block != found_block->next; found_block = found_block->next) {
+        bcprintf("        looking for block: %x -> %x\n",found_block, found_block->next); 
+    }
 
     size += sizeof(BlockHeader);
     // We've found a free block (unitialised), let's set it up :)
@@ -58,8 +55,21 @@ void* kmalloc(size_t size) {
     next_block->size = size;
 
     if(found_block->in_use) 
-        found_block->next = found_block;
+        found_block->next = next_block;
 
+    bcprintf("---\n");
+    bcprintf("          found_block=%x\n",found_block);
+    bcprintf("          found_block->size=%d\n",found_block->size);
+    bcprintf("          found_block->prev=%x\n",found_block->prev);
+    bcprintf("          found_block->next=%x\n",found_block->next); 
+
+
+    bcprintf("---\n");
+    bcprintf("          next_block=%x\n",next_block);
+    bcprintf("          next_block->size=%d\n",next_block->size);
+    bcprintf("          next_block->prev=%x\n",next_block->prev);
+    bcprintf("          next_block->next=%x\n",next_block->next); 
+    bcprintf("---\n");
     return (void*)(next_block + sizeof(BlockHeader));
 }
 
