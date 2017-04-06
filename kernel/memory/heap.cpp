@@ -4,7 +4,7 @@
 
 // our heap goes from V.addr 0xE0000000 -> 0xF0000000
 static uintptr_t kheap_top = KERNEL_HEAP_START;
-static mblock_t *kheap_start = 0; // our metadata
+static uintptr_t kheap_start = 0; // our metadata
 
 void expand_heap(uintptr_t start, size_t size) {
     bcprintf("expand_heap -------------------->\n");
@@ -22,51 +22,45 @@ void expand_heap(uintptr_t start, size_t size) {
 
 // kernel heap memory allocation
 void* kmalloc(size_t size) {
-    bcprintf("kmalloc(size=%d) kheap=%x\n",size,kheap_top);
-
-    size += sizeof(mblock_t); // append the header metadata to each alloc block
-
-    mblock_t* prev_block = kheap_start;
-    mblock_t* free_block = kheap_start;
+    bcprintf("kmalloc(size=%d) kheap_top=%x\n",size,kheap_top);
 
     bcprintf("    kheap_start=%x\n",kheap_start);
 
-    while(free_block) {
-        // if(!free_block->in_use) { // do some block splitting here
-        //     return free_block
-        // }
+    if(!kheap_start) {
+        // we need to initialise the heap!
+        map_vaddr_page(KERNEL_HEAP_START);
+        memset((void*)KERNEL_HEAP_START, 0, PAGE_SIZE);
 
-        bcprintf("        looking for block: %x -> \n",free_block);
-        bcprintf("free_block->size=%d\n",free_block->size);
-        bcprintf("free_block->prev=%x\n",free_block->prev);
-        bcprintf("free_block->next=%x\n",free_block->next);
+        kheap_start = KERNEL_HEAP_START;
 
-        // traverse the linked list to find the next NULL block (unitialised)
-        prev_block = free_block;
-        free_block = free_block->next;
-
-        bcprintf("%x\n",free_block);
+        bcprintf(" >>>>>>>>>   initialised heap\n");
     }
 
-    if(!prev_block) {
-        kheap_start = free_block = (mblock_t *)KERNEL_HEAP_START;
-        prev_block = 0;
+    BlockHeader* found_block = (BlockHeader*)kheap_start;
+    for(; found_block->next != 0; found_block = found_block->next) {
+        bcprintf("        looking for block: %x -> \n",found_block);
+        bcprintf("found_block->size=%d\n",found_block->size);
+        bcprintf("found_blockbh->prev=%x\n",found_block->prev);
+        bcprintf("found_block->next=%x\n",found_block->next);  
     }
 
-    bcprintf("        free_block=%x\n",free_block);
+    BlockHeader* last_block = found_block->prev;
 
+    bcprintf("        found_block=%x\n",found_block);
+
+    size += sizeof(BlockHeader);
     // We've found a free block (unitialised), let's set it up :)
-    expand_heap((uintptr_t)free_block, size);
+    expand_heap((uintptr_t)found_block, size);
 
-    free_block->next = 0;
-    free_block->prev = prev_block;
-    free_block->in_use = true;
-    free_block->size = size;
+    found_block->next = 0;
+    found_block->prev = last_block;
+    found_block->in_use = true;
+    found_block->size = size;
 
-    if(prev_block) 
-        prev_block->next = free_block;
+    if(last_block) 
+        last_block->next = found_block;
 
-    return (void*)(free_block + sizeof(mblock_t));
+    return (void*)(found_block + sizeof(BlockHeader));
 }
 
 // alloc and zero memory

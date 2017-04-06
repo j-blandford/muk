@@ -30,12 +30,20 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
     pmm_setup(mb_info, k_phys_start, k_phys_end);
     page_directory_t kernel_pd = pg_directory_setup(); // set up the page tables
 
+    // uint32_t* pg_alloc = (uint32_t*)page_allocate();
+    // bcprintf("&pg_alloc=%x\n", pg_alloc);
+    // uint32_t* pg_alloc2 = (uint32_t*)page_allocate();
+    // bcprintf("&pg_alloc2=%x\n", pg_alloc2);
+    // uint32_t* pg_alloc3 = (uint32_t*)page_allocate();
+    // bcprintf("&pg_alloc=%x\n", pg_alloc3);
+    // MAGIC_BREAK;
+
     uint32_t* alloc1 = (uint32_t*)kmalloc(sizeof(uint32_t));
     *alloc1 = 10;
 
     bcprintf("&alloc1=%x, alloc1=%d\n", alloc1, *alloc1);
 
-    MAGIC_BREAK;
+    //MAGIC_BREAK;
     
      uint32_t* alloc2 = (uint32_t*)kmalloc(sizeof(uint32_t));
 
