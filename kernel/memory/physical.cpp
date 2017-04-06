@@ -123,15 +123,13 @@ void map_vaddr_page(uint32_t virtual_address) {
 	uint32_t pd_index = virtual_address >> 22;
 	uint32_t pde = page_dir[pd_index];
 
-	bcprintf("Page Dir Entry creation: pd_index=%d\n", pd_index);
+	bcprintf("map_vaddr_page(%x)\n", virtual_address);
 
 	bool new_pd = false;
 
 	if(!pde & 0b1) { // is the pg dir entry present?
 		// NO! Let's set it up
 		uint32_t* pde_phys_addr = (uint32_t*)page_allocate();
-
-		bcprintf("    &pde_phys_addr=%x\n", pde_phys_addr);
 
 		uint32_t pde = (uint32_t)pde_phys_addr;
 		pde |= (1);			// PRESENT
@@ -143,8 +141,6 @@ void map_vaddr_page(uint32_t virtual_address) {
 
 		new_pd = true;
 	}
-
-	bcprintf("Added PDE!\n\n");
 
 	page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index); // uses recursive pg tables
 
@@ -170,8 +166,6 @@ void map_vaddr_page(uint32_t virtual_address) {
 		pte_new |= (1);			// PRESENT
 		pte_new |= (1 << 1);		// READ/WRITE
 		pte_new |= (1 << 2);		// ALL ACCESS
-
-		bcprintf("    > pte_new=%x\n", pte_new);
 
 		page_table[pt_index] = pte_new; // 0x10000007;
 	//}

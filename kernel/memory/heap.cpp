@@ -37,30 +37,30 @@ void* kmalloc(size_t size) {
     }
 
     BlockHeader* found_block = (BlockHeader*)kheap_start;
-    for(; found_block->next != 0; found_block = found_block->next) {
-        bcprintf("        looking for block: %x -> \n",found_block);
-        bcprintf("found_block->size=%d\n",found_block->size);
-        bcprintf("found_blockbh->prev=%x\n",found_block->prev);
-        bcprintf("found_block->next=%x\n",found_block->next);  
+    for(; found_block->next != 0 && found_block->next != found_block->prev; found_block = found_block->next) {
+        bcprintf("        looking for block: %x -> \n",found_block); 
     }
 
-    BlockHeader* last_block = found_block->prev;
-
-    bcprintf("        found_block=%x\n",found_block);
+    bcprintf("          found_block=%x\n",found_block);
+    bcprintf("          found_block->size=%d\n",found_block->size);
+    bcprintf("          found_block->prev=%x\n",found_block->prev);
+    bcprintf("          found_block->next=%x\n",found_block->next); 
 
     size += sizeof(BlockHeader);
     // We've found a free block (unitialised), let's set it up :)
-    expand_heap((uintptr_t)found_block, size);
+    expand_heap((uintptr_t)found_block + found_block->size, size);
 
-    found_block->next = 0;
-    found_block->prev = last_block;
-    found_block->in_use = true;
-    found_block->size = size;
+    BlockHeader* next_block = (BlockHeader*)(found_block + found_block->size);
 
-    if(last_block) 
-        last_block->next = found_block;
+    next_block->next = 0;
+    next_block->prev = found_block;
+    next_block->in_use = true;
+    next_block->size = size;
 
-    return (void*)(found_block + sizeof(BlockHeader));
+    if(found_block->in_use) 
+        found_block->next = found_block;
+
+    return (void*)(next_block + sizeof(BlockHeader));
 }
 
 // alloc and zero memory

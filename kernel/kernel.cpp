@@ -43,7 +43,7 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
 
     bcprintf("&alloc1=%x, alloc1=%d\n", alloc1, *alloc1);
 
-    //MAGIC_BREAK;
+    MAGIC_BREAK;
     
      uint32_t* alloc2 = (uint32_t*)kmalloc(sizeof(uint32_t));
 
