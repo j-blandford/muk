@@ -15,7 +15,7 @@ Surface::Surface(Vector2 pos, Vector2 dim) {
     float pitchRatio = (float)frame_pitch / (float)frame_width;
     this->s_pitch = pitchRatio*dim.x; 
 
-    this->buff_loc = (uint8_t*)kmalloc(dim.y*this->;
+    this->buff_loc = (uint8_t*)kmalloc(dim.y*this->s_pitch);
 
     this->dirty_buffer = (bool*)kmalloc(dim.y*sizeof(bool));
     memset(this->dirty_buffer, false, dim.y*sizeof(bool));
@@ -112,8 +112,8 @@ void Surface::setBackground(RGBA bg_color) {
 void init_screens() {
 	screen_surfaces.push_back(new Surface(Vector2(0,0), Vector2(frame_width,frame_height)));
 	
-	//screen_surfaces[SURF_SCREEN].setBackground(RGBA(0x2a2b31));
-	//screen_surfaces[SURF_SCREEN].apply();
+	screen_surfaces[SURF_SCREEN]->setBackground(RGBA(0x2a2b31));
+	screen_surfaces[SURF_SCREEN]->apply(true);
 
 	bcprintf("Finished initialising surfaces\n");
 
@@ -129,7 +129,11 @@ void init_screens() {
 void surface_update() {
     //Scheduler::pause();
 
+    bcprintf(">>>> surface_update()\n");
+
     update_buffer(true);
+
+    bcprintf(">>>> END :: surface_update()\n");
 
     //Scheduler::resume();
 }
@@ -137,6 +141,8 @@ void surface_update() {
 void start_display_driver(multiboot_info_t* mboot) {
     init_fbe(mboot);
     init_screens();
+
+    surface_update();
 
     //start_thread("display_driver", &surface_update);
 }

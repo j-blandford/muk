@@ -179,6 +179,53 @@ void map_vaddr_page(uint32_t virtual_address) {
 
 		//bcprintf("%d (%x)\n", pt_index,pte_phys_addr );
 	}
+}
 
-	 
+void map_vaddr_page(uint32_t virtual_address, uint32_t phys_address) {
+	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress;
+
+	uint32_t pd_index = virtual_address >> 22;
+	uint32_t pde = page_dir[pd_index];
+
+	if(!is_present(pde)) { // is the pg dir entry present?
+		// NO! Let's set it up
+		uint32_t* pde_phys_addr = (uint32_t*)page_allocate();
+
+		uint32_t pde = (uint32_t)pde_phys_addr;
+		pde |= (1);			// PRESENT
+		pde |= (1 << 1);		// READ/WRITE
+		pde |= (1 << 2);		// ALL ACCESS
+		pde |= (1 << 5);		// CACHE DISABLE
+
+		page_dir[pd_index] = pde; 
+
+		// this is a new PD, we need to zero out the whole directory
+		page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index);
+		for(int i = 0; i < 1024; i++) {
+			page_table[i] = 0;
+		}
+
+		//bcprintf("pg: %d (%x), ", pd_index, pde_phys_addr);
+	}
+
+	page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index); // uses recursive pg tables
+
+	uint32_t pt_index = (virtual_address >> PAGE_OFFSET_BITS) & 0x03FF;
+	uint32_t pte = page_table[pt_index];
+
+	if(!is_present(pte)) { // is the pg table entry present?
+		// NO! Let's set it up
+		uint32_t* pte_phys_addr = (uint32_t*)phys_address;
+
+
+
+		uint32_t pte_new = (uint32_t)pte_phys_addr;
+		pte_new |= (1);			// PRESENT
+		pte_new |= (1 << 1);		// READ/WRITE
+		pte_new |= (1 << 2);		// ALL ACCESS
+
+		page_table[pt_index] = pte_new;
+
+	//	bcprintf("%d (%x)\n", pt_index,pte_phys_addr );
+	}
 }

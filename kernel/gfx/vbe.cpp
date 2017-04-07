@@ -72,15 +72,24 @@ void fill_circle(const uint32_t x, const uint32_t y, uint16_t radius, RGBA color
 }
 
 void init_fbe(multiboot_info_t* mboot) {
-
-    fb_loc = (uint8_t*)(int)mboot->framebuffer_addr + KERNEL_VIRT_BASE;
-
+    
     frame_width = mboot->framebuffer_width;
     frame_height = mboot->framebuffer_height;
     frame_depth = mboot->framebuffer_bpp;
 
     frame_pitch = mboot->framebuffer_pitch;
 
+    // We have to remap the physical framebuffer address to a virtual address
+    // because we are using pagetables
+    uintptr_t fb_addr_base = 0xD0000000;
+    uint32_t fb_phys_loc = (uint32_t)mboot->framebuffer_addr;
+    size_t fb_size = frame_height*frame_pitch;
+
+    for(size_t pg_num = 0; pg_num*PAGE_SIZE < fb_size; pg_num++) {
+        map_vaddr_page(fb_addr_base + pg_num*PAGE_SIZE, fb_phys_loc + pg_num*PAGE_SIZE);
+    }
+
+    fb_loc = reinterpret_cast<uint8_t*>(fb_addr_base);
     bb_loc = (uint8_t*)kmalloc(frame_height*frame_pitch);
 
     dirty_lines = (bool*)kmalloc(sizeof(bool)*frame_height);

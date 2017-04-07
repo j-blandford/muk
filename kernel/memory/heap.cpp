@@ -17,7 +17,7 @@ void map_heap_pages(uintptr_t end_addr) {
 
 // kernel heap memory allocation
 void* kmalloc(size_t size) {
-    bcprintf("> kmalloc(size=%d)\n",size);
+    bcprintf("> kmalloc(%d) ",size);
 
     if(size == 0) {
         bcprintf("KERNEL ERROR: Cannot allocate 0 bytes!\n");
@@ -46,6 +46,8 @@ void* kmalloc(size_t size) {
     // Update the previous block to point to this memory block
     if(found_block) 
         found_block->next = next_block;
+
+    bcprintf("-> (%x)\n",(next_block + sizeof(BlockHeader)));
 
     return (void*)(next_block + sizeof(BlockHeader));
 }
