@@ -89,9 +89,6 @@ void pmm_setup(multiboot_info_t* mboot, uint32_t k_phys_start, uint32_t k_phys_e
 	for(uint32_t pg_index = 0; pg_index < end_kernel_pg+1; pg_index++) {
 		pg_mark_taken(pg_index);
 	}
-
-	//for(uint32_t )
-	//pg_mark_taken(0);
 }
 
 /**
@@ -122,8 +119,6 @@ page_directory_t pg_directory_setup() {
 	page_dir[1023] = recursive_pde; //** last page directory points to itself (which is virtual address 0xFFFFF000) **//
 
 	terminal_printf("[PGT] Recursive paging successful\n");
-
-	//terminal_printf("[PGT] Kernel page table installed\n");
 
 	return page_dir;
 }

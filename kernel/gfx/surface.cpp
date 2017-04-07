@@ -7,19 +7,18 @@
 std::vector<Surface*> screen_surfaces;
 
 Surface::Surface(Vector2 pos, Vector2 dim) {
-    (*this).pos = pos;
-    (*this).dim = dim;
+    this->pos = pos;
+    this->dim = dim;
 
-    (*this).z_index = 1; // 1 is just above the lowest terminal buffer
+    this->z_index = 1; // 1 is just above the lowest terminal buffer
 
     float pitchRatio = (float)frame_pitch / (float)frame_width;
-    (*this).s_pitch = pitchRatio*dim.x; 
+    this->s_pitch = pitchRatio*dim.x; 
 
-    bcprintf("buff_loc -> requesting %d bytes...\n",dim.y*(*this).s_pitch);
-    (*this).buff_loc = (uint8_t*)kmalloc(dim.y*(*this).s_pitch);
+    this->buff_loc = (uint8_t*)kmalloc(dim.y*this->;
 
-    bcprintf("dirty_buffer -> requesting %d bytes...\n",dim.y*sizeof(bool));
-    (*this).dirty_buffer = (bool*)kmalloc(dim.y*sizeof(bool));
+    this->dirty_buffer = (bool*)kmalloc(dim.y*sizeof(bool));
+    memset(this->dirty_buffer, false, dim.y*sizeof(bool));
 
     bcprintf("Successfully initialised surface!\n");
 }
@@ -99,7 +98,7 @@ void Surface::bringToFront() {
     z_index = 10;
 }
 void Surface::setZindex(uint8_t z_index) {
-    (*this).z_index = z_index;
+    this->z_index = z_index;
 }
 
 void Surface::setBackground(RGBA bg_color) {
@@ -111,9 +110,7 @@ void Surface::setBackground(RGBA bg_color) {
 }
 
 void init_screens() {
-    bcprintf("init_screens()\n");
 	screen_surfaces.push_back(new Surface(Vector2(0,0), Vector2(frame_width,frame_height)));
-	
 	
 	//screen_surfaces[SURF_SCREEN].setBackground(RGBA(0x2a2b31));
 	//screen_surfaces[SURF_SCREEN].apply();
@@ -139,7 +136,7 @@ void surface_update() {
 
 void start_display_driver(multiboot_info_t* mboot) {
     init_fbe(mboot);
-  //  init_screens();
+    init_screens();
 
     //start_thread("display_driver", &surface_update);
 }

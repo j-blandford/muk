@@ -81,23 +81,10 @@ void init_fbe(multiboot_info_t* mboot) {
 
     frame_pitch = mboot->framebuffer_pitch;
 
-    bcprintf("Width: (addr=%x)\n",&frame_width);
-
-    MAGIC_BREAK;
-    
     bb_loc = (uint8_t*)kmalloc(frame_height*frame_pitch);
-
-    bcprintf("LUL1\n");
-    bcprintf("%dx%dx%d (width addr=%x)\n",frame_width,frame_height,frame_depth, &frame_width);
-
-    MAGIC_BREAK;
 
     dirty_lines = (bool*)kmalloc(sizeof(bool)*frame_height);
     memset(dirty_lines, false, sizeof(bool)*frame_height);
-
-    bcprintf("LUL2\n");
-    bcprintf("%dx%dx%d (addr=%x)\n",frame_width,frame_height,frame_depth, mboot);
-
 }
 
 void test_surfaces() {
