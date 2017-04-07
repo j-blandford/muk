@@ -7,14 +7,13 @@
 #include <kernel/memory/physical.hpp>
 
 // each block of memory allocated has a small header of metadata
+// this is a linked list
 class BlockHeader {
 public:
-	bool in_use;
+	bool in_use;	// this field isn't used for the moment
 	uint32_t size;
-	BlockHeader* next;
-	BlockHeader* prev;
-
-	BlockHeader() : in_use(true), size(0), next(0), prev(0) {}
+	BlockHeader* next; // ptr to the next block header
+	BlockHeader* prev; // "" previous block header
 };
 
 void* kmalloc(size_t size);

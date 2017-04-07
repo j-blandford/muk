@@ -39,15 +39,20 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
     // MAGIC_BREAK;
 
     uint32_t* alloc1 = (uint32_t*)kmalloc(sizeof(uint32_t));
-    *alloc1 = 10;
-    bcprintf("&alloc1=%x\n", alloc1, *alloc1);
+    bcprintf("&alloc1=%x\n", alloc1);
 
-    
-    uint32_t* alloc2 = (uint32_t*)kmalloc(sizeof(uint32_t));
+    MAGIC_BREAK;
+
+    uint32_t* alloc2 = (uint32_t*)kmalloc(sizeof(uint32_t)*2);
     bcprintf("&alloc2=%x\n", alloc2);
 
-    uint32_t* alloc3 = (uint32_t*)kmalloc(sizeof(uint32_t));
+    MAGIC_BREAK;
+
+    uint32_t* alloc3 = (uint32_t*)kmalloc(sizeof(uint32_t)*2000);
     bcprintf("&alloc3=%x\n", alloc3);
+    MAGIC_BREAK;
+    uint32_t* alloc4 = (uint32_t*)kmalloc(sizeof(uint32_t)*500);
+    bcprintf("&alloc4=%x\n", alloc4);
 
     bcprintf("got to bottom :)\n");
 

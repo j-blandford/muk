@@ -117,6 +117,10 @@ page_directory_t pg_directory_setup() {
 }
 
 
+inline bool is_present(uint32_t page_entry) {
+	return page_entry & 0x1; // grabs the first bit of the entry - both PDEs and PTEs
+}
+
 void map_vaddr_page(uint32_t virtual_address) {
 	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress;
 
@@ -127,7 +131,7 @@ void map_vaddr_page(uint32_t virtual_address) {
 
 	bool new_pd = false;
 
-	if(!pde & 0b1) { // is the pg dir entry present?
+	if(!is_present(pde)) { // is the pg dir entry present?
 		// NO! Let's set it up
 		uint32_t* pde_phys_addr = (uint32_t*)page_allocate();
 
@@ -140,6 +144,8 @@ void map_vaddr_page(uint32_t virtual_address) {
 		page_dir[pd_index] = pde; 
 
 		new_pd = true;
+
+		bcprintf("PDE INSTALLED (4mib boundary) @ %x\n", pde_phys_addr);
 	}
 
 	page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index); // uses recursive pg tables
@@ -154,21 +160,22 @@ void map_vaddr_page(uint32_t virtual_address) {
 	uint32_t pt_index = (virtual_address >> PAGE_OFFSET_BITS) & 0x03FF;
 	uint32_t pte = page_table[pt_index];
 
-	//bcprintf("Page Table Entry creation: pt_index=%d\n", pt_index);
+	if(!is_present(pte)) {
+		bcprintf("Page Table Entry creation: pt_index=%d\n", pt_index);
 
-	// //if(!(pte & 0b1)) { // is the pg table entry present?
-	// 	// NO! Let's set it up
 		uint32_t* pte_phys_addr = (uint32_t*)page_allocate();
 
-		//bcprintf("    &pte_phys_addr=%x\n", pte_phys_addr);
+		bcprintf("    &pte_phys_addr=%x\n", pte_phys_addr);
 
-		uint32_t pte_new = ((uint32_t)pte_phys_addr);
+		uint32_t pte_new = (uint32_t)pte_phys_addr;
 		pte_new |= (1);			// PRESENT
 		pte_new |= (1 << 1);		// READ/WRITE
 		pte_new |= (1 << 2);		// ALL ACCESS
 
 		page_table[pt_index] = pte_new; // 0x10000007;
-	//}
+	}
+
+	bcprintf("Got here :)\n");
 
 	//tlb_flush();
 }
