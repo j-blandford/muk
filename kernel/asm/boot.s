@@ -35,7 +35,7 @@ mb_header:
     dd end                      ; load_bss_end
     dd bootstrapper                   ; entry_addr
 
-    dd 1                        ; 0 = vbe mode, 1 = linear framebuffer
+    dd 0                        ; 0 = vbe mode, 1 = linear framebuffer
     dd 640
     dd 480
     dd 24

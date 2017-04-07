@@ -52,6 +52,6 @@ public:
 };
 
 extern std::vector<Surface*> screen_surfaces;
-void start_display_driver(multiboot_info_t* mb_info);
+void start_display_driver(multiboot_info_t* mboot);
 void surface_update();
 void init_screens();

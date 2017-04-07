@@ -111,13 +111,14 @@ void Surface::setBackground(RGBA bg_color) {
 }
 
 void init_screens() {
+    bcprintf("init_screens()\n");
 	screen_surfaces.push_back(new Surface(Vector2(0,0), Vector2(frame_width,frame_height)));
-	bcprintf("screen_surfaces:%d\n",screen_surfaces.size());
+	
 	
 	//screen_surfaces[SURF_SCREEN].setBackground(RGBA(0x2a2b31));
 	//screen_surfaces[SURF_SCREEN].apply();
 
-	bcprintf("\n\nAND HERE\n");
+	bcprintf("Finished initialising surfaces\n");
 
     //test_surfaces();
 
@@ -136,9 +137,9 @@ void surface_update() {
     //Scheduler::resume();
 }
 
-void start_display_driver(multiboot_info_t * mb_info) {
-    init_fbe(mb_info);
-    init_screens();
+void start_display_driver(multiboot_info_t* mboot) {
+    init_fbe(mboot);
+  //  init_screens();
 
     //start_thread("display_driver", &surface_update);
 }

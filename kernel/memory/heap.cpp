@@ -19,6 +19,11 @@ void map_heap_pages(uintptr_t end_addr) {
 void* kmalloc(size_t size) {
     bcprintf("> kmalloc(size=%d)\n",size);
 
+    if(size == 0) {
+        bcprintf("KERNEL ERROR: Cannot allocate 0 bytes!\n");
+        return 0;
+    }
+
     if(!kheap_start) {
         // we need to initialise the heap!
         map_vaddr_page(KERNEL_HEAP_START);
@@ -36,11 +41,7 @@ void* kmalloc(size_t size) {
     uintptr_t end_of_block = (uintptr_t)found_block + found_block->size; // end of the last free block
     map_heap_pages(end_of_block + size); // see if we need to map pages to fit the block in
 
-    BlockHeader* next_block = (BlockHeader*)end_of_block; // now the memory is 100% initialised, let's start using it!
-    next_block->in_use = true;
-    next_block->size = size;
-    next_block->next = 0;
-    next_block->prev = found_block;
+    BlockHeader* next_block = new ((void*)end_of_block) BlockHeader(size, found_block);// now the memory is 100% initialised, let's start using it!
 
     // Update the previous block to point to this memory block
     if(found_block) 

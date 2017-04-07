@@ -9,18 +9,26 @@
 uint32_t pg_num_free;
 uint32_t pg_free_bmp[BITMAP_SIZE];
 
+/**
+* bitmap sets the correct bit in the array to 1
+*/ 
 void pg_mark_free(uint32_t pg_num) {
 	pg_free_bmp[pg_num >> 5] |= (1 << (pg_num & 0x1F));
-
 	pg_num_free++;
 }
 
+/**
+* bitmap sets the correct bit in the array to 0
+*/ 
 void pg_mark_taken(uint32_t pg_num) {
 	pg_free_bmp[pg_num >> 5] &= ~(1 << (pg_num & 0x1F));
-
 	pg_num_free--;
 }
 
+/**
+*	the heart of the PMM - we say "hey, give me a page!" and it returns a free address.
+*	very handy abstraction
+*/ 
 void * page_allocate() {
 	for(size_t chunk = 0; chunk < BITMAP_SIZE; chunk++) {
 		if(pg_free_bmp[chunk] != 0) {
@@ -43,7 +51,7 @@ void * page_allocate() {
 /**
 * 	Function which initialises the memory bitmap from the GRUB boot information
 */
-void pmm_setup(multiboot_info_t *mboot, uint32_t k_phys_start, uint32_t k_phys_end) {
+void pmm_setup(multiboot_info_t* mboot, uint32_t k_phys_start, uint32_t k_phys_end) {
 	terminal_printf("[INFO] Total memory:  %d kb\n",mboot->mem_upper + mboot->mem_lower);
 
 	pg_num_free = 0;
@@ -75,16 +83,20 @@ void pmm_setup(multiboot_info_t *mboot, uint32_t k_phys_start, uint32_t k_phys_e
 		mmap ++;
 	}
 
-	uint32_t first_kernel_pg = (k_phys_start & 0xFFFFF000) >> PAGE_OFFSET_BITS;
+	terminal_printf("\n");
+
 	uint32_t end_kernel_pg = (k_phys_end & 0xFFFFF000) >> PAGE_OFFSET_BITS;
-	for(uint32_t pg_index = first_kernel_pg-1; pg_index < end_kernel_pg; pg_index++) {
+	for(uint32_t pg_index = 0; pg_index < end_kernel_pg+1; pg_index++) {
 		pg_mark_taken(pg_index);
 	}
 
-	pg_mark_taken(0);
-	// terminal_printf("\n[PMM] kernel_start=%x, kernel_end=%x\n", k_phys_start, k_phys_end);
+	//for(uint32_t )
+	//pg_mark_taken(0);
 }
 
+/**
+*	Converts a page index into it's virtual address so that we can alter specific pages
+*/
 void* pg_virtual_addr(uint16_t pg_num) {
   uint32_t virt_addr = 0xFFC00000; // 0b1111111111
 
@@ -116,20 +128,22 @@ page_directory_t pg_directory_setup() {
 	return page_dir;
 }
 
-
+// grabs the first bit of the entry - both PDEs and PTEs
 inline bool is_present(uint32_t page_entry) {
-	return page_entry & 0x1; // grabs the first bit of the entry - both PDEs and PTEs
+	return page_entry & 0x1; 
 }
 
+/**
+*	This is the heart of the memory manager - it bridges the physical memory manager (which uses
+*	a bitmap) and the page table manager together. This means we can just map as many virtual addresses
+*   as we want (assuming we have enough memory to do so), as the PMM takes care of ALL physical addresses 
+*    for us!
+*/
 void map_vaddr_page(uint32_t virtual_address) {
 	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress;
 
 	uint32_t pd_index = virtual_address >> 22;
 	uint32_t pde = page_dir[pd_index];
-
-	bcprintf("map_vaddr_page(%x)\n", virtual_address);
-
-	bool new_pd = false;
 
 	if(!is_present(pde)) { // is the pg dir entry present?
 		// NO! Let's set it up
@@ -143,39 +157,33 @@ void map_vaddr_page(uint32_t virtual_address) {
 
 		page_dir[pd_index] = pde; 
 
-		new_pd = true;
+		// this is a new PD, we need to zero out the whole directory
+		page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index);
+		for(int i = 0; i < 1024; i++) {
+			page_table[i] = 0;
+		}
 
-		bcprintf("PDE INSTALLED (4mib boundary) @ %x\n", pde_phys_addr);
+		//bcprintf("pg: %d (%x), ", pd_index, pde_phys_addr);
 	}
 
 	page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index); // uses recursive pg tables
 
-	if(new_pd) {
-		// this is a new PD, we need to zero out the whole directory
-		for(int i = 0; i < 1024; i++) {
-			page_table[i] = 0;
-		}
-	}
-
 	uint32_t pt_index = (virtual_address >> PAGE_OFFSET_BITS) & 0x03FF;
 	uint32_t pte = page_table[pt_index];
 
-	if(!is_present(pte)) {
-		bcprintf("Page Table Entry creation: pt_index=%d\n", pt_index);
-
+	if(!is_present(pte)) { // is the pg table entry present?
+		// NO! Let's set it up
 		uint32_t* pte_phys_addr = (uint32_t*)page_allocate();
-
-		bcprintf("    &pte_phys_addr=%x\n", pte_phys_addr);
 
 		uint32_t pte_new = (uint32_t)pte_phys_addr;
 		pte_new |= (1);			// PRESENT
 		pte_new |= (1 << 1);		// READ/WRITE
 		pte_new |= (1 << 2);		// ALL ACCESS
 
-		page_table[pt_index] = pte_new; // 0x10000007;
+		page_table[pt_index] = pte_new;
+
+		//bcprintf("%d (%x)\n", pt_index,pte_phys_addr );
 	}
 
-	bcprintf("Got here :)\n");
-
-	//tlb_flush();
+	 
 }

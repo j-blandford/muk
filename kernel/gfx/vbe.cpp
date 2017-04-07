@@ -71,19 +71,33 @@ void fill_circle(const uint32_t x, const uint32_t y, uint16_t radius, RGBA color
     }
 }
 
-void init_fbe(multiboot_info_t * mb_info) {
-    fb_loc = (uint8_t*)(int)mb_info->framebuffer_addr;
+void init_fbe(multiboot_info_t* mboot) {
 
-    frame_width = mb_info->framebuffer_width;
-    frame_height = mb_info->framebuffer_height;
-    frame_depth = mb_info->framebuffer_bpp;
+    fb_loc = (uint8_t*)(int)mboot->framebuffer_addr + KERNEL_VIRT_BASE;
 
-    frame_pitch = mb_info->framebuffer_pitch;
+    frame_width = mboot->framebuffer_width;
+    frame_height = mboot->framebuffer_height;
+    frame_depth = mboot->framebuffer_bpp;
 
+    frame_pitch = mboot->framebuffer_pitch;
+
+    bcprintf("Width: (addr=%x)\n",&frame_width);
+
+    MAGIC_BREAK;
+    
     bb_loc = (uint8_t*)kmalloc(frame_height*frame_pitch);
+
+    bcprintf("LUL1\n");
+    bcprintf("%dx%dx%d (width addr=%x)\n",frame_width,frame_height,frame_depth, &frame_width);
+
+    MAGIC_BREAK;
 
     dirty_lines = (bool*)kmalloc(sizeof(bool)*frame_height);
     memset(dirty_lines, false, sizeof(bool)*frame_height);
+
+    bcprintf("LUL2\n");
+    bcprintf("%dx%dx%d (addr=%x)\n",frame_width,frame_height,frame_depth, mboot);
+
 }
 
 void test_surfaces() {

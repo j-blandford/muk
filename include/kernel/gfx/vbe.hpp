@@ -84,8 +84,13 @@ const RGBA color_gray = RGBA(0x77, 0x77, 0x77, 0xFF);
 const RGBA color_light_gray = RGBA(0xED, 0xED, 0xED, 0xFF);
 const RGBA color_white = RGBA(0xFF, 0xFF, 0xFF, 0xFF);
 
+extern unsigned int frame_width, frame_height, frame_depth, frame_pitch;
+extern uint8_t     *fb_loc;
+extern uint8_t     *bb_loc; // back-buffer
+extern bool        *dirty_lines;
+
 // front-buffer, grabbed from Multiboot information
-void init_fbe(multiboot_info_t * mb_info);
+void init_fbe(multiboot_info_t* mboot);
 void test_surfaces();
 
 void update_buffer(bool fullRefresh = true);
@@ -97,11 +102,6 @@ void       draw_circle(const uint32_t x, const uint32_t y,
                                       uint16_t radius, RGBA color);
 void       fill_circle(const uint32_t x, const uint32_t y,
                                       uint16_t radius, RGBA color);
-
-extern unsigned int frame_width, frame_height, frame_depth, frame_pitch;
-extern uint8_t     *fb_loc;
-extern uint8_t     *bb_loc; // back-buffer
-extern bool        *dirty_lines;
 
 // Font drawing and display functions
 void drawchar_transparent( unsigned char c, int x, int y, RGBA fgcolor);
