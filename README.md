@@ -12,15 +12,21 @@ A very basic microkernel. This isn't meant to be a full-featured kernel+OS, but 
 		* [TODO] std::bitset
 * GRUB2 bootloader
 * Page tables
+* Memory management
+    * Virtual Memory management
+    * Heap manager (kernel only for the moment)
+    * Physical Memory management
 * Interrupts
     * Timer IRQ for sleep() and wait()
 	* Keyboard IRQ for TTY input
+	* Lock/Unlock the scheduler per thread
 	* [TODO] Exception handling
 * Higher-half kernel loading
 * Basic time-slicing scheduler
     * Multiple threads can run concurrently!
 	* [TODO] thread priorities
+    * Graphics driver as a thread
 * Starting to implement a POSIX-compatible terminal
 * Filesystems
-    * [TODO] FAT16
-	* [TODO] ext2
+    * FAT16 (almost finished)
+    * [TODO] ext2
