@@ -106,8 +106,6 @@ void idt_install() {
   idt_p.base = (uint32_t)&idt_entries;
 
   idt_flush((uint32_t)&idt_p);
-
-  terminal_writestring("[IDT] Installed blank interrupt table\n");
 }
 
 isr_t isr_handlers[256];

@@ -6,6 +6,8 @@
 #include <kernel/idt.hpp>
 #include <kernel/timer.hpp>
 
+#include <kernel/gfx/surface.hpp>
+
 #include <kernel/proc/process.hpp>
 #include <kernel/proc/scheduler.hpp>
 #include <kernel/proc/thread.hpp>
@@ -41,18 +43,22 @@ static void test_thread() {
 *   process for the time being.
 */
 void start_thread(char* title, void_fn entry) {
-	Thread *thread = new Thread();
+	bcprintf("Starting thread %s...\n", title);
+	Thread* thread = new Thread();
+	bcprintf("Got here 1...\n");
 	memcpy(thread->title, title, strlen(title)+1);
 	thread->thread_id = next_tid;
+	bcprintf("Got here 2...\n");
 
 	thread->entry_ptr = entry;
 	thread->state_reg.eip = (uint32_t)entry;
-
+	bcprintf("Got here 3...\n");
 	thread_list.push_back(thread);
-
+	bcprintf("Got here 4...\n");
 	next_tid++;
 }
 
 void init_kthreads() {
 	start_thread("keyboard_driver", &tty_update);
+	start_thread("display_driver", &surface_update);
 }

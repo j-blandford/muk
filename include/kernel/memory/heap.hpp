@@ -15,17 +15,17 @@ public:
 	BlockHeader* next; // ptr to the next block header
 	BlockHeader* prev; // "" previous block header
 
-	BlockHeader(size_t size, BlockHeader* prev) : 
-		in_use(true), 
-		size(size), 
-		next(0), 
-		prev(prev) { }
+	BlockHeader(size_t size, BlockHeader* prev) 
+	: in_use(true)
+	, size(size)
+	, next(0)
+	, prev(prev) { }
 	
-	BlockHeader(size_t size, BlockHeader* prev, BlockHeader* next) : 
-		in_use(true), 
-		size(size), 
-		next(next), 
-		prev(prev) { }
+	BlockHeader(size_t size, BlockHeader* prev, BlockHeader* next)
+	: in_use(true)
+	, size(size)
+	, next(next)
+	, prev(prev) { }
 };
 
 void* kmalloc(size_t size);

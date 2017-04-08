@@ -52,8 +52,6 @@ void * page_allocate() {
 * 	Function which initialises the memory bitmap from the GRUB boot information
 */
 void pmm_setup(multiboot_info_t* mboot, uint32_t k_phys_start, uint32_t k_phys_end) {
-	terminal_printf("[INFO] Total memory:  %d kb\n",mboot->mem_upper + mboot->mem_lower);
-
 	pg_num_free = 0;
 
 	// GRUB provides the kernel with a struct containing the map of memory
@@ -61,7 +59,6 @@ void pmm_setup(multiboot_info_t* mboot, uint32_t k_phys_start, uint32_t k_phys_e
 	memory_map_t * mmap = (memory_map_t*)(mboot->mmap_addr + KERNEL_VIRT_BASE);
 	size_t mmap_entries = mboot->mmap_length / sizeof(memory_map_t);
 
-	terminal_printf("[PMM] Physical memory layout is: ");
 	for(size_t index = 0; index < mmap_entries; index++) {
 
 		if(mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
@@ -75,15 +72,9 @@ void pmm_setup(multiboot_info_t* mboot, uint32_t k_phys_start, uint32_t k_phys_e
 			for(uint32_t pg_index = first_pg; pg_index < end_pg; pg_index++) {
 				pg_mark_free(pg_index);
 			}
-
-			// Print how many pages we have in this chunk
-			terminal_printf("(%d)", mmap->length_low / PAGE_SIZE);
 		}
-
 		mmap ++;
 	}
-
-	terminal_printf("\n");
 
 	uint32_t end_kernel_pg = (k_phys_end & 0xFFFFF000) >> PAGE_OFFSET_BITS;
 	for(uint32_t pg_index = 0; pg_index < end_kernel_pg+1; pg_index++) {
@@ -117,8 +108,6 @@ page_directory_t pg_directory_setup() {
 	recursive_pde |= (1 << 2);		// ALL ACCESS
 	recursive_pde |= (1 << 5);		// CACHE DISABLE
 	page_dir[1023] = recursive_pde; //** last page directory points to itself (which is virtual address 0xFFFFF000) **//
-
-	terminal_printf("[PGT] Recursive paging successful\n");
 
 	return page_dir;
 }

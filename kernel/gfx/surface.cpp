@@ -20,7 +20,7 @@ Surface::Surface(Vector2 pos, Vector2 dim) {
     this->dirty_buffer = (bool*)kmalloc(dim.y*sizeof(bool));
     memset(this->dirty_buffer, false, dim.y*sizeof(bool));
 
-    bcprintf("Successfully initialised surface!\n");
+    bcprintf("Successfully initialised surface (%d bytes)!\n",dim.y*this->s_pitch);
 }
 
 void Surface::setPixel(uint32_t x, uint32_t y, RGBA color) {
@@ -33,7 +33,7 @@ void Surface::setPixel(uint32_t x, uint32_t y, RGBA color) {
     this->buff_loc[where + 1] = color.g;
     this->buff_loc[where + 2] = color.r;
 
-    this->dirty_buffer[y] = true;
+    //this->dirty_buffer[y] = true;
 }
 
 void Surface::drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGBA color) {
@@ -69,6 +69,7 @@ void Surface::drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGBA color) {
 }
 
 void Surface::apply(bool fullRefresh) {
+    //
     // Apply the surface to the back buffer.
     // ------------------------------------------------------------------**
     //     PLEASE NOTE: this function doesn't actually display the Surface! 
@@ -103,7 +104,7 @@ void Surface::setZindex(uint8_t z_index) {
 
 void Surface::setBackground(RGBA bg_color) {
     for(size_t x = 0; x < this->dim.x; x++) {
-        for(size_t y = 0; y < this->dim.y; y++) {
+        for(size_t y = 0; y < this->dim.y-1; y++) {
             this->setPixel(x, y, bg_color);
         }
     }
@@ -115,8 +116,6 @@ void init_screens() {
 	screen_surfaces[SURF_SCREEN]->setBackground(RGBA(0x2a2b31));
 	screen_surfaces[SURF_SCREEN]->apply(true);
 
-	bcprintf("Finished initialising surfaces\n");
-
     //test_surfaces();
 
 	// screen_surfaces.push_back(Surface(Vector2(250,250), Vector2(50,50)));
@@ -127,22 +126,22 @@ void init_screens() {
 }
 
 void surface_update() {
-    //Scheduler::pause();
+    for(;;) {
+        //Scheduler::lock();
 
-    bcprintf(">>>> surface_update()\n");
+        bcprintf(">>>> surface_update()\n");
 
-    update_buffer(true);
+        update_buffer(true);
 
-    bcprintf(">>>> END :: surface_update()\n");
+        Scheduler::yield();
 
-    //Scheduler::resume();
+        //Scheduler::unlock();
+    }
 }
 
 void start_display_driver(multiboot_info_t* mboot) {
     init_fbe(mboot);
     init_screens();
 
-    surface_update();
-
-    //start_thread("display_driver", &surface_update);
+    update_buffer(true);  
 }

@@ -9,7 +9,6 @@ uint8_t     *bb_loc; // back-buffer
 
 bool         *dirty_lines; // our "dirty" buffer
 
-
 void putpx(size_t x, size_t y, uint32_t color)
 {
     RGBA col(color);
@@ -20,7 +19,6 @@ void putpx(size_t x, size_t y, uint32_t color)
     bb_loc[where + 0] = col.b;
     bb_loc[where + 1] = col.g;
     bb_loc[where + 2] = col.r;
-    
 }
 
 void setpx(size_t x, size_t y, RGBA col)
@@ -111,14 +109,12 @@ void test_surfaces() {
 
 void drawchar_transparent(unsigned char c, int x, int y, RGBA fgcolor) {
 	size_t cx,cy;
-	int mask[8]={1,2,4,8,16,32,64,128};
+	int mask[8]={1,2,4,8,16,32,64,128}; // essentially 1 << 1, 1<<2, 1<<3, 1<<4...
 
     uint32_t x_coord;
     uint32_t y_coord;
 
 	uint8_t * glyph = font_terminus[c];
-
-	bcprintf("screen_surfaces.size(): %d", screen_surfaces.size());
  
 	for(cy=0;cy<16;cy++){
 		for(cx=0;cx<8;cx++){
@@ -126,19 +122,15 @@ void drawchar_transparent(unsigned char c, int x, int y, RGBA fgcolor) {
                 x_coord = x+cx;
                 y_coord = y+cy-12;
 
-             //   screen_surfaces[SURF_SCREEN]->setPixel(x_coord, y_coord, fgcolor);
-               // *(dirty_lines+sizeof(bool)*(y_coord)) = true; // update the dirty buffer for this y-value
+                screen_surfaces[SURF_SCREEN]->setPixel(x_coord, y_coord, fgcolor);
+                *(dirty_lines+sizeof(bool)*(y_coord)) = true; // update the dirty buffer for this y-value
             }
 		}
 	}
-
-    // MOVE THIS SOMEWHERE BETTER 
-    //screen_surfaces[SURF_SCREEN].apply();
 }
 
 void update_buffer(bool fullRefresh) {
-
-    //screen_surfaces[SURF_SCREEN]->apply(false);
+    screen_surfaces[SURF_SCREEN]->apply(true);
 
     // Copy back buffer to front buffer where the "dirty" buffer is 1
     // we are currently marking one line dirty and updating the line

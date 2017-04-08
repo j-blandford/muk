@@ -25,14 +25,16 @@ void ENV::set(string envVar, string envVal) {
 		}
 	}
 
+	bcprintf("Set ENV::%s = %s\n", envVar, envVal);
+
 	// if we get here, then the key wasn't found inside the vector, so let's add it!
 	environment.push_back(pair(envVar, envVal));
 }
 
 void ENV::initialise() {
-	ENV::set("cd", "/");
-	ENV::set("user", "james");
-	ENV::set("comp-name", "localhost");
+	// ENV::set("cd", "/");
+	// ENV::set("user", "james");
+	// ENV::set("comp-name", "localhost");
 	//ENV::set()
 
 	// terminal_printf("%x\n", &environment);

@@ -4,14 +4,16 @@
 #include <stdint.h>
 
 extern volatile uint64_t timer_ticks;
+extern volatile uint32_t timer_tenths;
 
-class Timer {
-public:
-    static void initTimer();
-    static void testTimer();
+namespace Timer {
+    void initTimer();
+    void testTimer();
 
-    static void setCount(int hz);
-    static void sleep(int ticks);
+    void setCount(int hz);
+    void sleep(int ticks);
+
+    void yield();
 };
 
 void sleep(int ticks);

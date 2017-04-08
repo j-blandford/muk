@@ -12,8 +12,8 @@
 #include <kernel/gfx/vbe.hpp>
 #include <kernel/gfx/surface.hpp>
 
-size_t terminal_row;
-size_t terminal_column;
+size_t terminal_row = 0;
+size_t terminal_column = 0;
 uint8_t terminal_color;
 uint16_t* terminal_buffer;
 
@@ -24,25 +24,23 @@ static vec2 cursor_pos = { 0, 0 };
 
 char kb_buffer[1024];
 
+// For the moment, this is not used as it relates to VGA memory rather than VBE
 void init_tty() {
-	terminal_row = 0;
-	terminal_column = 0;
-	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-	terminal_buffer = VGA_MEMORY;
-
-	for (size_t y = 0; y < VGA_HEIGHT; y++) {
-		for (size_t x = 0; x < VGA_WIDTH; x++) {
-			const size_t index = y * VGA_WIDTH + x;
-			terminal_buffer[index] = vga_entry(' ', terminal_color);
-		}
-	}
-	terminal_writestring("[TTY] Initialised\n");
+	//terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+	//terminal_buffer = VGA_MEMORY;
+	// for (size_t y = 0; y < VGA_HEIGHT; y++) {
+	// 	for (size_t x = 0; x < VGA_WIDTH; x++) {
+	// 		const size_t index = y * VGA_WIDTH + x;
+	// 		terminal_buffer[index] = vga_entry(' ', terminal_color);
+	// 	}
+	// }
+	//terminal_writestring("[TTY] Initialised\n");
 }
 
 void terminal_writestring(const char* data) {
-	if(terminal_row == VGA_HEIGHT) {
-	//	terminal_scrollup();
-	}
+	// if(terminal_row == VGA_HEIGHT) {
+	// //	terminal_scrollup();
+	// }
 
 	for (; *data; ++data) {
 		terminal_putchar((*data));
@@ -51,10 +49,8 @@ void terminal_writestring(const char* data) {
 
 void terminal_putentryat(const char c, size_t x, size_t y) {
 	const size_t index = y * VGA_WIDTH + x;
-
-	terminal_buffer[index] = vga_entry(c, VGA_COLOR_WHITE);
-
-//	drawchar_transparent(c, x*X_FONTWIDTH, y*Y_FONTWIDTH, RGBA(0xFFFFFF));
+	//terminal_buffer[index] = vga_entry(c, VGA_COLOR_WHITE);
+	drawchar_transparent(c, x*X_FONTWIDTH, (y+1)*Y_FONTWIDTH, RGBA(0xFFFFFF));
 }
 
 void terminal_putchar(const char c) {
@@ -98,10 +94,10 @@ void terminal_printf(const char* fmt, ...) {
 }
 
 void terminal_clearline(size_t y) {
-	for (size_t x = 0; x < VGA_WIDTH; x++) {
-		const size_t index = y * VGA_WIDTH + x;
-		terminal_buffer[index] = vga_entry(' ', terminal_color);
-	}
+	// for (size_t x = 0; x < VGA_WIDTH; x++) {
+	// 	const size_t index = y * VGA_WIDTH + x;
+	// 	terminal_buffer[index] = vga_entry(' ', terminal_color);
+	// }
 }
 
 void terminal_scrollup() {
@@ -113,7 +109,7 @@ void terminal_scrollup() {
 
 		terminal_clearline(y-1);
 
-		memcpy(&terminal_buffer[dest_idx], &terminal_buffer[src_idx], VGA_WIDTH * sizeof(uint16_t));
+		//memcpy(&terminal_buffer[dest_idx], &terminal_buffer[src_idx], VGA_WIDTH * sizeof(uint16_t));
 	}
 }
 
@@ -146,15 +142,17 @@ void tty_set_cursor_x(size_t x) {
 
 void tty_update() {
 	for(;;) {
+		        bcprintf(">>>> surface_update()\n");
+
 		//BochsConsolePrint(">>>>>>>>>>>>>>>>>>>>> tty_update\n");
 		terminal_writestring("[");
-		terminal_writestring((char*)ENV::get("user"));
+		terminal_writestring("james");
 		terminal_writestring("@");
-		terminal_writestring((char*)ENV::get("comp-name"));
+		terminal_writestring("localhost");
 		terminal_writestring(" ");
 
 		terminal_writestring("0:");
-		terminal_writestring((char*)ENV::get("cd"));
+		terminal_writestring("/");
 		
 		terminal_writestring("] ");
 		//surface_update();

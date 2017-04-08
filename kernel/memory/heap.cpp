@@ -34,7 +34,13 @@ void* kmalloc(size_t size) {
 
     // Lets traverse the linked list to find the next block which is free (has no "next" ptr)
     BlockHeader* found_block = (BlockHeader*)kheap_start;
-    for(; found_block->next && found_block != found_block->next; found_block = found_block->next) { }
+    for(; found_block->next && found_block != found_block->next; found_block = found_block->next) {
+        bcprintf("     found_block=%x, \n", found_block);
+        bcprintf("        ->size=%x\n", found_block->size);
+        bcprintf("        ->next=%x\n", found_block->next);
+     }
+
+
 
     size += sizeof(BlockHeader);
 

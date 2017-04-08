@@ -43,6 +43,10 @@ void Timer::sleep(int ticks) {
 	}
 }
 
+void Timer::yield() {
+    timer_tenths = 100; // force the next timer IRQ to switch threads
+}
+
 void Timer::initTimer() {
     timer_ticks = 0;
     timer_tenths = 0;
@@ -62,9 +66,5 @@ void Timer::testTimer() {
 }
 
 void sleep(int ticks) {
-    Timer::sleep(ticks);
-}
-
-void Timer(int ticks) {
     Timer::sleep(ticks);
 }

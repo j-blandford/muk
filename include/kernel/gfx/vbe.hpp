@@ -14,6 +14,27 @@
 
 #define SURF_SCREEN 0
 
+class RGB {
+public:
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+
+    RGB(uint8_t r, uint8_t g, uint8_t b) {
+        (*this).r = r;
+        (*this).g = g;
+        (*this).b = b;
+    }
+
+    RGB(uint32_t hex) {
+        (*this).r = hex >> 16;
+        (*this).g = hex >> 8;
+        (*this).b = hex;
+    }
+
+    RGB() : r(0xFF), g(0xFF), b(0xFF) { } // default to pure white if values aren't specified
+    ~RGB() { }
+};
 
 class RGBA {
 public:
@@ -67,6 +88,7 @@ typedef struct {
     uint32_t h;
 } rect;
 
+// obsolete
 typedef struct {
     int x;
     int y;

@@ -4,6 +4,7 @@
 #include <kernel/tty.hpp>
 #include <kernel/cpu.hpp>
 #include <kernel/idt.hpp>
+#include <kernel/timer.hpp>
 
 #include <kernel/memory/alloc.hpp>
 
@@ -20,7 +21,7 @@ registers Scheduler::base_state;
 // this function currently isn't used. I need to work out how
 // to call interrupts from within the IRQ0 (timer) interrupt.
 static void scheduler_isr130(registers * r) {
-	// scheduler_next(r);
+	Scheduler::next(r);
 	// MAGIC_BREAK;
 	// return;
 }
@@ -58,6 +59,8 @@ void Scheduler::next(registers * r) {
 		// set the registers from the current thread's saved state
 		memcpy(r, &thread_list[task_idx]->state_reg, sizeof(registers));
 
+		bcprintf("thread: %s\n", thread_list[task_idx]->title);
+
 		task_idx++;
 
 		// Loop around 0 -> 1 -> 2 -> 0 -> ...
@@ -71,20 +74,24 @@ void Scheduler::next(registers * r) {
 // it stops schedule_next from switching context to another thread until
 // resume() is called. 
 // Note: this can HANG THE KERNEL if used improperly!!!!!
-bool Scheduler::pause() {
+bool Scheduler::lock() {
 	if(running) {
 		running = false;
 		return true;
 	}
-	return false; // already paused, we cannot pause AGAIN!
+	return false; // already locked, we cannot lock AGAIN!
 }
 
-bool Scheduler::resume() {
+bool Scheduler::unlock() {
 	if(!running) {
 		running = true;
 		return true;
 	}
-	return false; // already running, we cannot resume AGAIN!
+	return false; // already unlocked, we cannot unlock AGAIN!
+}
+
+void Scheduler::yield() {
+	Timer::yield();
 }
 
 void Scheduler::init() {

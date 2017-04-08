@@ -14,8 +14,9 @@ class Scheduler {
 	
 public:
 	static void next(registers* r);
-	static bool pause();
-	static bool resume();
+	static bool lock();
+	static bool unlock();
+	static void yield();
 	
 	static void init();
 };
