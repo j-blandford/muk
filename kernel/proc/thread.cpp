@@ -43,18 +43,15 @@ static void test_thread() {
 *   process for the time being.
 */
 void start_thread(char* title, void_fn entry) {
-	bcprintf("Starting thread %s...\n", title);
 	Thread* thread = new Thread();
-	bcprintf("Got here 1...\n");
 	memcpy(thread->title, title, strlen(title)+1);
 	thread->thread_id = next_tid;
-	bcprintf("Got here 2...\n");
 
 	thread->entry_ptr = entry;
 	thread->state_reg.eip = (uint32_t)entry;
-	bcprintf("Got here 3...\n");
+
 	thread_list.push_back(thread);
-	bcprintf("Got here 4...\n");
+
 	next_tid++;
 }
 

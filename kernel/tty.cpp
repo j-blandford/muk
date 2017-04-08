@@ -9,6 +9,7 @@
 #include <kernel/memory/alloc.hpp>
 #include <kernel/drivers/keyboard.hpp>
 #include <kernel/user/env.hpp>
+#include <kernel/proc/scheduler.hpp>
 #include <kernel/gfx/vbe.hpp>
 #include <kernel/gfx/surface.hpp>
 
@@ -41,10 +42,11 @@ void terminal_writestring(const char* data) {
 	// if(terminal_row == VGA_HEIGHT) {
 	// //	terminal_scrollup();
 	// }
-
+	Scheduler::lock();
 	for (; *data; ++data) {
 		terminal_putchar((*data));
 	}
+	Scheduler::unlock();
 }
 
 void terminal_putentryat(const char c, size_t x, size_t y) {
@@ -119,13 +121,13 @@ void update_cursor(int row, int col) {
 	cursor_pos.x = col+1;
 	cursor_pos.y = row;
 
-	// cursor LOW port to vga INDEX register
-	outportb(0x3D4, 0x0F);
-	outportb(0x3D5, (unsigned char)(position&0xFF));
+	// // cursor LOW port to vga INDEX register
+	// outportb(0x3D4, 0x0F);
+	// outportb(0x3D5, (unsigned char)(position&0xFF));
 	
-	// cursor HIGH port to vga INDEX register
-	outportb(0x3D4, 0x0E);
-	outportb(0x3D5, (unsigned char )((position>>8)&0xFF));
+	// // cursor HIGH port to vga INDEX register
+	// outportb(0x3D4, 0x0E);
+	// outportb(0x3D5, (unsigned char )((position>>8)&0xFF));
 
 }
 
@@ -142,7 +144,8 @@ void tty_set_cursor_x(size_t x) {
 
 void tty_update() {
 	for(;;) {
-		        bcprintf(">>>> surface_update()\n");
+		//Scheduler::lock();
+		bcprintf(">>>> tty_update()\n");
 
 		//BochsConsolePrint(">>>>>>>>>>>>>>>>>>>>> tty_update\n");
 		terminal_writestring("[");
@@ -155,10 +158,15 @@ void tty_update() {
 		terminal_writestring("/");
 		
 		terminal_writestring("] ");
+
+		//Scheduler::yield();
+		
 		//surface_update();
 		getsn(&kb_buffer[0], 1024);
 
 		Command::Parse(kb_buffer);
+
+		//Scheduler::unlock();
 		//BochsConsolePrint("<<<<<<<<<<<<<<<<<<<<<<<<< tty_update\n");
 	}
 }

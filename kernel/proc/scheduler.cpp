@@ -22,8 +22,6 @@ registers Scheduler::base_state;
 // to call interrupts from within the IRQ0 (timer) interrupt.
 static void scheduler_isr130(registers * r) {
 	Scheduler::next(r);
-	// MAGIC_BREAK;
-	// return;
 }
 
 // this is the heart of our time slicing algorithm. It's extremely
@@ -59,7 +57,7 @@ void Scheduler::next(registers * r) {
 		// set the registers from the current thread's saved state
 		memcpy(r, &thread_list[task_idx]->state_reg, sizeof(registers));
 
-		bcprintf("thread: %s\n", thread_list[task_idx]->title);
+		// bcprintf("thread: %s\n", thread_list[task_idx]->title);
 
 		task_idx++;
 
@@ -91,6 +89,7 @@ bool Scheduler::unlock() {
 }
 
 void Scheduler::yield() {
+	Scheduler::unlock();
 	Timer::yield();
 }
 

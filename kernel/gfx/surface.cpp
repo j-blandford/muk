@@ -33,7 +33,7 @@ void Surface::setPixel(uint32_t x, uint32_t y, RGBA color) {
     this->buff_loc[where + 1] = color.g;
     this->buff_loc[where + 2] = color.r;
 
-    //this->dirty_buffer[y] = true;
+    this->dirty_buffer[y] = true;
 }
 
 void Surface::drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGBA color) {
@@ -127,15 +127,9 @@ void init_screens() {
 
 void surface_update() {
     for(;;) {
-        //Scheduler::lock();
-
-        bcprintf(">>>> surface_update()\n");
-
-        update_buffer(true);
-
+        Scheduler::lock();
+        update_buffer(false);
         Scheduler::yield();
-
-        //Scheduler::unlock();
     }
 }
 

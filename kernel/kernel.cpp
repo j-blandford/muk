@@ -24,37 +24,36 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
     tss_install();
     idt_install();
 
+    // Set up the Physical Memory manager's bitmap (with pages taken up by the kernel)
     pmm_setup(mb_info, k_phys_start, k_phys_end);
-    page_directory_t kernel_pd = pg_directory_setup(); // set up the page tables
+    // now we can set up the kernels' Page directory (this is out VIRTUAL memory manager)
+    page_directory_t kernel_pd = pg_directory_setup();
 
     // IRQ0
     Timer::initTimer();
     // IRQ1
     keyboard_install();
 
+    // this loads our driver threads into the scheduler
     init_kthreads();
 
     start_display_driver(mb_info);
 
-    //init_tty();
-
-    update_buffer(true);
-
     ENV::initialise();
-
-    // // ISR130
-    // scheduler_init();
 
     // // void_fn module_one = get_module_funct(mb_info, 0); // should execute our "basic_program.s" file...
     // // terminal_printf("module_one address: %x\n", module_one);
     // // MAGIC_BREAK;
     // // module_one();
 
+    // this line starts to run the threads and drivers, the LAST thing to enable!!!
     interrupts_enable();
+
+    terminal_writestring("[OK] muk boot successful.\n");
 
     // Filesystem::initialise();
 
-    // // This does nothing apart from stop our kmain function from returning
-    // // Every process is now a thread (running almost asynchronously)
+    // This does nothing apart from stop our kmain function from returning
+    // Every process is now a thread (running "asynchronously")
     while(true) { }
 }
