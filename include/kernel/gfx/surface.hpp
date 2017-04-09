@@ -46,9 +46,9 @@ public:
     void bringToFront();
     void setZindex(uint8_t z_index);
 
-    void setPixel(uint32_t x, uint32_t y, RGBA color); // Set a single pixel
-    void setBackground(RGBA bg_color);
-    void drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGBA color);
+    void setPixel(uint32_t x, uint32_t y, RGB color); // Set a single pixel
+    void setBackground(RGB bg_color);
+    void drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGB color);
 };
 
 extern std::vector<Surface*> screen_surfaces;

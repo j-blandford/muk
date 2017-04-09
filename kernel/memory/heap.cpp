@@ -38,7 +38,7 @@ void* kmalloc(size_t size) {
         bcprintf("     found_block=%x, \n", found_block);
         bcprintf("        ->size=%x\n", found_block->size);
         bcprintf("        ->next=%x\n", found_block->next);
-     }
+    }
 
 
 

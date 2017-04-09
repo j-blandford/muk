@@ -38,24 +38,24 @@ void init_tty() {
 	//terminal_writestring("[TTY] Initialised\n");
 }
 
-void terminal_writestring(const char* data) {
+void terminal_writestring(char* data, RGB colour) {
 	// if(terminal_row == VGA_HEIGHT) {
 	// //	terminal_scrollup();
 	// }
 	Scheduler::lock();
 	for (; *data; ++data) {
-		terminal_putchar((*data));
+		terminal_putchar((*data), colour);
 	}
 	Scheduler::unlock();
 }
 
-void terminal_putentryat(const char c, size_t x, size_t y) {
+void terminal_putentryat(char c, size_t x, size_t y, RGB colour) {
 	const size_t index = y * VGA_WIDTH + x;
 	//terminal_buffer[index] = vga_entry(c, VGA_COLOR_WHITE);
-	drawchar_transparent(c, x*X_FONTWIDTH, (y+1)*Y_FONTWIDTH, RGBA(0xFFFFFF));
+	drawchar_transparent(c, x*X_FONTWIDTH, (y+1)*Y_FONTWIDTH, colour);
 }
 
-void terminal_putchar(const char c) {
+void terminal_putchar(char c, RGB colour) {
 	if(c == '\n') {
 		terminal_column = 0;
 		terminal_row++;
@@ -74,7 +74,7 @@ void terminal_putchar(const char c) {
 		return;
 	}
 
-	terminal_putentryat(c, terminal_column, terminal_row);
+	terminal_putentryat(c, terminal_column, terminal_row, colour);
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
 

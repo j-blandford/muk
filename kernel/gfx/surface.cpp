@@ -23,7 +23,7 @@ Surface::Surface(Vector2 pos, Vector2 dim) {
     bcprintf("Successfully initialised surface (%d bytes)!\n",dim.y*this->s_pitch);
 }
 
-void Surface::setPixel(uint32_t x, uint32_t y, RGBA color) {
+void Surface::setPixel(uint32_t x, uint32_t y, RGB color) {
     if(x>=this->dim.x || y>=this->dim.y)
         return;
 
@@ -36,7 +36,7 @@ void Surface::setPixel(uint32_t x, uint32_t y, RGBA color) {
     this->dirty_buffer[y] = true;
 }
 
-void Surface::drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGBA color) {
+void Surface::drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGB color) {
     unsigned int xm=0;
     int delta=1-2*radius, error=0, ym=radius;
 
@@ -102,7 +102,7 @@ void Surface::setZindex(uint8_t z_index) {
     this->z_index = z_index;
 }
 
-void Surface::setBackground(RGBA bg_color) {
+void Surface::setBackground(RGB bg_color) {
     for(size_t x = 0; x < this->dim.x; x++) {
         for(size_t y = 0; y < this->dim.y-1; y++) {
             this->setPixel(x, y, bg_color);
@@ -113,7 +113,7 @@ void Surface::setBackground(RGBA bg_color) {
 void init_screens() {
 	screen_surfaces.push_back(new Surface(Vector2(0,0), Vector2(frame_width,frame_height)));
 	
-	screen_surfaces[SURF_SCREEN]->setBackground(RGBA(0x2a2b31));
+	screen_surfaces[SURF_SCREEN]->setBackground(RGB(0x2a2b31));
 	screen_surfaces[SURF_SCREEN]->apply(true);
 
     //test_surfaces();

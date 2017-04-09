@@ -19,9 +19,9 @@ void init_tty();
 void tty_update();
 void terminal_scrollup();
 void terminal_clearline(size_t y);
-void terminal_writestring(const char* data);
-void terminal_putentryat(const char c, size_t x, size_t y);
-void terminal_putchar(const char c);
+void terminal_writestring(char* data, RGB colour = RGB(0xFFFFFF));
+void terminal_putentryat(char c, size_t x, size_t y, RGB colour = RGB(0xFFFFFF));
+void terminal_putchar(char c, RGB colour = RGB(0xFFFFFF));
 
 void terminal_printf(const char* fmt, ...);
 

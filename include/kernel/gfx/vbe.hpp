@@ -7,7 +7,6 @@
 #include <std.hpp>
 #include <std/vector.hpp>
 
-#include <kernel/tty.hpp>
 #include <kernel/multiboot.hpp>
 
 #include <kernel/gfx/vga.hpp>
@@ -94,18 +93,6 @@ typedef struct {
     int y;
 } vec2;
 
-const RGBA color_transparency = RGBA(0x00, 0x00, 0x00, 0x00);
-const RGBA color_black = RGBA(0x00, 0x00, 0x00, 0xFF);
-const RGBA color_red = RGBA(0xFF, 0x00, 0x00, 0xFF);
-const RGBA color_green = RGBA(0x00, 0xFF, 0x00, 0xFF);
-const RGBA color_blue = RGBA(0x00, 0x00, 0xFF, 0xFF);
-const RGBA color_cyan = RGBA(0x00, 0xFF, 0xFF, 0xFF);
-const RGBA color_magenta = RGBA(0xFF, 0x00, 0xFF, 0xFF);
-const RGBA color_yellow = RGBA(0xFF, 0xFF, 0x00, 0xFF);
-const RGBA color_gray = RGBA(0x77, 0x77, 0x77, 0xFF);
-const RGBA color_light_gray = RGBA(0xED, 0xED, 0xED, 0xFF);
-const RGBA color_white = RGBA(0xFF, 0xFF, 0xFF, 0xFF);
-
 extern unsigned int frame_width, frame_height, frame_depth, frame_pitch;
 extern uint8_t     *fb_loc;
 extern uint8_t     *bb_loc; // back-buffer
@@ -126,4 +113,4 @@ void       fill_circle(const uint32_t x, const uint32_t y,
                                       uint16_t radius, RGBA color);
 
 // Font drawing and display functions
-void drawchar_transparent( unsigned char c, int x, int y, RGBA fgcolor);
+void drawchar_transparent( unsigned char c, int x, int y, RGB fgcolor);
