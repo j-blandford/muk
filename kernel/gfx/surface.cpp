@@ -19,8 +19,6 @@ Surface::Surface(Vector2 pos, Vector2 dim) {
 
     this->dirty_buffer = (bool*)kmalloc(dim.y*sizeof(bool));
     memset(this->dirty_buffer, false, dim.y*sizeof(bool));
-
-    bcprintf("Successfully initialised surface (%d bytes)!\n",dim.y*this->s_pitch);
 }
 
 void Surface::setPixel(uint32_t x, uint32_t y, RGB color) {
@@ -127,9 +125,11 @@ void init_screens() {
 
 void surface_update() {
     for(;;) {
-        Scheduler::lock();
+        //Scheduler::lock();
+        interrupts_disable();
         update_buffer(false);
-        Scheduler::yield();
+        interrupts_enable();
+        //Scheduler::yield();
     }
 }
 

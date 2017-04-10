@@ -17,7 +17,7 @@ void map_heap_pages(uintptr_t end_addr) {
 
 // kernel heap memory allocation
 void* kmalloc(size_t size) {
-    bcprintf("> kmalloc(%d) ",size);
+    bcprintf("> kmalloc(%d)\n",size);
 
     if(size == 0) {
         bcprintf("KERNEL ERROR: Cannot allocate 0 bytes!\n");
@@ -35,9 +35,9 @@ void* kmalloc(size_t size) {
     // Lets traverse the linked list to find the next block which is free (has no "next" ptr)
     BlockHeader* found_block = (BlockHeader*)kheap_start;
     for(; found_block->next && found_block != found_block->next; found_block = found_block->next) {
-        bcprintf("     found_block=%x, \n", found_block);
-        bcprintf("        ->size=%x\n", found_block->size);
-        bcprintf("        ->next=%x\n", found_block->next);
+        // bcprintf("     found_block=%x, \n", found_block);
+        // bcprintf("        ->size=%x\n", found_block->size);
+        // bcprintf("        ->next=%x\n", found_block->next);
     }
 
 
@@ -53,7 +53,7 @@ void* kmalloc(size_t size) {
     if(found_block) 
         found_block->next = next_block;
 
-    bcprintf("-> (%x)\n",(next_block + sizeof(BlockHeader)));
+    //bcprintf("-> (%x)\n",(next_block + sizeof(BlockHeader)));
 
     return (void*)(next_block + sizeof(BlockHeader));
 }

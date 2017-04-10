@@ -57,7 +57,7 @@ void Scheduler::next(registers * r) {
 		// set the registers from the current thread's saved state
 		memcpy(r, &thread_list[task_idx]->state_reg, sizeof(registers));
 
-		// bcprintf("thread: %s\n", thread_list[task_idx]->title);
+		bcprintf("thread: %s\n", thread_list[task_idx]->title);
 
 		task_idx++;
 
@@ -65,6 +65,9 @@ void Scheduler::next(registers * r) {
 		if(task_idx >= thread_list.size()) {
 			task_idx = 0;
 		}
+	} 
+	else {
+		bcprintf("Thread locked!\n");
 	}
 }
 
@@ -74,6 +77,7 @@ void Scheduler::next(registers * r) {
 // Note: this can HANG THE KERNEL if used improperly!!!!!
 bool Scheduler::lock() {
 	if(running) {
+		//bcprintf(">>>>>>>>>>>>>>> LOCKED THREAD\n");
 		running = false;
 		return true;
 	}
@@ -82,6 +86,7 @@ bool Scheduler::lock() {
 
 bool Scheduler::unlock() {
 	if(!running) {
+		//bcprintf("<<<<<<<<<<<<<<<< UNLOCKED THREAD\n");
 		running = true;
 		return true;
 	}

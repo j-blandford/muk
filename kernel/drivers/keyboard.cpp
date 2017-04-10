@@ -4,7 +4,7 @@
 #include <kernel/tty.hpp> 
 #include <kernel/idt.hpp> 
 #include <kernel/cpu.hpp> 
-
+#include <kernel/proc/scheduler.hpp> 
 #include <kernel/drivers/keyboard.hpp> 
 
 static unsigned char keyboard_map[128] =  {
@@ -57,49 +57,54 @@ static buffer_t keyboard_buffer = { .head = 0, .tail = 0, .size = KEYBOARD_BUFFE
 char getc() {
 	volatile char c;
 	for (;;) {
+
 		c = buffer_read(&keyboard_buffer);
 		if (c == -1) {
 			__asm__ __volatile__ ("hlt"); // wait a bit
 		} 
 		else {
+			bcprintf("Pressed key '%c' (%d)\n", c, (int)c);
+
 			return c;
 		}
 	}
 }
 
 char * getsn(char * str, size_t max) {
-    size_t i = 0;
-    while (i < max) {
-        uint8_t px = tty_get_cursor_x();
-        char c = getc();
-        if (c == '\n') {
-            str[i] = 0;
-            return str;
-        } 
-        else if (c == '\b') {
-            if (i > 0) {
-                terminal_putchar(' ');
-                tty_set_cursor_x(tty_get_cursor_x()-2);
-                terminal_putchar(' ');
-                tty_set_cursor_x(tty_get_cursor_x()-2);
-                terminal_putchar(' ');
-                tty_set_cursor_x(tty_get_cursor_x()-1);
-                i = i - 1;
-            } 
-            else {
-                uint8_t x = tty_get_cursor_x();
-                if (x < px) {
-                    tty_set_cursor_x(px-1);
-                }
-            }
-        } 
-        else {
-            str[i] = c;
-            i++;
-        }
-    }
-
-    return NULL;
+	
+	size_t i = 0;
+	while (i < max) {
+		uint8_t px = tty_get_cursor_x();
+		char c = getc();
+		
+		if (c == '\n') {
+			str[i] = 0;
+			bcprintf("sending buffer to command processor...\n");
+			return str;
+		} 
+		else if (c == '\b') {
+			if (i > 0) {
+				terminal_putchar(' ');
+				tty_set_cursor_x(tty_get_cursor_x()-2);
+				terminal_putchar(' ');
+				tty_set_cursor_x(tty_get_cursor_x()-2);
+				terminal_putchar(' ');
+				tty_set_cursor_x(tty_get_cursor_x()-1);
+				i = i - 1;
+			} 
+			else {
+				uint8_t x = tty_get_cursor_x();
+				if (x < px) {
+					tty_set_cursor_x(px-1);
+				}
+			}
+		} 
+		else {
+			str[i] = c;
+			i++;
+		}
+	}
+	return NULL;
 }
 
 static void keyboard_irq1(registers *r) {

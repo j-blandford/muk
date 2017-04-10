@@ -98,8 +98,6 @@ void* pg_virtual_addr(uint16_t pg_num) {
 * 	Sets up recursive page directory to allow us to change the PDEs during runtime
 */
 page_directory_t pg_directory_setup() {
-	const int KERNEL_PAGE_NUMBER = 768;
-
 	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress; // PDVirtualAddress is defined in boot.s
 
 	uint32_t recursive_pde = (uint32_t)&PDPhysicalAddress;

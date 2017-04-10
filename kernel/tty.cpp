@@ -42,11 +42,11 @@ void terminal_writestring(char* data, RGB colour) {
 	// if(terminal_row == VGA_HEIGHT) {
 	// //	terminal_scrollup();
 	// }
-	Scheduler::lock();
+	//Scheduler::lock();
 	for (; *data; ++data) {
 		terminal_putchar((*data), colour);
 	}
-	Scheduler::unlock();
+	//Scheduler::unlock();
 }
 
 void terminal_putentryat(char c, size_t x, size_t y, RGB colour) {
@@ -144,29 +144,28 @@ void tty_set_cursor_x(size_t x) {
 
 void tty_update() {
 	for(;;) {
-		//Scheduler::lock();
-		bcprintf(">>>> tty_update()\n");
 
-		//BochsConsolePrint(">>>>>>>>>>>>>>>>>>>>> tty_update\n");
-		terminal_writestring("[");
-		terminal_writestring("james");
-		terminal_writestring("@");
-		terminal_writestring("localhost");
+		Scheduler::lock();
+
+		terminal_writestring("[", RGB(0xe4e4c8));
+		terminal_writestring("james", RGB(0xff6064));
+		terminal_writestring("@", RGB(0xff6064));
+		terminal_writestring("localhost", RGB(0xff6064));
 		terminal_writestring(" ");
 
-		terminal_writestring("0:");
-		terminal_writestring("/");
+		terminal_writestring("0:", RGB(0x288acc));
+		terminal_writestring("/", RGB(0x288acc));
 		
-		terminal_writestring("] ");
+		terminal_writestring("] ", RGB(0xe4e4c8));
+
+		Scheduler::unlock();
 
 		//Scheduler::yield();
 		
-		//surface_update();
 		getsn(&kb_buffer[0], 1024);
 
-		Command::Parse(kb_buffer);
+		bcprintf("parsing commands...\n");
 
-		//Scheduler::unlock();
-		//BochsConsolePrint("<<<<<<<<<<<<<<<<<<<<<<<<< tty_update\n");
+		// Command::Parse(kb_buffer);
 	}
 }

@@ -9,8 +9,7 @@ uint8_t     *bb_loc; // back-buffer
 
 bool         *dirty_lines; // our "dirty" buffer
 
-void putpx(size_t x, size_t y, uint32_t color)
-{
+void putpx(size_t x, size_t y, uint32_t color) {
     RGBA col(color);
 
     if(x>=frame_width || y>=frame_height)
@@ -21,8 +20,7 @@ void putpx(size_t x, size_t y, uint32_t color)
     bb_loc[where + 2] = col.r;
 }
 
-void setpx(size_t x, size_t y, RGBA col)
-{
+void setpx(size_t x, size_t y, RGBA col) {
     if(x>=frame_width || y>=frame_height)
         return;
         
@@ -32,8 +30,7 @@ void setpx(size_t x, size_t y, RGBA col)
     bb_loc[where + 2] = col.r;
 }
 
-void fill_circle(const uint32_t x, const uint32_t y, uint16_t radius, RGBA color)
-{
+void fill_circle(const uint32_t x, const uint32_t y, uint16_t radius, RGBA color) {
     while(radius > 0)
     {
         unsigned xm=0;
