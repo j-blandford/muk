@@ -13,30 +13,16 @@
 #include <kernel/gfx/vbe.hpp>
 #include <kernel/gfx/surface.hpp>
 
-size_t terminal_row = 0;
-size_t terminal_column = 0;
-uint8_t terminal_color;
+volatile size_t terminal_row = 0;
+volatile size_t terminal_column = 0;
 uint16_t* terminal_buffer;
 
 const int X_FONTWIDTH = 8;
 const int Y_FONTWIDTH = 16; 
 
-static vec2 cursor_pos = { 0, 0 };
+static Vector2 cursor_pos(0,0);
 
 char kb_buffer[1024];
-
-// For the moment, this is not used as it relates to VGA memory rather than VBE
-void init_tty() {
-	//terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-	//terminal_buffer = VGA_MEMORY;
-	// for (size_t y = 0; y < VGA_HEIGHT; y++) {
-	// 	for (size_t x = 0; x < VGA_WIDTH; x++) {
-	// 		const size_t index = y * VGA_WIDTH + x;
-	// 		terminal_buffer[index] = vga_entry(' ', terminal_color);
-	// 	}
-	// }
-	//terminal_writestring("[TTY] Initialised\n");
-}
 
 void terminal_writestring(char* data, RGB colour) {
 	// if(terminal_row == VGA_HEIGHT) {
@@ -156,7 +142,7 @@ void tty_update() {
 		terminal_writestring("0:", RGB(0x288acc));
 		terminal_writestring("/", RGB(0x288acc));
 		
-		terminal_writestring("] ", RGB(0xe4e4c8));
+		terminal_writestring("]# ", RGB(0xe4e4c8));
 
 		Scheduler::unlock();
 

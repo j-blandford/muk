@@ -10,9 +10,8 @@
 
 #define TAB_WIDTH 12
 
-extern size_t terminal_row;
-extern size_t terminal_column;
-extern uint8_t terminal_color;
+extern volatile size_t terminal_row;
+extern volatile size_t terminal_column;
 extern uint16_t* terminal_buffer;
 
 void init_tty();

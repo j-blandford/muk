@@ -4,9 +4,9 @@
 #include <kernel/proc/scheduler.hpp>
 #include <kernel/cpu.hpp>
 
-std::vector<Surface*> screen_surfaces;
+std::vector<BaseSurface*> screen_surfaces;
 
-Surface::Surface(Vector2 pos, Vector2 dim) {
+BaseSurface::BaseSurface(Vector2 pos, Vector2 dim) {
     this->pos = pos;
     this->dim = dim;
 
@@ -21,7 +21,7 @@ Surface::Surface(Vector2 pos, Vector2 dim) {
     memset(this->dirty_buffer, false, dim.y*sizeof(bool));
 }
 
-void Surface::setPixel(uint32_t x, uint32_t y, RGB color) {
+void BaseSurface::setPixel(uint32_t x, uint32_t y, RGB color) {
     if(x>=this->dim.x || y>=this->dim.y)
         return;
 
@@ -34,7 +34,7 @@ void Surface::setPixel(uint32_t x, uint32_t y, RGB color) {
     this->dirty_buffer[y] = true;
 }
 
-void Surface::drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGB color) {
+void BaseSurface::drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGB color) {
     unsigned int xm=0;
     int delta=1-2*radius, error=0, ym=radius;
 
@@ -66,7 +66,7 @@ void Surface::drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGB color) {
     }
 }
 
-void Surface::apply(bool fullRefresh) {
+void BaseSurface::apply(bool full_refresh) {
     //
     // Apply the surface to the back buffer.
     // ------------------------------------------------------------------**
@@ -74,17 +74,26 @@ void Surface::apply(bool fullRefresh) {
     //              --> You need to call "update_buffer()" to display it
     // ------------------------------------------------------------------**
 
-    for(size_t y = 0; y < this->dim.y; y++) {
-        if(fullRefresh || this->dirty_buffer[y]) {
-            // no SSE functions are currently implemented, so we have to copy it line by line
-            size_t where = this->pos.x*(frame_depth/8) + (y+this->pos.y)*(frame_pitch); //
+    if(full_refresh) {
+        // just copy the whole buffer if we need to do a full surface refresh
 
-            memcpy(&bb_loc[where], &this->buff_loc[y*this->s_pitch], this->s_pitch);
+        // todo: make this work for window sizes that aren't 100% width/height
+        memcpy(bb_loc, this->buff_loc, this->s_pitch*this->dim.y);
+    } 
+    else {
+        // only update the incremental changes to the backbuffer
+        for(size_t y = 0; y < this->dim.y; y++) {
+            if(this->dirty_buffer[y]) {
+                size_t where = this->pos.x*(frame_depth/8) + (y+this->pos.y)*(frame_pitch); //
+
+                memcpy(&bb_loc[where], &this->buff_loc[y*this->s_pitch], this->s_pitch);
+            }
         }
     }
+
 }
 
-void Surface::scrollUp(size_t num_lines) {
+void BaseSurface::scrollUp(size_t num_lines) {
     for(size_t y = num_lines; y < this->dim.y - num_lines; y++) {
         size_t from_loc = this->pos.x*(frame_depth/8) + (y+this->pos.y)*(frame_pitch);
         size_t to_loc = this->pos.x*(frame_depth/8) + (y+this->pos.y-num_lines)*(frame_pitch);
@@ -93,14 +102,14 @@ void Surface::scrollUp(size_t num_lines) {
     }
 }
 
-void Surface::bringToFront() {
+void BaseSurface::bringToFront() {
     z_index = 10;
 }
-void Surface::setZindex(uint8_t z_index) {
+void BaseSurface::setZindex(uint8_t z_index) {
     this->z_index = z_index;
 }
 
-void Surface::setBackground(RGB bg_color) {
+void BaseSurface::setBackground(RGB bg_color) {
     for(size_t x = 0; x < this->dim.x; x++) {
         for(size_t y = 0; y < this->dim.y-1; y++) {
             this->setPixel(x, y, bg_color);
@@ -109,7 +118,7 @@ void Surface::setBackground(RGB bg_color) {
 }
 
 void init_screens() {
-	screen_surfaces.push_back(new Surface(Vector2(0,0), Vector2(frame_width,frame_height)));
+	screen_surfaces.push_back(new BaseSurface(Vector2(0,0), Vector2(frame_width,frame_height)));
 	
 	screen_surfaces[SURF_SCREEN]->setBackground(RGB(0x2a2b31));
 	screen_surfaces[SURF_SCREEN]->apply(true);

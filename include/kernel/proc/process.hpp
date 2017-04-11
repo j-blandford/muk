@@ -11,7 +11,7 @@ public:
 	size_t proc_id;
 	char title[255];
 
-	page_directory_t pd;
+	PageDirectory pd;
 
 //	std::vector<Thread *> threads;
 

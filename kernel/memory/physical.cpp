@@ -97,8 +97,8 @@ void* pg_virtual_addr(uint16_t pg_num) {
 /**
 * 	Sets up recursive page directory to allow us to change the PDEs during runtime
 */
-page_directory_t pg_directory_setup() {
-	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress; // PDVirtualAddress is defined in boot.s
+PageDirectory pg_directory_setup() {
+	PageDirectory page_dir = (PageDirectory)&PDVirtualAddress; // PDVirtualAddress is defined in boot.s
 
 	uint32_t recursive_pde = (uint32_t)&PDPhysicalAddress;
 	recursive_pde |= (1);			// PRESENT
@@ -122,7 +122,7 @@ inline bool is_present(uint32_t page_entry) {
 *    for us!
 */
 void map_vaddr_page(uint32_t virtual_address) {
-	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress;
+	PageDirectory page_dir = (PageDirectory)&PDVirtualAddress;
 
 	uint32_t pd_index = virtual_address >> 22;
 	uint32_t pde = page_dir[pd_index];
@@ -140,7 +140,7 @@ void map_vaddr_page(uint32_t virtual_address) {
 		page_dir[pd_index] = pde; 
 
 		// this is a new PD, we need to zero out the whole directory
-		page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index);
+		PageTable page_table = (PageTable)pg_virtual_addr(pd_index);
 		for(int i = 0; i < 1024; i++) {
 			page_table[i] = 0;
 		}
@@ -148,7 +148,7 @@ void map_vaddr_page(uint32_t virtual_address) {
 		//bcprintf("pg: %d (%x), ", pd_index, pde_phys_addr);
 	}
 
-	page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index); // uses recursive pg tables
+	PageTable page_table = (PageTable)pg_virtual_addr(pd_index); // uses recursive pg tables
 
 	uint32_t pt_index = (virtual_address >> PAGE_OFFSET_BITS) & 0x03FF;
 	uint32_t pte = page_table[pt_index];
@@ -169,7 +169,7 @@ void map_vaddr_page(uint32_t virtual_address) {
 }
 
 void map_vaddr_page(uint32_t virtual_address, uint32_t phys_address) {
-	page_directory_t page_dir = (page_directory_t)&PDVirtualAddress;
+	PageDirectory page_dir = (PageDirectory)&PDVirtualAddress;
 
 	uint32_t pd_index = virtual_address >> 22;
 	uint32_t pde = page_dir[pd_index];
@@ -187,7 +187,7 @@ void map_vaddr_page(uint32_t virtual_address, uint32_t phys_address) {
 		page_dir[pd_index] = pde; 
 
 		// this is a new PD, we need to zero out the whole directory
-		page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index);
+		PageTable page_table = (PageTable)pg_virtual_addr(pd_index);
 		for(int i = 0; i < 1024; i++) {
 			page_table[i] = 0;
 		}
@@ -195,7 +195,7 @@ void map_vaddr_page(uint32_t virtual_address, uint32_t phys_address) {
 		//bcprintf("pg: %d (%x), ", pd_index, pde_phys_addr);
 	}
 
-	page_table_t page_table = (page_table_t)pg_virtual_addr(pd_index); // uses recursive pg tables
+	PageTable page_table = (PageTable)pg_virtual_addr(pd_index); // uses recursive pg tables
 
 	uint32_t pt_index = (virtual_address >> PAGE_OFFSET_BITS) & 0x03FF;
 	uint32_t pte = page_table[pt_index];

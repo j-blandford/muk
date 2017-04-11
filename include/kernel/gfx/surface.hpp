@@ -22,10 +22,19 @@
 //  |         |----------|    | |
 //  |-------------------------| V
 
-class Surface {
-    
-    uint8_t z_index;
+class ISurface {
+    public:
+    virtual ~ISurface() {}
 
+    virtual void apply(bool full_refresh) = 0;
+    virtual void setPixel(uint32_t x, uint32_t y, RGB color) = 0;
+    virtual void bringToFront() = 0;
+    virtual void setZindex(uint8_t z_index) = 0;
+    virtual void setBackground(RGB bg_color) = 0;
+};
+
+class BaseSurface : public ISurface {
+    uint8_t z_index;
 public:
     uint8_t* buff_loc;
     bool* dirty_buffer; // per window dirty buffer for speedy updates!
@@ -34,24 +43,21 @@ public:
     Vector2 pos;
     Vector2 dim;
 
-    Surface() {}
-    Surface(Vector2 pos, Vector2 dim);
+    BaseSurface(Vector2 pos, Vector2 dim);
+    ~BaseSurface() {}
 
-    ~Surface() {}
-
-    void apply(bool fullRefresh = true); // Apply the Surface to the backbuffer
-
-    void scrollUp(size_t num_lines); // this needs to be inside a TTY:: class (which will embed a Surface object within it)
-
+    void apply(bool full_refresh);
+    void setPixel(uint32_t x, uint32_t y, RGB color);
     void bringToFront();
     void setZindex(uint8_t z_index);
-
-    void setPixel(uint32_t x, uint32_t y, RGB color); // Set a single pixel
     void setBackground(RGB bg_color);
+
+    void scrollUp(size_t num_lines); // this needs to be inside a TTY:: class (which will embed a Surface object within it)
     void drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGB color);
 };
 
-extern std::vector<Surface*> screen_surfaces;
+extern std::vector<BaseSurface*> screen_surfaces;
+
 void start_display_driver(multiboot_info_t* mboot);
 void surface_update();
 void init_screens();

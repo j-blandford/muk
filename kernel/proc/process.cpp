@@ -36,7 +36,7 @@ void start_process(char* title) {
 	// next_pid++;
 }
 
-void init_process(page_directory_t kernel_pgdir) {
+void init_process(PageDirectory kernel_pgdir) {
 //	start_process("kernel", kernel_pgdir);
 
 	//proc_list[0]

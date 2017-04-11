@@ -475,3 +475,11 @@ int vsprintf(char* buffer, const char* format, va_list parameters) {
 	}
 	return written;
 }
+
+template<class T_in, class T_out>
+T_out copy(T_in first, T_in last, T_out d_first) {
+    while (first != last) {
+        *d_first++ = *first++;
+    }
+    return d_first;
+}

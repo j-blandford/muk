@@ -56,7 +56,7 @@ static buffer_t keyboard_buffer = { .head = 0, .tail = 0, .size = KEYBOARD_BUFFE
 
 char getc() {
 	volatile char c;
-	for (;;) {
+	for (int loops = 0; loops < 1024; loops++) {
 
 		c = buffer_read(&keyboard_buffer);
 		if (c == -1) {

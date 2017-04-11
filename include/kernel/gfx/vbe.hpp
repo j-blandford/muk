@@ -19,12 +19,7 @@ public:
     uint8_t g;
     uint8_t b;
 
-    RGB(uint8_t r, uint8_t g, uint8_t b) {
-        (*this).r = r;
-        (*this).g = g;
-        (*this).b = b;
-    }
-
+    RGB(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b) { }
     RGB(uint32_t hex) {
         (*this).r = hex >> 16;
         (*this).g = hex >> 8;
@@ -35,20 +30,11 @@ public:
     ~RGB() { }
 };
 
-class RGBA {
+class RGBA : public RGB {
 public:
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
     uint8_t a;
 
-    RGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-        (*this).r = r;
-        (*this).g = g;
-        (*this).b = b;
-        (*this).a = a;
-    }
-
+    RGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : RGB(r,g,b), a(a) { }
     RGBA(uint32_t hex) {
         (*this).r = hex >> 16;
         (*this).g = hex >> 8;
@@ -56,13 +42,9 @@ public:
 
         (*this).a = 0xFF; // this constructor only supports 32-bit colour, no transparency
     }
-
-    RGBA() : r(0xFF), g(0xFF), b(0xFF) { } // default to pure white if values aren't specified
+    RGBA() : RGB(0xFFFFFF), a(0xFF) { } // default to pure white if values aren't specified
 
     ~RGBA() { }
-
-    string toHex();
-
 };
 
 class Vector2 {
@@ -80,19 +62,6 @@ public:
     }
 };
 
-typedef struct {
-    uint32_t x;
-    uint32_t y;
-    uint32_t w;
-    uint32_t h;
-} rect;
-
-// obsolete
-typedef struct {
-    int x;
-    int y;
-} vec2;
-
 extern unsigned int frame_width, frame_height, frame_depth, frame_pitch;
 extern uint8_t     *fb_loc;
 extern uint8_t     *bb_loc; // back-buffer
@@ -102,7 +71,7 @@ extern bool        *dirty_lines;
 void init_fbe(multiboot_info_t* mboot);
 void test_surfaces();
 
-void update_buffer(bool fullRefresh = true);
+void update_buffer(bool full_refresh = true);
 
 void putpx(size_t x, size_t y, RGBA color);
 void setpx(size_t x, size_t y, RGBA col);

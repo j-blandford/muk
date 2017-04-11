@@ -18,6 +18,9 @@ typedef struct {
 template<class T>
 void swap(T x, T y);
 
+template<class T_in, class T_out>
+T_out copy(T_in first, T_in last, T_out d_first);
+
 // C++ dynamic memory allocation operators
 void *operator new(size_t size);
 void *operator new[](size_t size);
@@ -29,7 +32,6 @@ inline void *operator new(size_t, void *p)     throw() { return p; }
 inline void *operator new[](size_t, void *p)   throw() { return p; }
 inline void  operator delete  (void *, void *) throw() { };
 inline void  operator delete[](void *, void *) throw() { };
-
 
 // "String" functions
 

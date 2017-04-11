@@ -17,15 +17,15 @@
 #define KERNEL_VIRT_BASE 0xC0000000
 #define KERNEL_PAGE_IDX	(KERNEL_VIRT_BASE / PAGE_SIZE) / 1024 // for a higher half kernel, this = 768
 
-typedef uint32_t * page_directory_t;
-typedef uint32_t * page_table_t;
+typedef uint32_t* PageDirectory;
+typedef uint32_t* PageTable;
 
 extern uint32_t PDVirtualAddress;
 extern uint32_t PDPhysicalAddress;
 extern "C" void tlb_flush();
 
 // Page Table functions
-page_directory_t pg_directory_setup();
+PageDirectory pg_directory_setup();
 void kernel_pg_setup();
 void map_vaddr_page(uint32_t virtual_address);
 void map_vaddr_page(uint32_t virtual_address, uint32_t phys_address);

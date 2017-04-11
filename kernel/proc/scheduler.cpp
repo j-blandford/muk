@@ -12,10 +12,9 @@
 #include <kernel/proc/thread.hpp>
 #include <kernel/proc/process.hpp>
 
-// Define the in-class private static members...
 int Scheduler::task_idx(0);
 bool Scheduler::has_initialised(false);
-bool Scheduler::running(true);
+volatile bool Scheduler::running(true);
 registers Scheduler::base_state;
 
 // this function currently isn't used. I need to work out how
@@ -40,8 +39,8 @@ void Scheduler::next(registers * r) {
 		// if this is the first time the thread has been scheduled,
 		// we need to initialize it's state register beforehand
 		memcpy(&thread_list[task_idx]->state_reg, &base_state, sizeof(registers));
+		
 		thread_list[task_idx]->state_reg.eip = (uint32_t)thread_list[task_idx]->entry_ptr;
-
 		thread_list[task_idx]->ran = true;
 	}
 

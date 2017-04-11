@@ -126,14 +126,14 @@ void drawchar_transparent(unsigned char c, int x, int y, RGB fgcolor) {
 	}
 }
 
-void update_buffer(bool fullRefresh) {
+void update_buffer(bool full_refresh) {
     screen_surfaces[SURF_SCREEN]->apply(false);
 
     // Copy back buffer to front buffer where the "dirty" buffer is 1
     // we are currently marking one line dirty and updating the line
     // this could be improved by creating little pixels of ~25x25 for the dirty buffer
     for(size_t y = 0; y < frame_height; y++ ) {
-        if(fullRefresh || dirty_lines[y]) {
+        if(full_refresh || dirty_lines[y]) {
             memcpy(&(fb_loc[y*frame_pitch]), bb_loc + y*frame_pitch, frame_pitch);
         }
     }

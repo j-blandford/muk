@@ -27,7 +27,7 @@ void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_p
     // Set up the Physical Memory manager's bitmap (with pages taken up by the kernel)
     pmm_setup(mb_info, k_phys_start, k_phys_end);
     // now we can set up the kernels' Page directory (this is out VIRTUAL memory manager)
-    page_directory_t kernel_pd = pg_directory_setup();
+    PageDirectory kernel_pd = pg_directory_setup();
 
     // IRQ0
     Timer::initTimer();
