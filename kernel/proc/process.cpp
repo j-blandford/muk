@@ -9,7 +9,7 @@
 #include <kernel/proc/scheduler.hpp>
 #include <kernel/proc/thread.hpp>
 
-#include <kernel/memory/physical.hpp>
+#include <kernel/memory/manager.hpp>
 
 std::vector<Process *> proc_list = std::vector<Process *>();
 
@@ -36,7 +36,7 @@ void start_process(char* title) {
 	// next_pid++;
 }
 
-void init_process(PageDirectory kernel_pgdir) {
+void init_process(Memory::PageDirectory kernel_pgdir) {
 //	start_process("kernel", kernel_pgdir);
 
 	//proc_list[0]

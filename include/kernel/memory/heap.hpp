@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 #include <kernel/memory/alloc.hpp>
-#include <kernel/memory/physical.hpp>
+#include <kernel/memory/manager.hpp>
 
 // each block of memory allocated has a small header of metadata
 // this is a linked list

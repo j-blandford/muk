@@ -10,7 +10,7 @@ static uintptr_t kheap_start = 0; // our metadata
 // about any of the underlying physical page allocation functions
 void map_heap_pages(uintptr_t end_addr) {
     for(; end_addr > kheap_top; kheap_top += PAGE_SIZE) {
-        map_vaddr_page(kheap_top);
+        Memory::virt_manager.MapPage(kheap_top);
         memset((void*)kheap_top, 0, PAGE_SIZE);        
     }
 }
@@ -26,7 +26,7 @@ void* kmalloc(size_t size) {
 
     if(!kheap_start) {
         // we need to initialise the heap!
-        map_vaddr_page(KERNEL_HEAP_START);
+        Memory::virt_manager.MapPage(KERNEL_HEAP_START);
         memset((void*)KERNEL_HEAP_START, 0, PAGE_SIZE);
 
         kheap_start = KERNEL_HEAP_START;
@@ -39,8 +39,6 @@ void* kmalloc(size_t size) {
         // bcprintf("        ->size=%x\n", found_block->size);
         // bcprintf("        ->next=%x\n", found_block->next);
     }
-
-
 
     size += sizeof(BlockHeader);
 

@@ -4,14 +4,14 @@
 
 #include <kernel/idt.hpp>
 #include <kernel/proc/thread.hpp>
-#include <kernel/memory/physical.hpp>
+#include <kernel/memory/manager.hpp>
 
 class Process {
 public:
 	size_t proc_id;
 	char title[255];
 
-	PageDirectory pd;
+	Memory::PageDirectory pd;
 
 //	std::vector<Thread *> threads;
 

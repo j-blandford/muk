@@ -14,20 +14,18 @@
 #include <kernel/fs/fat16.hpp>
 #include <kernel/proc/scheduler.hpp>
 #include <kernel/proc/process.hpp>
-#include <kernel/memory/physical.hpp>
+#include <kernel/memory/manager.hpp>
 #include <kernel/user/env.hpp>
 #include <kernel/gfx/surface.hpp>
 
 extern "C"
-void kernel_main(multiboot_info_t * mb_info, uint32_t k_phys_start, uint32_t k_phys_end) {
+void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_phys_end) {
     gdt_install();
     tss_install();
     idt_install();
 
-    // Set up the Physical Memory manager's bitmap (with pages taken up by the kernel)
-    pmm_setup(mb_info, k_phys_start, k_phys_end);
-    // now we can set up the kernels' Page directory (this is out VIRTUAL memory manager)
-    PageDirectory kernel_pd = pg_directory_setup();
+    // Set up the Memory manager (botrh physical and virtual)
+    Memory::Setup(mb_info, k_phys_end);
 
     // IRQ0
     Timer::initTimer();

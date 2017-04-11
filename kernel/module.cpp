@@ -4,7 +4,7 @@
 #include <kernel/module.hpp>
 #include <kernel/tty.hpp>
 
-#include <kernel/memory/physical.hpp>
+#include <kernel/memory/manager.hpp>
 
 void_fn get_module_funct(multiboot_info_t * mb_info, int mdl_index) {
 	module_t * modules;

@@ -2,7 +2,7 @@
 
 #define TRUE 1
 #define FALSE 0
-#define NULL 0
+///#define NULL 0
 
 #define iscntrl(c) (((int)c>=0 && (int)c<=0x1F) || c==0x7F)?TRUE:FALSE
 #define isspace(c) (((int)c>=0x9 && (int)c<=0x0D) || c==0x20)?TRUE:FALSE

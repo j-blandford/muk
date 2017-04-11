@@ -12,7 +12,7 @@
 #include <kernel/proc/scheduler.hpp>
 #include <kernel/proc/thread.hpp>
 
-#include <kernel/memory/physical.hpp>
+#include <kernel/memory/manager.hpp>
 #include <kernel/memory/heap.hpp>
 #include <kernel/memory/alloc.hpp>
 

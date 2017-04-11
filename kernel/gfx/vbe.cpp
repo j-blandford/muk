@@ -81,7 +81,7 @@ void init_fbe(multiboot_info_t* mboot) {
     size_t fb_size = frame_height*frame_pitch;
 
     for(size_t pg_num = 0; pg_num*PAGE_SIZE < fb_size; pg_num++) {
-        map_vaddr_page(fb_addr_base + pg_num*PAGE_SIZE, fb_phys_loc + pg_num*PAGE_SIZE);
+        Memory::virt_manager.MapPage(fb_addr_base + pg_num*PAGE_SIZE, fb_phys_loc + pg_num*PAGE_SIZE);
     }
 
     fb_loc = reinterpret_cast<uint8_t*>(fb_addr_base);
