@@ -10,7 +10,7 @@
 #include <kernel/drivers/keyboard.hpp>
 #include <kernel/user/env.hpp>
 #include <kernel/proc/scheduler.hpp>
-#include <kernel/gfx/vbe.hpp>
+#include <kernel/gfx/buffer.hpp>
 #include <kernel/gfx/surface.hpp>
 
 volatile size_t terminal_row = 0;
@@ -20,11 +20,11 @@ uint16_t* terminal_buffer;
 const int X_FONTWIDTH = 8;
 const int Y_FONTWIDTH = 16; 
 
-static Vector2 cursor_pos(0,0);
+static Graphics::Vector2 cursor_pos(0,0);
 
 char kb_buffer[1024];
 
-void terminal_writestring(char* data, RGB colour) {
+void terminal_writestring(char* data, Graphics::RGB colour) {
 	// if(terminal_row == VGA_HEIGHT) {
 	// //	terminal_scrollup();
 	// }
@@ -35,20 +35,19 @@ void terminal_writestring(char* data, RGB colour) {
 	//Scheduler::unlock();
 }
 
-void terminal_putentryat(char c, size_t x, size_t y, RGB colour) {
+void terminal_putentryat(char c, size_t x, size_t y, Graphics::RGB colour) {
 	const size_t index = y * VGA_WIDTH + x;
 	//terminal_buffer[index] = vga_entry(c, VGA_COLOR_WHITE);
 	drawchar_transparent(c, x*X_FONTWIDTH, (y+1)*Y_FONTWIDTH, colour);
 }
 
-void terminal_putchar(char c, RGB colour) {
+void terminal_putchar(char c, Graphics::RGB colour) {
 	if(c == '\n') {
 		terminal_column = 0;
 		terminal_row++;
 
 		return;
 	}
-
 
 	if(terminal_row == VGA_HEIGHT) {
 		terminal_scrollup();
@@ -133,16 +132,16 @@ void tty_update() {
 
 		Scheduler::lock();
 
-		terminal_writestring("[", RGB(0xe4e4c8));
-		terminal_writestring("james", RGB(0xff6064));
-		terminal_writestring("@", RGB(0xff6064));
-		terminal_writestring("localhost", RGB(0xff6064));
+		terminal_writestring("[", Graphics::RGB(0xe4e4c8));
+		terminal_writestring("james", Graphics::RGB(0xff6064));
+		terminal_writestring("@", Graphics::RGB(0xff6064));
+		terminal_writestring("localhost", Graphics::RGB(0xff6064));
 		terminal_writestring(" ");
 
-		terminal_writestring("0:", RGB(0x288acc));
-		terminal_writestring("/", RGB(0x288acc));
+		terminal_writestring("0:", Graphics::RGB(0x288acc));
+		terminal_writestring("/", Graphics::RGB(0x288acc));
 		
-		terminal_writestring("]# ", RGB(0xe4e4c8));
+		terminal_writestring("] ", Graphics::RGB(0xe4e4c8));
 
 		Scheduler::unlock();
 

@@ -1,4 +1,3 @@
-
 #include <kernel/memory/heap.hpp>
 #include <kernel/cpu.hpp>
 
@@ -9,7 +8,6 @@ static uintptr_t kheap_start = 0; // our metadata
 // this takes care of the heap <-> Page table mappings so the heap doesn't have to worry
 // about any of the underlying physical page allocation functions
 void map_heap_pages(uintptr_t end_addr) {
-    bcprintf("Mapping next heap page from (%x -> %x)\n", kheap_top,end_addr);
     for(; end_addr > kheap_top; kheap_top += Memory::kPageSize) {
         Memory::virt_manager.MapPage(kheap_top);
         
@@ -26,19 +24,14 @@ void* kmalloc(size_t size) {
         return 0;
     }
 
-    bcprintf("BEFORE kheap_top @ %x\n", kheap_top);
-
     if(!kheap_start) {
         // we need to initialise the heap!
         Memory::virt_manager.MapPage(Memory::kHeapStart);
         memset((void*)Memory::kHeapStart, 0, Memory::kPageSize);
 
         kheap_start = Memory::kHeapStart;
-
-        bcprintf("Initialised heap @ %x\n", kheap_start);
+        kheap_top = Memory::kHeapStart;
     }
-
-    bcprintf("AFTER kheap_top @ %x\n", kheap_top);
 
     // Lets traverse the linked list to find the next block which is free (has no "next" ptr)
     BlockHeader* found_block = (BlockHeader*)kheap_start;
@@ -59,7 +52,7 @@ void* kmalloc(size_t size) {
     if(found_block) 
         found_block->next = next_block;
 
-    bcprintf("-> (%x)\n",(next_block + sizeof(BlockHeader)));
+    // bcprintf("-> (%x)\n",(next_block + sizeof(BlockHeader)));
 
     return (void*)(next_block + sizeof(BlockHeader));
 }

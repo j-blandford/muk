@@ -5,8 +5,10 @@
 #include <kernel/memory/alloc.hpp>
 #include <kernel/memory/heap.hpp>
 
+#include <std/vector.hpp>
+
 #include <kernel/gfx/vga.hpp>
-#include <kernel/gfx/vbe.hpp>
+#include <kernel/gfx/buffer.hpp>
 
 #include <kernel/cpu.hpp>
 
@@ -27,10 +29,10 @@ class ISurface {
     virtual ~ISurface() {}
 
     virtual void apply(bool full_refresh) = 0;
-    virtual void setPixel(uint32_t x, uint32_t y, RGB color) = 0;
+    virtual void setPixel(uint32_t x, uint32_t y, Graphics::RGB color) = 0;
     virtual void bringToFront() = 0;
     virtual void setZindex(uint8_t z_index) = 0;
-    virtual void setBackground(RGB bg_color) = 0;
+    virtual void setBackground(Graphics::RGB bg_color) = 0;
 };
 
 class BaseSurface : public ISurface {
@@ -40,20 +42,20 @@ public:
     bool* dirty_buffer; // per window dirty buffer for speedy updates!
 
     uint32_t s_pitch;
-    Vector2 pos;
-    Vector2 dim;
+    Graphics::Vector2 pos;
+    Graphics::Vector2 dim;
 
-    BaseSurface(Vector2 pos, Vector2 dim);
+    BaseSurface(Graphics::Vector2 pos, Graphics::Vector2 dim);
     ~BaseSurface() {}
 
     void apply(bool full_refresh);
-    void setPixel(uint32_t x, uint32_t y, RGB color);
+    void setPixel(uint32_t x, uint32_t y, Graphics::RGB color);
     void bringToFront();
     void setZindex(uint8_t z_index);
-    void setBackground(RGB bg_color);
+    void setBackground(Graphics::RGB bg_color);
 
     void scrollUp(size_t num_lines); // this needs to be inside a TTY:: class (which will embed a Surface object within it)
-    void drawCircle(uint32_t x, uint32_t y, uint16_t radius, RGB color);
+    //void drawCircle(uint32_t x, uint32_t y, uint16_t radius, Graphics::RGB color);
 };
 
 extern std::vector<BaseSurface*> screen_surfaces;

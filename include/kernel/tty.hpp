@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 #include <kernel/gfx/vga.hpp>
-#include <kernel/gfx/vbe.hpp>
+#include <kernel/gfx/buffer.hpp>
 
 #define TAB_WIDTH 12
 
@@ -18,9 +18,9 @@ void init_tty();
 void tty_update();
 void terminal_scrollup();
 void terminal_clearline(size_t y);
-void terminal_writestring(char* data, RGB colour = RGB(0xFFFFFF));
-void terminal_putentryat(char c, size_t x, size_t y, RGB colour = RGB(0xFFFFFF));
-void terminal_putchar(char c, RGB colour = RGB(0xFFFFFF));
+void terminal_writestring(char* data, Graphics::RGB colour = Graphics::RGB(0xFFFFFF));
+void terminal_putentryat(char c, size_t x, size_t y, Graphics::RGB colour = Graphics::RGB(0xFFFFFF));
+void terminal_putchar(char c, Graphics::RGB colour = Graphics::RGB(0xFFFFFF));
 
 void terminal_printf(const char* fmt, ...);
 

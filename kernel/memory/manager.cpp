@@ -85,7 +85,7 @@ BitmapAllocator<BitmapSize>::BitmapAllocator(multiboot_info_t *mboot, uint32_t k
 }
 
 // grabs the first bit of the entry - both PDEs and PTEs
-inline bool is_present(uint32_t page_entry) {
+static inline bool is_present(uint32_t page_entry) {
 	return page_entry & 0x1; 
 }
 
@@ -124,8 +124,6 @@ PageTable PageTableManager::GetFromVirtualAddress(uint16_t page_index) {
 void PageTableManager::MapPage(uint32_t virtual_address, uint32_t physical_address) {
 	uint32_t pd_index = virtual_address >> 22;
 	uint32_t pt_index = (virtual_address >> 12) & 0x03FF;
-
-	bcprintf("PageTableManager::MapPage(%x,%x)\n",virtual_address, physical_address);
 
 	uint32_t pde = page_dir[pd_index];
 	if(!is_present(pde)) { // is the pg dir entry present?

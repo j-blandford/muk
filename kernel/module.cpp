@@ -9,9 +9,9 @@
 void_fn get_module_funct(multiboot_info_t * mb_info, int mdl_index) {
 	module_t * modules;
     if (mb_info->mods_count > 0) {
-        modules = (module_t *) (mb_info->mods_addr + KERNEL_VIRT_BASE);
+        modules = (module_t *) (mb_info->mods_addr + Memory::kVirtualBase);
         for (uint8_t i = 0; i < mb_info->mods_count; i++)
 			if(i == mdl_index)
-            	return (void_fn)(modules[i].mod_start + KERNEL_VIRT_BASE);
+            	return (void_fn)(modules[i].mod_start + Memory::kVirtualBase);
     }
 }
