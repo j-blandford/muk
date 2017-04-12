@@ -1,19 +1,16 @@
 #include <kernel/memory/manager.hpp>
 
-#define PAGE_DIRECTORY_OFFSET_BITS 10
-#define PAGE_TABLE_OFFSET_BITS 10
-#define PAGE_OFFSET_BITS 12
-
 using namespace Memory;
 
 BitmapAllocator<4096> Memory::phys_manager;
 PageTableManager Memory::virt_manager;
+
 /**
 * 	Function which initialises the memory bitmap from the GRUB boot information
 */
 void Memory::Setup(multiboot_info_t* mboot, uint32_t kernel_end) {
 	phys_manager = BitmapAllocator<4096>(mboot, kernel_end);
-	virt_manager = PageTableManager(PDVirtualAddress, PDPhysicalAddress); // PDVirtualAddress is defined in boot.s
+	virt_manager = PageTableManager(&PDVirtualAddress, &PDPhysicalAddress); // PDVirtualAddress is defined in boot.s
 }
 
 /**
@@ -49,7 +46,7 @@ void* BitmapAllocator<BitmapSize>::AllocatePage() {
 					uint32_t pg_num = chunk*32 + bit;
 
 					PageTaken(pg_num);
-					return (void*)(pg_num << PAGE_OFFSET_BITS);
+					return (void*)(pg_num << 12);
 				}
 			}
 		}
@@ -62,7 +59,7 @@ template<int BitmapSize>
 BitmapAllocator<BitmapSize>::BitmapAllocator(multiboot_info_t *mboot, uint32_t kernel_end) : free_pages(0) {
 	// GRUB provides the kernel with a struct containing the map of memory
 	// let's parse this to get a list of free physical memory pages
-	memory_map_t* mmap = (memory_map_t*)(mboot->mmap_addr + KERNEL_VIRT_BASE);
+	memory_map_t* mmap = (memory_map_t*)(mboot->mmap_addr + Memory::kVirtualBase);
 	size_t mmap_entries = mboot->mmap_length / sizeof(memory_map_t);
 
 	for(size_t index = 0; index < mmap_entries; index++) {
@@ -72,7 +69,7 @@ BitmapAllocator<BitmapSize>::BitmapAllocator(multiboot_info_t *mboot, uint32_t k
 			// loop over the mmap's memory space and mark each as "free"
 
 			uint32_t first_pg = (mmap->base_addr_low & 0xFFFFF000) >> 12; // 4kb-aligned page mask with a bit-shift
-			uint32_t end_pg = ((mmap->base_addr_low + mmap->length_low) & 0xFFFFF000) >> PAGE_OFFSET_BITS; // 4kb-aligned page mask with a bit-shift
+			uint32_t end_pg = ((mmap->base_addr_low + mmap->length_low) & 0xFFFFF000) >> 12; // 4kb-aligned page mask with a bit-shift
 
 			for(uint32_t pg_index = first_pg; pg_index < end_pg; pg_index++) {
 				PageFree(pg_index);
@@ -95,10 +92,10 @@ inline bool is_present(uint32_t page_entry) {
 /**
 * 	Sets up recursive page directory to allow us to change the PDEs during runtime
 */
-PageTableManager::PageTableManager(uint32_t VirtualAddress, uint32_t PhysicalAddress) {
-	page_dir = (PageDirectory)&VirtualAddress; // PDVirtualAddress is defined in boot.s
+PageTableManager::PageTableManager(uint32_t* VirtualAddress, uint32_t* PhysicalAddress) {
+	page_dir = (PageDirectory)VirtualAddress; // PDVirtualAddress is defined in boot.s
 
-	uint32_t recursive_pde = (uint32_t)&PhysicalAddress;
+	uint32_t recursive_pde = (uint32_t)PhysicalAddress;
 	recursive_pde |= (1);			// PRESENT
 	recursive_pde |= (1 << 1);		// READ/WRITE
 	recursive_pde |= (1 << 2);		// ALL ACCESS
@@ -110,12 +107,12 @@ PageTableManager::PageTableManager(uint32_t VirtualAddress, uint32_t PhysicalAdd
 *	Converts a page index into it's virtual address so that we can alter specific pages
 */
 PageTable PageTableManager::GetFromVirtualAddress(uint16_t page_index) {
-  uint32_t virt_addr = 0xFFC00000; // 0b1111111111
+	uint32_t virt_addr = Memory::kPageTableAddr;
 
-  // Next 10 bits pg index
-  virt_addr |= (page_index << 12);
+	// Next 10 bits pg index
+	virt_addr |= (page_index << 12);
 
-  return (PageTable)virt_addr;
+	return reinterpret_cast<PageTable>(virt_addr);
 }
 
 /**
@@ -127,6 +124,8 @@ PageTable PageTableManager::GetFromVirtualAddress(uint16_t page_index) {
 void PageTableManager::MapPage(uint32_t virtual_address, uint32_t physical_address) {
 	uint32_t pd_index = virtual_address >> 22;
 	uint32_t pt_index = (virtual_address >> 12) & 0x03FF;
+
+	bcprintf("PageTableManager::MapPage(%x,%x)\n",virtual_address, physical_address);
 
 	uint32_t pde = page_dir[pd_index];
 	if(!is_present(pde)) { // is the pg dir entry present?

@@ -6,23 +6,24 @@
 #include <kernel/multiboot.hpp>
 #include <kernel/tty.hpp>
 
-#define KERNEL_HEAP_START 0xE0000000
-
-#define PMM_PAGE_TABLES 0xFFC00000
-#define PMM_PAGE_DIR 0xFFFFF000
-#define PMM_STACK_PTR 0xF0000000
-
-#define PAGE_SIZE 4096
-
-#define KERNEL_VIRT_BASE 0xC0000000
-#define KERNEL_PAGE_IDX	(KERNEL_VIRT_BASE / PAGE_SIZE) / 1024 // for a higher half kernel, this = 768
-
+// following variables are defined in asm/boot.s
 extern uint32_t PDVirtualAddress;
 extern uint32_t PDPhysicalAddress;
 
-namespace Memory {
+namespace Memory {	
 	typedef uint32_t* PageDirectory;
 	typedef uint32_t* PageTable;
+
+	const uintptr_t kVirtualBase = 0xC0000000; // Our Higher-half kernel is loaded from this address
+	const uintptr_t kHeapStart = 0xE0000000; // Our kernel's heap base virtual addres
+		
+	const int kNumPageEntries = 1024; // the number of entries per page directory (1024 for x86)
+	const int kPageSize = 4096; // page size = 4 KiB
+	const int kKernelPageIndex = ( kVirtualBase / kPageSize ) / kNumPageEntries; // kernel's pde
+
+	// The following addresses require the use of a recursive page table
+	const uintptr_t kPageTableAddr = 0xFFC00000;  // 0b1111111111
+	const uintptr_t kPageDirAddr = 0xFFFFF000;
 
 	class IAllocator {
 	public:
@@ -50,7 +51,7 @@ namespace Memory {
 		PageDirectory page_dir; 
 	public:
 		PageTableManager() { }
-		PageTableManager(uint32_t VirtualAddress, uint32_t PhysicalAddress);
+		PageTableManager(uint32_t* VirtualAddress, uint32_t* PhysicalAddress);
 		~PageTableManager() { }
 
 		PageTable GetFromVirtualAddress(uint16_t page_index);
