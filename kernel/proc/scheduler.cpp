@@ -39,7 +39,7 @@ void Scheduler::next(registers * r) {
 		// if this is the first time the thread has been scheduled,
 		// we need to initialize it's state register beforehand
 		memcpy(&thread_list[task_idx]->state_reg, &base_state, sizeof(registers));
-		
+
 		thread_list[task_idx]->state_reg.eip = (uint32_t)thread_list[task_idx]->entry_ptr;
 		thread_list[task_idx]->ran = true;
 	}
@@ -56,7 +56,7 @@ void Scheduler::next(registers * r) {
 		// set the registers from the current thread's saved state
 		memcpy(r, &thread_list[task_idx]->state_reg, sizeof(registers));
 
-		bcprintf("thread: %s\n", thread_list[task_idx]->title);
+		//bcprintf("thread: %s\n", thread_list[task_idx]->title);
 
 		task_idx++;
 
@@ -65,9 +65,9 @@ void Scheduler::next(registers * r) {
 			task_idx = 0;
 		}
 	} 
-	else {
-		bcprintf("Thread locked!\n");
-	}
+	// else {
+	// 	bcprintf("Thread locked!\n");
+	// }
 }
 
 // this is used to allow threads to perform blocking I/O calculations.

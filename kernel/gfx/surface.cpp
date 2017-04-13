@@ -46,19 +46,18 @@ void BaseSurface::apply(bool full_refresh) {
         // just copy the whole buffer if we need to do a full surface refresh
 
         // todo: make this work for window sizes that aren't 100% width/height
-        Graphics::back_buffer.Copy(0, this->buff_loc, this->s_pitch*this->dim.y);
+        memcpy(Graphics::back_buffer.GrabPointer(), this->buff_loc, this->s_pitch*this->dim.y);
     } 
     else {
         // only update the incremental changes to the backbuffer
         for(size_t y = 0; y < this->dim.y; y++) {
             if(this->dirty_buffer[y]) {
-                size_t where = this->pos.x*(Graphics::frame_depth/8) + (y+this->pos.y)*(this->s_pitch); //
+                size_t where = this->pos.x*(Graphics::frame_depth/8) + (y+this->pos.y)*(this->s_pitch);
 
-                Graphics::back_buffer.Copy(where, &this->buff_loc[y*this->s_pitch], this->s_pitch);
+                memcpy(&Graphics::back_buffer.GrabPointer()[where], &this->buff_loc[y*this->s_pitch], this->s_pitch);
             }
         }
     }
-
 }
 
 void BaseSurface::scrollUp(size_t num_lines) {

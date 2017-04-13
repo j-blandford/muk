@@ -136,7 +136,6 @@ void tty_update() {
 		terminal_writestring("james", Graphics::RGB(0xff6064));
 		terminal_writestring("@", Graphics::RGB(0xff6064));
 		terminal_writestring("localhost", Graphics::RGB(0xff6064));
-		terminal_writestring(" ");
 
 		terminal_writestring("0:", Graphics::RGB(0x288acc));
 		terminal_writestring("/", Graphics::RGB(0x288acc));

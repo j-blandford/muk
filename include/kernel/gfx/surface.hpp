@@ -55,7 +55,6 @@ public:
     void setBackground(Graphics::RGB bg_color);
 
     void scrollUp(size_t num_lines); // this needs to be inside a TTY:: class (which will embed a Surface object within it)
-    //void drawCircle(uint32_t x, uint32_t y, uint16_t radius, Graphics::RGB color);
 };
 
 extern std::vector<BaseSurface*> screen_surfaces;

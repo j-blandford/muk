@@ -18,6 +18,8 @@
 #include <kernel/user/env.hpp>
 #include <kernel/gfx/surface.hpp>
 
+#include <kernel/gfx/terminus.hpp>
+
 extern "C"
 void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_phys_end) {
     gdt_install();
@@ -34,21 +36,15 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_ph
 
     // this loads our driver threads into the scheduler
     init_kthreads();
-
     start_display_driver(mb_info);
 
     ENV::initialise();
 
-    // // void_fn module_one = get_module_funct(mb_info, 0); // should execute our "basic_program.s" file...
-    // // terminal_printf("module_one address: %x\n", module_one);
-    // // MAGIC_BREAK;
-    // // module_one();
-
     // this line starts to run the threads and drivers, the LAST thing to enable!!!
     interrupts_enable();
 
-    terminal_writestring("[OK]", Graphics::RGB(0x00FF00));
-    terminal_writestring(" muk boot successful.\n");
+    // terminal_writestring("[OK]", Graphics::RGB(0x00FF00));
+    // terminal_writestring(" muk boot successful.\n");
 
     // Filesystem::initialise();
 

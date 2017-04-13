@@ -1,4 +1,5 @@
 #include <kernel/memory/manager.hpp>
+#include <kernel/cpu.hpp>
 
 using namespace Memory;
 
