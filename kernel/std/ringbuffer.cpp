@@ -30,10 +30,3 @@ int buffer_write(buffer_t * buffer, uint8_t v) {
 	buffer->head = next;
 	return 0;
 }
-
-int buffer_clear(buffer_t* buffer) {
-	for(int idx = 0; idx < buffer->size; idx++) {
-		buffer->buffer[idx] = 0;
-	}
-	return 0;
-}

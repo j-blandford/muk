@@ -36,7 +36,6 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_ph
 
     // this loads our driver threads into the scheduler
     init_kthreads();
-    
     start_display_driver(mb_info);
 
     ENV::initialise();

@@ -105,6 +105,15 @@ void update_cursor(int row, int col) {
 
 	cursor_pos.x = col+1;
 	cursor_pos.y = row;
+
+	// // cursor LOW port to vga INDEX register
+	// outportb(0x3D4, 0x0F);
+	// outportb(0x3D5, (unsigned char)(position&0xFF));
+	
+	// // cursor HIGH port to vga INDEX register
+	// outportb(0x3D4, 0x0E);
+	// outportb(0x3D5, (unsigned char )((position>>8)&0xFF));
+
 }
 
 size_t tty_get_cursor_x() {
@@ -117,42 +126,29 @@ void tty_set_cursor_x(size_t x) {
 	update_cursor(terminal_row, x);
 }
 
-/**
-*	This function is used for the "tty_driver" thread
-*/
+
 void tty_update() {
-	char* command = new char[255];
-
 	for(;;) {
-		bool parsing = false;
-		size_t c_idx = 0;
-
-		while(!parsing) {
-			for(size_t idx = 0; idx < keyboard_buffer.size; idx++) {
-				if(keyboard_buffer.buffer[idx] == 28) {
-					parsing = true;
-					break;
-				} 
-				else {
-					command[c_idx] = keyboard_buffer.buffer[idx];
-					c_idx++;
-				}
-			}
-		}
-		buffer_clear(&keyboard_buffer);
 
 		Scheduler::lock();
-		terminal_writestring("\n[", Graphics::RGB(0xe4e4c8));
+
+		terminal_writestring("[", Graphics::RGB(0xe4e4c8));
 		terminal_writestring("james", Graphics::RGB(0xff6064));
 		terminal_writestring("@", Graphics::RGB(0xff6064));
 		terminal_writestring("localhost", Graphics::RGB(0xff6064));
+
 		terminal_writestring("0:", Graphics::RGB(0x288acc));
 		terminal_writestring("/", Graphics::RGB(0x288acc));
+		
 		terminal_writestring("] ", Graphics::RGB(0xe4e4c8));
-		terminal_writestring(command, Graphics::RGB(0xe4e4c8));
+
 		Scheduler::unlock();
 
+		//Scheduler::yield();
+		
+		getsn(&kb_buffer[0], 1024);
 
+		bcprintf("parsing commands...\n");
 
 		// Command::Parse(kb_buffer);
 	}

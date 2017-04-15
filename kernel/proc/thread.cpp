@@ -5,7 +5,7 @@
 #include <kernel/cpu.hpp>
 #include <kernel/idt.hpp>
 #include <kernel/timer.hpp>
-#include <kernel/drivers/keyboard.hpp>
+
 #include <kernel/gfx/surface.hpp>
 
 #include <kernel/proc/process.hpp>
@@ -22,9 +22,21 @@ static int next_tid = 1;
 
 static void test_thread() {
 	for(;;) {
-		BochsConsolePrintChar('a');
+		bool hello = true;
+		//BochsConsolePrintChar('a');
 	}
+		//terminal_printf("1");
 }
+
+// static void test_thread2() {
+// 	//MAGIC_BREAK;
+// 	BochsConsolePrintChar('B');
+// 	for(;;) {
+// 		BochsConsolePrintChar('b');
+// 	}
+// 		//terminal_printf("2");
+// }
+
 /**
 *  This is the hub of the process list. For the moment, this function only adds 
 *  threads to the "kernel" process. Every new thread is attached to this initial
@@ -44,7 +56,6 @@ void start_thread(char* title, void_fn entry) {
 }
 
 void init_kthreads() {
-	start_thread("keyboard_driver", &kb_update); // adds to the ringbuffer
-	start_thread("tty_driver", &tty_update); // updates the terminal text and parses commands
-	start_thread("display_driver", &surface_update); // keeps the frontbuffer in sync with the backbuffer
+	start_thread("keyboard_driver", &tty_update);
+	start_thread("display_driver", &surface_update);
 }
