@@ -121,27 +121,16 @@ void tty_set_cursor_x(size_t x) {
 *	This function is used for the "tty_driver" thread
 */
 void tty_update() {
-	char* command = new char[255];
+	// Scheduler::lock();
+	char command[255];
+	// Scheduler::unlock();
 
 	for(;;) {
 		bool parsing = false;
 		size_t c_idx = 0;
 
-		while(!parsing) {
-			for(size_t idx = 0; idx < keyboard_buffer.size; idx++) {
-				if(keyboard_buffer.buffer[idx] == 28) {
-					parsing = true;
-					break;
-				} 
-				else {
-					command[c_idx] = keyboard_buffer.buffer[idx];
-					c_idx++;
-				}
-			}
-		}
-		buffer_clear(&keyboard_buffer);
-
 		Scheduler::lock();
+		bcprintf("lol\n");
 		terminal_writestring("\n[", Graphics::RGB(0xe4e4c8));
 		terminal_writestring("james", Graphics::RGB(0xff6064));
 		terminal_writestring("@", Graphics::RGB(0xff6064));
@@ -149,10 +138,32 @@ void tty_update() {
 		terminal_writestring("0:", Graphics::RGB(0x288acc));
 		terminal_writestring("/", Graphics::RGB(0x288acc));
 		terminal_writestring("] ", Graphics::RGB(0xe4e4c8));
-		terminal_writestring(command, Graphics::RGB(0xe4e4c8));
+		//terminal_writestring(command, Graphics::RGB(0xe4e4c8));
 		Scheduler::unlock();
 
+		while(!parsing) {
+			Scheduler::lock();
+			for(size_t idx = 0; idx < keyboard_buffer.size; idx++) {
+				if(keyboard_buffer.buffer[idx] == 28) {
+					parsing = true;
+					break;
+				} 
+				else {
+					command[c_idx] = keyboard_buffer.buffer[idx];
 
+					// char to_print = command[c_idx];
+					// if(to_print != 0) {
+					// 	bcprintf("Printing char '%c'\n",to_print);
+					// 	terminal_putchar(to_print);
+					// }
+
+					parsing = false;
+					c_idx++;
+				}
+			}
+			Scheduler::unlock();
+		}
+		buffer_clear(&keyboard_buffer);
 
 		// Command::Parse(kb_buffer);
 	}

@@ -94,7 +94,7 @@ void drawchar_transparent(unsigned char c, int x, int y, Graphics::RGB fgcolor) 
                 y_coord = y+cy-12;
 
                 screen_surfaces[0]->setPixel(x_coord, y_coord, fgcolor);
-                *(dirty_buffer+sizeof(bool)*y_coord) = true; // update the dirty buffer for this y-value
+                dirty_buffer[y_coord] = true; // update the dirty buffer for this y-value
             }
 		}
 	}

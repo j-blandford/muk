@@ -5,6 +5,7 @@
 #include <kernel/idt.hpp> 
 #include <kernel/cpu.hpp> 
 #include <kernel/proc/scheduler.hpp> 
+#include <kernel/proc/message.hpp> 
 #include <kernel/drivers/keyboard.hpp> 
 
 static unsigned char keyboard_map[128] =  {
@@ -65,6 +66,8 @@ char getc() {
 		else {
 			bcprintf("Pressed key '%c' (%d)\n", c, (int)c);
 
+			Process::SendMessage(1, 1, c);
+
 			return c;
 		}
 	}
@@ -93,19 +96,22 @@ void keyboard_install() {
 
 void kb_update() {
 	for(;;) {
-		char c = getc();
-		
-		if (c == '\n') {
-			str[i] = 0;
-			bcprintf("sending buffer to command processor...\n");
-			return str;
-		} 
-		else if (c == '\b') {
+		for(int i = 0; i < 1024; i++) {
+			char c = getc();
 			
-		} 
-		else {
-			str[i] = c;
-			i++;
+			if (c == '\n') {
+				keyboard_buffer.buffer[i] = 0;
+				bcprintf("sending buffer to command processor...\n");
+				break;
+				//return keyboard_buffer.buffer;
+			} 
+			else if (c == '\b') {
+				
+			} 
+			else {
+				keyboard_buffer.buffer[i] = c;
+				i++;
+			}
 		}
 	}
 }

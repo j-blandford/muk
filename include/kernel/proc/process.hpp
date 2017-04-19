@@ -6,23 +6,25 @@
 #include <kernel/proc/thread.hpp>
 #include <kernel/memory/manager.hpp>
 
-class Process {
-public:
-	size_t proc_id;
-	char title[255];
+namespace Process{ 
+	// class Process {
+	// public:
+	// 	size_t proc_id;
+	// 	char title[255];
 
-	Memory::PageDirectory pd;
+	// 	Memory::PageDirectory pd;
 
-//	std::vector<Thread *> threads;
+	// //	std::vector<Thread *> threads;
 
-	registers r;
+	// 	registers r;
 
-	Process() { }
-	~Process() { }
-};
+	// 	Process() { }
+	// 	~Process() { }
+	// };
 
-//extern std::vector<Process *> proc_list;
+	// //extern std::vector<Process *> proc_list;
 
-void init_process();
+	// void init_process();
 
-void start_process(char* title);
+	// void start_process(char* title);
+}

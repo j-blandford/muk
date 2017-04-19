@@ -11,6 +11,7 @@
 #include <kernel/proc/process.hpp>
 #include <kernel/proc/scheduler.hpp>
 #include <kernel/proc/thread.hpp>
+#include <kernel/proc/message.hpp>
 
 #include <kernel/memory/manager.hpp>
 #include <kernel/memory/heap.hpp>
@@ -47,4 +48,5 @@ void init_kthreads() {
 	start_thread("keyboard_driver", &kb_update); // adds to the ringbuffer
 	start_thread("tty_driver", &tty_update); // updates the terminal text and parses commands
 	start_thread("display_driver", &surface_update); // keeps the frontbuffer in sync with the backbuffer
+	start_thread("postbox_debug", &postbox_debug);
 }

@@ -37,3 +37,11 @@ inline void BochsBreak() {
 
 void BochsConsolePrint(char *s);
 void bcprintf(const char* fmt, ...);
+
+// this cannot be an inline function as __FILE__ and __LINE__ would be incorrect.
+#define assert(n) ({if(!(n)){ \
+	interrupts_disable(); \
+	bcprintf("\n---------------------\n"); \
+	bcprintf("HALT! \n Assertion failed -> %s\n", #n); \
+	bcprintf("%s @ line %d", __FILE__, __LINE__-4); \
+  	for(;;);}})

@@ -22,8 +22,7 @@ BaseSurface::BaseSurface(Graphics::Vector2 pos, Graphics::Vector2 dim) {
 }
 
 void BaseSurface::setPixel(uint32_t x, uint32_t y, Graphics::RGB color) {
-    if(x>=this->dim.x || y>=this->dim.y)
-        return;
+    if(x>=this->dim.x || y>=this->dim.y) return;
 
     unsigned int where = x*(Graphics::frame_depth/8) + y*this->s_pitch;
     
@@ -31,7 +30,7 @@ void BaseSurface::setPixel(uint32_t x, uint32_t y, Graphics::RGB color) {
     this->buff_loc[where + 1] = color.g;
     this->buff_loc[where + 2] = color.r;
 
-    this->dirty_buffer[y] = true;
+    //this->dirty_buffer[y] = true;
 }
 
 void BaseSurface::apply(bool full_refresh) {

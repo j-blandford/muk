@@ -48,6 +48,7 @@ namespace std {
 		void reserve(size_t capacity);
 		void push_back(T value);
 		void pop_back();
+		void remove(T& value);
 
 		size_t capacity() const;
 		size_t size() const;
@@ -56,8 +57,11 @@ namespace std {
 		iterator end() { return iterator( buffer + _size ); }
 
 		T& operator[](size_t index);
-		vector<T>& operator=(const vector<T> & v);
+		vector<T>& operator=(const vector<T>& v);
 
+		friend bool operator==(const vector<T>& v1, const vector<T>& v2) {
+			return v1 == v2;
+		}
 	};
 }
 
@@ -108,7 +112,7 @@ namespace std {
 
 
 	template<class T>
-	vector<T>& vector<T>::operator= (const vector<T> & v) {
+	vector<T>& vector<T>::operator= (const vector<T>& v) {
 		delete[] buffer;
 		_size = v._size;
 

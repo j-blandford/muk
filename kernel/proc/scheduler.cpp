@@ -56,7 +56,7 @@ void Scheduler::next(registers * r) {
 		// set the registers from the current thread's saved state
 		memcpy(r, &thread_list[task_idx]->state_reg, sizeof(registers));
 
-		//bcprintf("thread: %s\n", thread_list[task_idx]->title);
+		bcprintf("thread: %s\n", thread_list[task_idx]->title);
 
 		task_idx++;
 

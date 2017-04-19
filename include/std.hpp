@@ -57,3 +57,23 @@ char* ltoa(unsigned long long value, char* buffer, int radix );
 // Integer functions
 int itoa(int value, char *sp, int radix);
 int atoi(char* str);
+
+namespace std {
+    template<class InputIt, class T>
+	InputIt find(InputIt first, InputIt last, const T& value);
+
+    template<class InputIt, class UnaryPredicate>
+	InputIt find_if_not(InputIt first, InputIt last, UnaryPredicate q);
+
+    template<class InputIt, class UnaryPredicate>
+    InputIt find_if(InputIt first, InputIt last, UnaryPredicate p);
+
+    template<class InputIt, class UnaryPredicate>
+    int count_if(InputIt first, InputIt last, UnaryPredicate p);
+
+    template<class ForwardIt, class T>
+	ForwardIt remove(ForwardIt first, ForwardIt last, const T& value);
+
+    template<class ForwardIt, class UnaryPredicate>
+	ForwardIt remove_if(ForwardIt first, ForwardIt last, UnaryPredicate p);
+}

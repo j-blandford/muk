@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <std/vector.hpp>
+#include <std/deque.hpp>
 
 #include <std/ringbuffer.hpp>
 
@@ -37,32 +38,49 @@ namespace Process {
 	class Message {
 	public:
 		int source_thread;
-		int dest_port;
-		VariantType data;
+		
+		char data;
 
-		Message(int dest_port, int src_thread, VariantType::Type data) 
-		: dest_port(dest_port)
+		Message() : data('c') { }
+		Message(int src_thread, char data) 
 		, source_thread(src_thread)
 		, data(data) { }
 		~Message() { }
+
+		friend bool operator==(const Message& m1, const Message& m2) { 
+			return (m1.source_thread == m2.source_thread) 
+				&& (m1.data == m2.data);
+		}
 	};
 
-	// "Queue" is a wrapper class around the std::vector
-	class MessageQueue {
+	// this class contains a queue for each port
+	class PortQueue {
 	public:
+		int port;
 		std::vector<Message> list;
 
-		MessageQueue() { list = std::vector<Message>(); }
+		PortQueue(int port_id) : port(port_id) { list = std::vector<Message>(); }
+		~PortQueue() { }
+	}
+
+	// "MessageQueue" is a wrapper class around the std::vector
+	class MessageQueue {
+	public:
+		std::vector<PortQueue> ports;
+
+		MessageQueue() { ports = std::vector<PortQueue>(); }
 		~MessageQueue() { }
 
 		Message* peek(int port_id);
-		void push(Message msg);
-		void pop(int port_id);
+		void push(int port_id, Message msg);
+		Message* pop(int port_id);
 		
 		std::vector<Message*> filter(int port_id);
 	};
 
-	extern Queue<Message> postbox;
+	extern MessageQueue postbox;
 
-	bool SendMessage(int port_id, int src_thread, VariantType::Type data);
+	bool SendMessage(int port_id, int src_thread, char data);
 }
+
+void postbox_debug();
