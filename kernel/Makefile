@@ -21,10 +21,16 @@ OBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 OBJS+= $(patsubst %.cpp,%.o,$(wildcard */*.cpp))
 OBJS+= $(patsubst %.cpp,%.o,$(wildcard */*/*.cpp))
 
+#STD_OBJS = $(patsubst %.cpp,%.o,$(shell find std/ -type f -name '*.cpp'))
+
 HEADERS = $(shell find include/ -type f -name '*.hpp')
 HEADERS+= $(shell find include/stlport/ -type f)
 
 ASMOBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
+
+# .PHONY: printvars 
+# printvars: 
+# 	@$(foreach V,$(sort $(.VARIABLES)), $(if $(filter-out environment% default automatic, $(origin $V)),$(warning $V=$($V) ($(value $V)))))
 
 .PHONY: compile run clean
 
@@ -34,7 +40,7 @@ ASMOBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
 compile: ${OBJS}
 	@${NASM} ${NASM_FLAGS} asm/boot.s
-	@${GPP} -T linker.ld ${CPPFLAGS} -o ../build/boot/kernel.elf asm/boot.o ${OBJS}
+	@${GPP} -T linker.ld ${CPPFLAGS} -o ../build/boot/kernel.elf asm/boot.o ${OBJS} 
 	@${INFO} "---->" "Kernel built..."
 
 # This provides the object files

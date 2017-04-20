@@ -3,24 +3,11 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#include <std/cstdlib.hpp>
+
 #include <std/ctype.hpp>
 #include <std/string.hpp>
 #include <std/vector.hpp>
-
-// Structs for stdlib
-typedef struct {
-    short quot, rem;
-} div_t;
-
-typedef struct {
-    long quot, rem;
-} ldiv_t;
-
-template<class T>
-void swap(T x, T y);
-
-template<class T_in, class T_out>
-T_out copy(T_in first, T_in last, T_out d_first);
 
 // C++ dynamic memory allocation operators
 void *operator new(size_t size);
@@ -58,29 +45,3 @@ char* ltoa(unsigned long long value, char* buffer, int radix );
 // Integer functions
 int itoa(int value, char *sp, int radix);
 int atoi(char* str);
-
-namespace std {
-    template<class InputIt, class T>
-	InputIt find(InputIt first, InputIt last, const T& value);
-
-    template<class InputIt, class T>
-	InputIt find(InputIt first, InputIt last, T& value);
-
-    template<class InputIt, class UnaryPredicate>
-	InputIt find_if_not(InputIt first, InputIt last, UnaryPredicate q);
-
-    template<class InputIt, class UnaryPredicate>
-    InputIt find_if(InputIt first, InputIt last, UnaryPredicate p);
-
-    template<class InputIt, class UnaryPredicate>
-    int count_if(InputIt first, InputIt last, UnaryPredicate p);
-
-    template<class InputIt, class OutputIt>
-	OutputIt move(InputIt first, InputIt last, OutputIt d_first);
-
-    template<class ForwardIt, class T>
-	ForwardIt remove(ForwardIt first, ForwardIt last, const T& value);
-
-    template<class ForwardIt, class UnaryPredicate>
-	ForwardIt remove_if(ForwardIt first, ForwardIt last, UnaryPredicate p);
-}
