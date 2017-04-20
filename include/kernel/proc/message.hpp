@@ -103,6 +103,7 @@ namespace Process {
 	extern Message kMessageNull; // used as a comparator for "NULL"
 
 	bool SendMessage(int port_id, int src_thread, char data);
+	void listen(int port_id);
 }
 
 void postbox_debug();

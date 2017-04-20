@@ -38,7 +38,7 @@ namespace std {
 	}
 	template<class T>
 	void queue<T>::pop() {
-		elements.pop_back();
+		//elements.pop_back();
 	}
 
 	template<class T>

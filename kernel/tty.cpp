@@ -142,7 +142,7 @@ void tty_update() {
 		Scheduler::unlock();
 
 		while(!parsing) {
-			Scheduler::lock();
+
 			for(size_t idx = 0; idx < keyboard_buffer.size; idx++) {
 				if(keyboard_buffer.buffer[idx] == 28) {
 					parsing = true;
@@ -161,7 +161,7 @@ void tty_update() {
 					c_idx++;
 				}
 			}
-			Scheduler::unlock();
+
 		}
 		buffer_clear(&keyboard_buffer);
 

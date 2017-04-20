@@ -66,9 +66,9 @@ void Graphics::Setup(multiboot_info_t* mboot) {
 
 void Graphics::UpdateBuffers(Graphics::Update update_method) {
     // Apply each surface to the backbuffer
-    for(auto surf : screen_surfaces) {
-        surf->apply(false);
-    }
+    // for(auto surf : screen_surfaces) {
+    //     surf->apply(false);
+    // }
     
     // Apply the backbuffer to the user's screen
     front_buffer.CopyFrom(back_buffer, update_method);

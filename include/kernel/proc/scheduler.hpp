@@ -5,7 +5,8 @@
 #include <kernel/idt.hpp>
 
 namespace Scheduler {
-	extern int task_idx;
+	extern unsigned int task_idx;
+	extern unsigned int lock_count;
 	extern registers base_state;
 	extern bool has_initialised;
 	extern volatile bool running;

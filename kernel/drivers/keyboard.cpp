@@ -64,10 +64,11 @@ char getc() {
 			__asm__ __volatile__ ("hlt"); // wait a bit
 		} 
 		else {
+			Scheduler::lock();
 			bcprintf("Pressed key '%c' (%d)\n", c, (int)c);
-
 			Process::SendMessage(1, 1, c);
-
+			Scheduler::unlock();
+			
 			return c;
 		}
 	}
@@ -76,7 +77,7 @@ char getc() {
 static void keyboard_irq1(registers *r) {
 	uint8_t status;
 	char keycode;
-	
+	//Scheduler::lock();
 	status = inportb(0x64);
 	if (status & 0x01) {
 		keycode = inportb(0x60);
@@ -87,6 +88,7 @@ static void keyboard_irq1(registers *r) {
 		char c = (char)keyboard_map[(uint8_t)keycode];
 		buffer_write(&keyboard_buffer, c);
 	}
+	//Scheduler::unlock();
 	return;
 }
 

@@ -16,7 +16,7 @@ static void timer_irq0(struct registers * r) {
     timer_ticks++;
     timer_tenths++;
 
-    if(timer_tenths > 2) {
+    if(timer_tenths > 50) {
         Scheduler::next(r);
 
         timer_tenths = 0;
@@ -44,6 +44,7 @@ void Timer::sleep(int ticks) {
 }
 
 void Timer::yield() {
+    interrupts_enable();
     timer_tenths = 100; // force the next timer IRQ to switch threads
 }
 

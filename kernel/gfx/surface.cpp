@@ -104,7 +104,8 @@ void surface_update() {
         interrupts_disable();
         Graphics::UpdateBuffers(Graphics::Update::DELTA_REFRESH);  
         interrupts_enable();
-        //Scheduler::yield();
+        //Scheduler::unlock();
+        Scheduler::yield();
     }
 }
 

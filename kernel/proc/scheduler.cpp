@@ -12,7 +12,8 @@
 #include <kernel/proc/thread.hpp>
 #include <kernel/proc/process.hpp>
 
-int Scheduler::task_idx(0);
+unsigned int Scheduler::task_idx(0);
+unsigned int Scheduler::lock_count(0); 
 bool Scheduler::has_initialised(false);
 volatile bool Scheduler::running(true);
 registers Scheduler::base_state;
@@ -44,11 +45,13 @@ void Scheduler::next(registers * r) {
 		thread_list[task_idx]->ran = true;
 	}
 
-	if(running) {
+	if(running || lock_count > 10) {
 		int lastThread = task_idx - 1;
 
 		if(task_idx == 0)
 			lastThread = thread_list.size()-1;
+		
+		bcprintf("thread: %s\n", thread_list[task_idx]->title);
 
 		// save the previous threads state
 		memcpy(&thread_list[lastThread]->state_reg, r, sizeof(registers));
@@ -56,18 +59,19 @@ void Scheduler::next(registers * r) {
 		// set the registers from the current thread's saved state
 		memcpy(r, &thread_list[task_idx]->state_reg, sizeof(registers));
 
-		bcprintf("thread: %s\n", thread_list[task_idx]->title);
-
 		task_idx++;
 
 		// Loop around 0 -> 1 -> 2 -> 0 -> ...
 		if(task_idx >= thread_list.size()) {
 			task_idx = 0;
 		}
+
+		lock_count = 0; // we will only allow the thread to lock for a certain time
 	} 
-	// else {
-	// 	bcprintf("Thread locked!\n");
-	// }
+	else {
+		lock_count++;
+		bcprintf("Thread locked!");
+	}
 }
 
 // this is used to allow threads to perform blocking I/O calculations.

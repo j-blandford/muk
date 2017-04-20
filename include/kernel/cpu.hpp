@@ -45,3 +45,4 @@ void bcprintf(const char* fmt, ...);
 	bcprintf("HALT! \n Assertion failed -> %s\n", #n); \
 	bcprintf("%s @ line %d", __FILE__, __LINE__-4); \
   	for(;;);}})
+
