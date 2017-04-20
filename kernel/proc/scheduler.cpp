@@ -50,14 +50,17 @@ void Scheduler::next(registers * r) {
 
 		if(task_idx == 0)
 			lastThread = thread_list.size()-1;
-		
-		bcprintf("thread: %s\n", thread_list[task_idx]->title);
 
-		// save the previous threads state
-		memcpy(&thread_list[lastThread]->state_reg, r, sizeof(registers));
+		// check if the thread is actually awake!
+		if(thread_list[lastThread]->t_status == ThreadStatus::T_RUNNING) {
+			bcprintf("thread: %s\n", thread_list[task_idx]->title);
 
-		// set the registers from the current thread's saved state
-		memcpy(r, &thread_list[task_idx]->state_reg, sizeof(registers));
+			// save the previous threads state
+			memcpy(&thread_list[lastThread]->state_reg, r, sizeof(registers));
+
+			// set the registers from the current thread's saved state
+			memcpy(r, &thread_list[task_idx]->state_reg, sizeof(registers));
+		}
 
 		task_idx++;
 
@@ -66,7 +69,13 @@ void Scheduler::next(registers * r) {
 			task_idx = 0;
 		}
 
-		lock_count = 0; // we will only allow the thread to lock for a certain time
+		// check whether the lock count has been exceeded on the previous thread
+		if(lock_count > 10) {
+			// thread has 99% hanged :( let's take it out of the scheduler
+			thread_list[lastThread]->t_status = ThreadStatus::T_HANGED;
+		}
+
+		lock_count = 0; // reset the lock counter
 	} 
 	else {
 		lock_count++;

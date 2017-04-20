@@ -11,6 +11,12 @@
 
 using void_fn = void(*)(void);
 
+enum class ThreadStatus {
+	T_RUNNING,
+	T_HANGED,
+	T_SLEEPING
+};
+
 class Thread {
 public:
 	//registers_t * r;
@@ -22,7 +28,13 @@ public:
 	registers state_reg;
 	bool ran;
 
-	Thread() : proc_id(1), title(new char[255]), ran(false) {}
+	ThreadStatus t_status;
+
+	Thread() 
+	: proc_id(1)
+	, title(new char[255])
+	, ran(false)
+	, t_status(ThreadStatus::T_RUNNING) {}
 };
 
 extern std::vector<Thread *> thread_list;
