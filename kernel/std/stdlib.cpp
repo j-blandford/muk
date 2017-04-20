@@ -497,6 +497,17 @@ namespace std {
 		return last;
 	}
 
+	template<class InputIt, class T>
+	InputIt find(InputIt first, InputIt last, T& value)
+	{
+		for (; first != last; ++first) {
+			if (*first == value) {
+				return first;
+			}
+		}
+		return last;
+	}
+
 	template<class InputIt, class UnaryPredicate>
 	InputIt find_if_not(InputIt first, InputIt last, UnaryPredicate q)
 	{
@@ -529,6 +540,15 @@ namespace std {
 			}
 		}
 		return n;
+	}
+
+	template<class InputIt, class OutputIt>
+	OutputIt move(InputIt first, InputIt last, OutputIt d_first)
+	{
+		while (first != last) {
+			*d_first++ = std::move(*first++);
+		}
+		return d_first;
 	}
 
 	template<class ForwardIt, class T>

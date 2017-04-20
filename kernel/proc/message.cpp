@@ -8,14 +8,14 @@ MessageQueue Process::postbox;
 bool Process::SendMessage(int port_id, int src_thread, char data) {
 	Scheduler::lock();
 	//bcprintf("Sending msg... %c\n", data ); // data.getChar()
-	postbox.push(Message(port_id, src_thread, data));
+	postbox.push(port_id, Message(src_thread, data));
 	Scheduler::unlock();
 	
 	return true;
 }
 
 void Process::MessageQueue::push(int port_id, Message msg) {
-	list.push_back(msg);
+	//ports.push_back(msg);
 }
 
 Message* Process::MessageQueue::peek(int port_id) {
@@ -33,9 +33,12 @@ Message* Process::MessageQueue::pop(int port_id) {
 	std::vector<Message*> port_postbox = filter(port_id);
 
 	if(port_postbox.size() > 0) { 
-		std::vector<Message>::iterator element_it = std::find(postbox.begin(), postbox.end(), *port_postbox[0]);
+		const int port = 1;
+		auto element_it = std::find_if(postbox.ports.begin(), 
+									   postbox.ports.end(),
+									   PortQueueComp(1) );
 		Message return_msg = *port_postbox[0];
-		list.erase(port_postbox[0]);
+		//list.erase(port_postbox[0]);
 		return port_postbox[0];
 	}
 	else { 
@@ -46,10 +49,10 @@ Message* Process::MessageQueue::pop(int port_id) {
 std::vector<Message*> Process::MessageQueue::filter(int port_id) {
 	std::vector<Message*> filtered = std::vector<Message*>();
 
-	for(auto x : list) {
-		if(x.dest_port == port_id) {
+	for(auto x : ports) {
+		if(x.port == port_id) {
 			bcprintf("Message Recieved (port=%d)\n",port_id);
-			filtered.push_back(&x);
+			//filtered.push_back(&x);
 		}
 	}
 

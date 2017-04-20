@@ -5,6 +5,7 @@
 
 #include <std/ctype.hpp>
 #include <std/string.hpp>
+#include <std/vector.hpp>
 
 // Structs for stdlib
 typedef struct {
@@ -62,6 +63,9 @@ namespace std {
     template<class InputIt, class T>
 	InputIt find(InputIt first, InputIt last, const T& value);
 
+    template<class InputIt, class T>
+	InputIt find(InputIt first, InputIt last, T& value);
+
     template<class InputIt, class UnaryPredicate>
 	InputIt find_if_not(InputIt first, InputIt last, UnaryPredicate q);
 
@@ -70,6 +74,9 @@ namespace std {
 
     template<class InputIt, class UnaryPredicate>
     int count_if(InputIt first, InputIt last, UnaryPredicate p);
+
+    template<class InputIt, class OutputIt>
+	OutputIt move(InputIt first, InputIt last, OutputIt d_first);
 
     template<class ForwardIt, class T>
 	ForwardIt remove(ForwardIt first, ForwardIt last, const T& value);

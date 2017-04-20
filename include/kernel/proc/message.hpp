@@ -2,8 +2,9 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <std.hpp>
 #include <std/vector.hpp>
-#include <std/deque.hpp>
+#include <std/queue.hpp>
 
 #include <std/ringbuffer.hpp>
 
@@ -38,12 +39,11 @@ namespace Process {
 	class Message {
 	public:
 		int source_thread;
-		
 		char data;
 
 		Message() : data('c') { }
 		Message(int src_thread, char data) 
-		, source_thread(src_thread)
+		: source_thread(src_thread)
 		, data(data) { }
 		~Message() { }
 
@@ -57,11 +57,16 @@ namespace Process {
 	class PortQueue {
 	public:
 		int port;
-		std::vector<Message> list;
+		std::queue<Message> list;
 
-		PortQueue(int port_id) : port(port_id) { list = std::vector<Message>(); }
+		PortQueue() = default;
+		PortQueue(int port_id) : port(port_id) { list = std::queue<Message>(); }
 		~PortQueue() { }
-	}
+
+		friend bool operator==(const PortQueue& p1, const PortQueue& p2) { 
+			return (p1.port == p2.port);
+		}
+	};
 
 	// "MessageQueue" is a wrapper class around the std::vector
 	class MessageQueue {
@@ -76,6 +81,14 @@ namespace Process {
 		Message* pop(int port_id);
 		
 		std::vector<Message*> filter(int port_id);
+	};
+
+	struct PortQueueComp
+	{
+		explicit PortQueueComp(int port) : port(port) { }
+		inline bool operator()(const PortQueue& m) const { return m.port == port; }
+	private:
+		int port;
 	};
 
 	extern MessageQueue postbox;
