@@ -73,13 +73,16 @@ void Scheduler::next(registers * r) {
 		if(lock_count > 10) {
 			// thread has 99% hanged :( let's take it out of the scheduler
 			thread_list[lastThread]->t_status = ThreadStatus::T_HANGED;
+			
+			bcprintf("|--------------------|\n");
+			bcprintf("| Thread has hung :( |\n");
+			bcprintf("|--------------------|\n");
 		}
 
 		lock_count = 0; // reset the lock counter
 	} 
 	else {
 		lock_count++;
-		bcprintf("Thread locked!");
 	}
 }
 
@@ -89,7 +92,6 @@ void Scheduler::next(registers * r) {
 // Note: this can HANG THE KERNEL if used improperly!!!!!
 bool Scheduler::lock() {
 	if(running) {
-		//bcprintf(">>>>>>>>>>>>>>> LOCKED THREAD\n");
 		running = false;
 		return true;
 	}
@@ -98,7 +100,6 @@ bool Scheduler::lock() {
 
 bool Scheduler::unlock() {
 	if(!running) {
-		//bcprintf("<<<<<<<<<<<<<<<< UNLOCKED THREAD\n");
 		running = true;
 		return true;
 	}

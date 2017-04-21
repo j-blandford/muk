@@ -64,10 +64,10 @@ char getc() {
 			__asm__ __volatile__ ("hlt"); // wait a bit
 		} 
 		else {
-			Scheduler::lock();
+			//Scheduler::lock();
 			bcprintf("Pressed key '%c' (%d)\n", c, (int)c);
 			Process::SendMessage(1, 1, c);
-			Scheduler::unlock();
+			//Scheduler::unlock();
 			
 			return c;
 		}

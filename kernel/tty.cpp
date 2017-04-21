@@ -129,8 +129,6 @@ void tty_update() {
 		bool parsing = false;
 		size_t c_idx = 0;
 
-		Scheduler::lock();
-		bcprintf("lol\n");
 		terminal_writestring("\n[", Graphics::RGB(0xe4e4c8));
 		terminal_writestring("james", Graphics::RGB(0xff6064));
 		terminal_writestring("@", Graphics::RGB(0xff6064));
@@ -139,31 +137,32 @@ void tty_update() {
 		terminal_writestring("/", Graphics::RGB(0x288acc));
 		terminal_writestring("] ", Graphics::RGB(0xe4e4c8));
 		//terminal_writestring(command, Graphics::RGB(0xe4e4c8));
-		Scheduler::unlock();
 
-		while(!parsing) {
+		for(;;);
 
-			for(size_t idx = 0; idx < keyboard_buffer.size; idx++) {
-				if(keyboard_buffer.buffer[idx] == 28) {
-					parsing = true;
-					break;
-				} 
-				else {
-					command[c_idx] = keyboard_buffer.buffer[idx];
+		// while(!parsing) {
 
-					// char to_print = command[c_idx];
-					// if(to_print != 0) {
-					// 	bcprintf("Printing char '%c'\n",to_print);
-					// 	terminal_putchar(to_print);
-					// }
+		// 	for(size_t idx = 0; idx < keyboard_buffer.size; idx++) {
+		// 		if(keyboard_buffer.buffer[idx] == 28) {
+		// 			parsing = true;
+		// 			break;
+		// 		} 
+		// 		else {
+		// 			command[c_idx] = keyboard_buffer.buffer[idx];
 
-					parsing = false;
-					c_idx++;
-				}
-			}
+		// 			// char to_print = command[c_idx];
+		// 			// if(to_print != 0) {
+		// 			// 	bcprintf("Printing char '%c'\n",to_print);
+		// 			// 	terminal_putchar(to_print);
+		// 			// }
 
-		}
-		buffer_clear(&keyboard_buffer);
+		// 			parsing = false;
+		// 			c_idx++;
+		// 		}
+		// 	}
+
+		// }
+		// buffer_clear(&keyboard_buffer);
 
 		// Command::Parse(kb_buffer);
 	}

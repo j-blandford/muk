@@ -66,9 +66,9 @@ void Graphics::Setup(multiboot_info_t* mboot) {
 
 void Graphics::UpdateBuffers(Graphics::Update update_method) {
     // Apply each surface to the backbuffer
-    // for(auto surf : screen_surfaces) {
-    //     surf->apply(false);
-    // }
+    for(auto surf : screen_surfaces) {
+        surf->apply(true);
+    }
     
     // Apply the backbuffer to the user's screen
     front_buffer.CopyFrom(back_buffer, update_method);
@@ -79,7 +79,7 @@ void Graphics::UpdateBuffers(Graphics::Update update_method) {
 
 void drawchar_transparent(unsigned char c, int x, int y, Graphics::RGB fgcolor) {
 	size_t cx,cy;
-	int mask[8]={1,2,4,8,16,32,64,128}; // essentially 1 << 1, 1<<2, 1<<3, 1<<4...
+	int mask[8]={1,2,4,8,16,32,64,128}; // 1 << 1, 1<<2, 1<<3, 1<<4...
 
     uint32_t x_coord;
     uint32_t y_coord;
@@ -87,7 +87,6 @@ void drawchar_transparent(unsigned char c, int x, int y, Graphics::RGB fgcolor) 
 	uint8_t* glyph = font_terminus[c];
     
 	for(cy=0;cy<16;cy++){
-        //bcprintf("%x\n",glyph[cy]);
 		for(cx=0;cx<8;cx++){
 			if(glyph[cy]&mask[7-cx]) {
                 x_coord = x+cx;

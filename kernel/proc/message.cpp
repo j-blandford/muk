@@ -26,12 +26,34 @@ void Process::listen(int port_id) {
 	}
 }
 
+bool Process::MessageList::push(Message msg) {
+	if(this->size() < this->kMaxMessages) {
+		list[wrap(head_index+list_size)] = msg;
+		list_size++;
+
+		return true;
+	}
+
+	// there's not enough space to fit the message in!
+	return false;
+}
+
+Message Process::MessageList::pop() {
+	Message pop = list[head_index];
+
+	head_index = wrap(head_index + 1);
+	list_size--;
+
+	return pop;
+}
+
 void Process::MessageQueue::push(int port_id, Message msg) {
 	auto port_it = search(port_id);
 
-	if(port_it != std::end(postbox.ports)) {
-		PortQueue portbox = *port_it;
-		portbox.list.push(msg);
+	if(port_it != postbox.ports.end()) {
+		port_it->messages.push(msg);
+
+		bcprintf("Adding to port %d postbox. Size is now %d\n", port_id, port_it->messages.size());
 	}
 }
 
@@ -39,13 +61,13 @@ Message* Process::MessageQueue::peek(int port_id) {
 	auto port_it = search(port_id);
 
 	if(port_it != std::end(postbox.ports)) {
-		PortQueue portbox = *port_it;
-		if(portbox.list.size() > 0) {
-			return &(portbox.list[0]);
-		}
-		else {
+		// PortQueue portbox = *port_it;
+		//if(portbox.list.size() > 0) {
+			//return &(portbox.list[0]);
+		//}
+		//else {
 			return nullptr;
-		}
+		//}
 	}
 	else {
 		return nullptr;
@@ -56,19 +78,12 @@ Message Process::MessageQueue::pop(int port_id) {
 	auto port_it = search(port_id);
 
 	if(port_it != std::end(postbox.ports)) {
-		PortQueue portbox = *port_it;
-
-		// if(portbox.list.size() > 0) {
-			
-		// 	// we have to REMOVE the message from the list
-		// 	Message return_msg = portbox.list[0];
-		// 	portbox.list.pop();
-
-		// 	return return_msg;
-		// }
-		// else {
+		if(port_it->messages.size() > 0) {
+			return port_it->messages.pop();
+		}
+		else {
 			return kMessageNull;
-		//}
+		}
 	}
 	else {
 		return kMessageNull;
@@ -87,12 +102,12 @@ void postbox_debug() {
 	Message msg = Process::kMessageNull;
 
 //	postbox.ports.push_back(PortQueue(1));
-//	Process::listen(1);
+	Process::listen(1);
 
 	for(;;) {
 
-		while(msg != Process::kMessageNull) {
-			// (msg = Process::postbox.pop(1))
+		while((msg = Process::postbox.pop(1)) != Process::kMessageNull) {
+			bcprintf("Recv. message '%c'\n", msg.data);
 		// 	//msg = Process::postbox.pop(1);
 		}
 

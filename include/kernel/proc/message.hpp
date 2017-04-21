@@ -8,6 +8,12 @@
 #include <std/queue.hpp>
 
 namespace Process {
+
+	inline static int floor(double x) {
+		int xi = (int)x;
+		return x < xi ? xi - 1 : xi;
+	}
+
 	struct VariantType {
 		enum Type {
 			Char,
@@ -42,7 +48,7 @@ namespace Process {
 
 		Message() 
 		: source_thread(0)
-		, data('c') { }
+		, data(0) { }
 
 		Message(int src_thread, char data) 
 		: source_thread(src_thread)
@@ -60,14 +66,40 @@ namespace Process {
 		}
 	};
 
+	// this is a wrapper so we can plug-n-play the message queue depending on what
+	// works best
+	class MessageList {
+		const static int kMaxMessages = 32;
+		int head_index;
+		int list_size;
+		Message* list;
+
+	public:
+		MessageList()
+		: head_index(0)
+		, list_size(0)
+		, list(new Message[kMaxMessages]) { }
+		
+		~MessageList() { }
+
+		bool push(Message msg);
+		Message pop();
+
+		int size() const { return list_size; }
+		int wrap(int index) const { return index - floor((double)index / (double)kMaxMessages); }
+
+		Message& operator[](size_t index);
+	};
+
 	// this class contains a queue for each port
 	class PortQueue {
 	public:
 		int port;
-		std::queue<Message> list;
+		MessageList messages;
 
 		PortQueue() = default;
-		PortQueue(int port_id) : port(port_id) { list = std::queue<Message>(); }
+		PortQueue(int port_id) 
+		: port(port_id) { }
 		~PortQueue() { }
 
 		friend bool operator==(const PortQueue& p1, const PortQueue& p2) { 
