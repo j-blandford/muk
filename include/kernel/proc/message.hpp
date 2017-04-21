@@ -7,6 +7,8 @@
 #include <std/vector.hpp>
 #include <std/queue.hpp>
 
+#include <kernel/proc/mutex.hpp>
+
 namespace Process {
 
 	inline static int floor(double x) {
@@ -79,7 +81,7 @@ namespace Process {
 		: head_index(0)
 		, list_size(0)
 		, list(new Message[kMaxMessages]) { }
-		
+
 		~MessageList() { }
 
 		bool push(Message msg);
@@ -133,9 +135,12 @@ namespace Process {
 
 	extern MessageQueue postbox;
 	extern Message kMessageNull; // used as a comparator for "NULL"
+	
+	extern SpinlockMutex messaging_mutex;
 
 	bool SendMessage(int port_id, int src_thread, char data);
 	void listen(int port_id);
+	
 }
 
 void postbox_debug();

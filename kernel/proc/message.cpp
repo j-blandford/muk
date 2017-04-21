@@ -6,6 +6,8 @@ using namespace Process;
 MessageQueue Process::postbox;
 Message Process::kMessageNull;
 
+SpinlockMutex Process::messaging_mutex;
+
 bool Process::SendMessage(int port_id, int src_thread, char data) {
 	//Scheduler::lock();
 	bcprintf("Sending message \"%c\" on port %d\n", data, port_id ); // data.getChar()
@@ -101,14 +103,18 @@ std::vector<PortQueue>::iterator Process::MessageQueue::search(int port_id) {
 void postbox_debug() {
 	Message msg = Process::kMessageNull;
 
-//	postbox.ports.push_back(PortQueue(1));
-	Process::listen(1);
+	{
+		Locker<SpinlockMutex> messaging_locker(Process::messaging_mutex, Scheduler::threadId());
+		Process::listen(1);
+	}
 
 	for(;;) {
 
 		while((msg = Process::postbox.pop(1)) != Process::kMessageNull) {
 			bcprintf("Recv. message '%c'\n", msg.data);
-		// 	//msg = Process::postbox.pop(1);
+
+			// this sends the keyboard packet to port 2, at the moment is the TTY driver
+			Process::SendMessage(2,4, msg.data); // maybe make a "process::forwardmessage" function...
 		}
 
 	}

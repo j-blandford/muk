@@ -15,6 +15,7 @@ namespace Scheduler {
 	bool lock();
 	bool unlock();
 	void yield();
-	
+
+	int threadId();
 	void init();
 };

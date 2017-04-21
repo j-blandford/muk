@@ -9,6 +9,7 @@
 #include <kernel/memory/alloc.hpp>
 #include <kernel/drivers/keyboard.hpp>
 #include <kernel/user/env.hpp>
+#include <kernel/proc/message.hpp>
 #include <kernel/proc/scheduler.hpp>
 #include <kernel/gfx/buffer.hpp>
 #include <kernel/gfx/surface.hpp>
@@ -121,9 +122,14 @@ void tty_set_cursor_x(size_t x) {
 *	This function is used for the "tty_driver" thread
 */
 void tty_update() {
-	// Scheduler::lock();
-	char command[255];
-	// Scheduler::unlock();
+	Process::Message msg = Process::kMessageNull;
+
+	{
+		using namespace Process;
+
+		Locker<SpinlockMutex> messaging_locker(messaging_mutex, Scheduler::threadId());
+		Process::listen(1);
+	}
 
 	for(;;) {
 		bool parsing = false;
@@ -136,10 +142,13 @@ void tty_update() {
 		terminal_writestring("0:", Graphics::RGB(0x288acc));
 		terminal_writestring("/", Graphics::RGB(0x288acc));
 		terminal_writestring("] ", Graphics::RGB(0xe4e4c8));
-		//terminal_writestring(command, Graphics::RGB(0xe4e4c8));
 
-		for(;;);
-
+		for(;;) {
+			// while((msg = Process::postbox.pop(2)) != Process::kMessageNull) {
+			// 	bcprintf("TTY receiving data '%c'\n", msg.data);
+			// 	terminal_putchar(msg.data);
+			// }
+		}
 		// while(!parsing) {
 
 		// 	for(size_t idx = 0; idx < keyboard_buffer.size; idx++) {

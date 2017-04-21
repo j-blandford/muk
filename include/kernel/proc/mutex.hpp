@@ -24,7 +24,7 @@ namespace Process {
 		SpinlockMutex() 
 		: interlock(0) { }
 
-		~SpinlockMutex();
+		~SpinlockMutex() { };
 
 		void Lock(int thread_id);
 		void Unlock(int thread_id);
@@ -43,7 +43,7 @@ namespace Process {
 		RecursiveMutex() 
 		: interlock(0) { }
 
-		~RecursiveMutex();
+		~RecursiveMutex() { };
 
 		void Lock(int thread_id);
 		void Unlock(int thread_id);

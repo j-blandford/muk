@@ -73,7 +73,7 @@ void Scheduler::next(registers * r) {
 		if(lock_count > 10) {
 			// thread has 99% hanged :( let's take it out of the scheduler
 			thread_list[lastThread]->t_status = ThreadStatus::T_HANGED;
-			
+
 			bcprintf("|--------------------|\n");
 			bcprintf("| Thread has hung :( |\n");
 			bcprintf("|--------------------|\n");
@@ -109,6 +109,10 @@ bool Scheduler::unlock() {
 void Scheduler::yield() {
 	Scheduler::unlock();
 	Timer::yield();
+}
+
+int Scheduler::threadId() {
+	return task_idx;
 }
 
 void Scheduler::init() {
