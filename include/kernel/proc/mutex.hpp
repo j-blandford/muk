@@ -1,24 +1,28 @@
 #pragma once
 
+#include <kernel/cpu.hpp>
+
 namespace Process {
 	template<class Lockable>
 	class Locker {
 		Lockable& lock;
-		int l_threadid;
+		volatile int l_threadid;
 	public:
 		Locker(Lockable& mutex, int thread_id)
 		: lock(mutex)
 		, l_threadid(thread_id) { 
+			bcprintf("ctor Locker called, locked mutex (thread=%d)\n", l_threadid);
 			lock.Lock(l_threadid); 
 		}
 		~Locker() { 
+			bcprintf("dtor Locker called, unlocked mutex!\n");
 			lock.Unlock(l_threadid); 
 		}
 	};
 
 	class SpinlockMutex {
 		volatile int interlock;
-		int l_threadid;
+		volatile int l_threadid;
 
 	public:
 		SpinlockMutex() 

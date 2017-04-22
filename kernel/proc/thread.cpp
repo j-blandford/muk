@@ -37,7 +37,10 @@ void start_thread(char* title, void_fn entry) {
 	thread->thread_id = next_tid;
 
 	thread->entry_ptr = entry;
+	thread->stack_ptr = (uintptr_t)kmalloc(4096); // 4kib of local thread stack
+
 	thread->state_reg.eip = (uint32_t)entry;
+	thread->state_reg.esp = thread->stack_ptr;
 
 	thread_list.push_back(thread);
 

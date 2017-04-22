@@ -18,14 +18,17 @@ bool Process::SendMessage(int port_id, int src_thread, char data) {
 }
 
 void Process::listen(int port_id) {
-	auto port_it = postbox.search(port_id);
 
-	if(port_it == std::end(postbox.ports)) {
-		postbox.ports.push_back(PortQueue(port_id));
+	auto port_it = postbox.search(port_id);
+	bcprintf("listen: Found iterator at %x\n",port_it);
+	//if(port_it == std::end(postbox.ports)) {
+	postbox.ports.push_back(PortQueue(port_id));
+	bcprintf("Listening on port %d...... (#ports=%d)\n", port_id, postbox.ports.size());
+
 		// maybe return the iterator?
-	} else {
-		// maybe return the iterator?
-	}
+	// } else {
+	// 	// maybe return the iterator?
+	// }
 }
 
 bool Process::MessageList::push(Message msg) {
@@ -93,10 +96,11 @@ Message Process::MessageQueue::pop(int port_id) {
 }
 
 std::vector<PortQueue>::iterator Process::MessageQueue::search(int port_id) {
+	bcprintf("Searching for port %d\n",port_id);
 	auto element_it = std::find_if(postbox.ports.begin(), 
 									postbox.ports.end(),
 									PortQueueComp(port_id) );
-
+	bcprintf("Found iterator at %x\n",element_it);
 	return element_it;
 }
 
@@ -104,14 +108,16 @@ void postbox_debug() {
 	Message msg = Process::kMessageNull;
 
 	{
+		bcprintf("Trying to lock messaging_mutex... postbox\n");
 		Locker<SpinlockMutex> messaging_locker(Process::messaging_mutex, Scheduler::threadId());
+		bcprintf("Trying to listen on port 1...\n");
 		Process::listen(1);
 	}
 
 	for(;;) {
 
 		while((msg = Process::postbox.pop(1)) != Process::kMessageNull) {
-			bcprintf("Recv. message '%c'\n", msg.data);
+			bcprintf("Recv. message '%c' (port 1)\n", msg.data);
 
 			// this sends the keyboard packet to port 2, at the moment is the TTY driver
 			Process::SendMessage(2,4, msg.data); // maybe make a "process::forwardmessage" function...

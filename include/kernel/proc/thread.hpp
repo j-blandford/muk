@@ -26,6 +26,7 @@ public:
 
 	void_fn entry_ptr;
 	registers state_reg;
+	uintptr_t stack_ptr;
 	bool ran;
 
 	ThreadStatus t_status;

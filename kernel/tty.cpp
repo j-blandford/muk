@@ -126,9 +126,9 @@ void tty_update() {
 
 	{
 		using namespace Process;
-
+		bcprintf("Trying to lock messaging_mutex... tty\n");
 		Locker<SpinlockMutex> messaging_locker(messaging_mutex, Scheduler::threadId());
-		Process::listen(1);
+		Process::listen(2);
 	}
 
 	for(;;) {
