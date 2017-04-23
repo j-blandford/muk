@@ -126,7 +126,6 @@ void tty_update() {
 
 	{
 		using namespace Process;
-		bcprintf("Trying to lock messaging_mutex... tty\n");
 		Locker<SpinlockMutex> messaging_locker(messaging_mutex, Scheduler::threadId());
 		Process::listen(2);
 	}
@@ -144,10 +143,10 @@ void tty_update() {
 		terminal_writestring("] ", Graphics::RGB(0xe4e4c8));
 
 		for(;;) {
-			// while((msg = Process::postbox.pop(2)) != Process::kMessageNull) {
-			// 	bcprintf("TTY receiving data '%c'\n", msg.data);
-			// 	terminal_putchar(msg.data);
-			// }
+			while((msg = Process::postbox.pop(2)) != Process::kMessageNull) {
+				bcprintf("TTY receiving data '%c'\n", msg.data);
+				terminal_putchar(msg.data);
+			}
 		}
 		// while(!parsing) {
 

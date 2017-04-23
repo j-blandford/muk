@@ -18,17 +18,16 @@ bool Process::SendMessage(int port_id, int src_thread, char data) {
 }
 
 void Process::listen(int port_id) {
-
 	auto port_it = postbox.search(port_id);
-	bcprintf("listen: Found iterator at %x\n",port_it);
-	//if(port_it == std::end(postbox.ports)) {
-	postbox.ports.push_back(PortQueue(port_id));
-	bcprintf("Listening on port %d...... (#ports=%d)\n", port_id, postbox.ports.size());
 
+	if(port_it == std::end(postbox.ports)) {
+		// port queue isn't found - let's add it
+		postbox.ports.push_back(new PortQueue(port_id));
 		// maybe return the iterator?
-	// } else {
-	// 	// maybe return the iterator?
-	// }
+	} 
+	else {
+		// maybe return the iterator?
+	}
 }
 
 bool Process::MessageList::push(Message msg) {
@@ -56,9 +55,9 @@ void Process::MessageQueue::push(int port_id, Message msg) {
 	auto port_it = search(port_id);
 
 	if(port_it != postbox.ports.end()) {
-		port_it->messages.push(msg);
+		(*port_it)->messages.push(msg);
 
-		bcprintf("Adding to port %d postbox. Size is now %d\n", port_id, port_it->messages.size());
+		bcprintf("Adding to port %d postbox. Size is now %d\n", port_id, (*port_it)->messages.size());
 	}
 }
 
@@ -83,8 +82,8 @@ Message Process::MessageQueue::pop(int port_id) {
 	auto port_it = search(port_id);
 
 	if(port_it != std::end(postbox.ports)) {
-		if(port_it->messages.size() > 0) {
-			return port_it->messages.pop();
+		if((*port_it)->messages.size() > 0) {
+			return (*port_it)->messages.pop();
 		}
 		else {
 			return kMessageNull;
@@ -95,12 +94,10 @@ Message Process::MessageQueue::pop(int port_id) {
 	}
 }
 
-std::vector<PortQueue>::iterator Process::MessageQueue::search(int port_id) {
-	bcprintf("Searching for port %d\n",port_id);
+std::vector<PortQueue*>::iterator Process::MessageQueue::search(int port_id) {
 	auto element_it = std::find_if(postbox.ports.begin(), 
 									postbox.ports.end(),
 									PortQueueComp(port_id) );
-	bcprintf("Found iterator at %x\n",element_it);
 	return element_it;
 }
 
@@ -108,9 +105,7 @@ void postbox_debug() {
 	Message msg = Process::kMessageNull;
 
 	{
-		bcprintf("Trying to lock messaging_mutex... postbox\n");
 		Locker<SpinlockMutex> messaging_locker(Process::messaging_mutex, Scheduler::threadId());
-		bcprintf("Trying to listen on port 1...\n");
 		Process::listen(1);
 	}
 
@@ -120,7 +115,7 @@ void postbox_debug() {
 			bcprintf("Recv. message '%c' (port 1)\n", msg.data);
 
 			// this sends the keyboard packet to port 2, at the moment is the TTY driver
-			Process::SendMessage(2,4, msg.data); // maybe make a "process::forwardmessage" function...
+			Process::SendMessage(2,Scheduler::threadId(), msg.data); // maybe make a "process::forwardmessage" function...
 		}
 
 	}

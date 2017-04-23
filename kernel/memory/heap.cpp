@@ -19,6 +19,8 @@ void map_heap_pages(uintptr_t end_addr) {
 void* kmalloc(size_t size) {
     // bcprintf("> kmalloc(%d)\n",size);
 
+    interrupts_disable();
+
     if(size == 0) {
         bcprintf("Cannot malloc 0 bytes!\n");
         return NULL;
@@ -54,7 +56,7 @@ void* kmalloc(size_t size) {
     if(found_block) 
         found_block->next = next_block;
 
-    // bcprintf("-> (%x)\n",(next_block + sizeof(BlockHeader)));
+    interrupts_enable();
 
     return (void*)(next_block + sizeof(BlockHeader));
 }

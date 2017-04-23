@@ -113,22 +113,22 @@ namespace Process {
 	// "MessageQueue" is a wrapper class around the std::vector
 	class MessageQueue {
 	public:
-		std::vector<PortQueue> ports;
+		std::vector<PortQueue*> ports;
 
-		MessageQueue() { ports = std::vector<PortQueue>(); }
+		MessageQueue() { ports = std::vector<PortQueue*>(); }
 		~MessageQueue() { }
 
 		Message* peek(int port_id);
 		void push(int port_id, Message msg);
 		Message pop(int port_id);
 		
-		std::vector<PortQueue>::iterator search(int port_id);
+		std::vector<PortQueue*>::iterator search(int port_id);
 	};
 
 	struct PortQueueComp
 	{
 		explicit PortQueueComp(int port) : port(port) { }
-		inline bool operator()(const PortQueue& m) const { return m.port == port; }
+		inline bool operator()(const PortQueue* m) const { return m->port == port; }
 	private:
 		int port;
 	};
