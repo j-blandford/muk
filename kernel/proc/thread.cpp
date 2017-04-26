@@ -37,7 +37,7 @@ void start_thread(char* title, void_fn entry) {
 	thread->thread_id = next_tid;
 
 	thread->entry_ptr = entry;
-	// thread->stack_ptr = (uintptr_t)kmalloc(4096); // 4kib of local thread stack
+	thread->stack_ptr = (uintptr_t)(&thread->stack)+4092; // 4kib of local thread stack
 
 	thread->state_reg.eip = (uint32_t)entry;
 	//thread->state_reg.esp = thread->stack_ptr;
@@ -49,7 +49,7 @@ void start_thread(char* title, void_fn entry) {
 
 void init_kthreads() {
 	start_thread("keyboard_driver", &kb_update); // adds to the ringbuffer
-	start_thread("tty_driver", &tty_update); // updates the terminal text and parses commands
+	//start_thread("tty_driver", &tty_update); // updates the terminal text and parses commands
 	start_thread("display_driver", &surface_update); // keeps the frontbuffer in sync with the backbuffer
 	start_thread("postbox_debug", &postbox_debug);
 }

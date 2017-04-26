@@ -29,6 +29,8 @@ public:
 	uintptr_t stack_ptr;
 	bool ran;
 
+	uint32_t stack[THREAD_STACK_SIZE];
+
 	ThreadStatus t_status;
 
 	Thread() 
