@@ -73,5 +73,26 @@ switch_registers:
 
 	ret
 
+
 get_eip: mov eax, [esp]
          ret
+
+global set_stack_ptr
+set_stack_ptr:
+	xchg bx, bx
+	mov eax, [esp + 4]
+	mov ebx, esp
+	mov esp, eax
+
+	xchg bx, bx
+
+	mov ecx, 16
+loop_stack:
+	mov edx, [ebx + 4*ecx]
+	push edx
+	dec ecx
+loop_bottom:
+	cmp ecx, 1
+	jne loop_stack
+
+	ret

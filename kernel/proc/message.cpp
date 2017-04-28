@@ -102,21 +102,22 @@ std::vector<PortQueue*>::iterator Process::MessageQueue::search(int port_id) {
 }
 
 void postbox_debug() {
-	Message msg = Process::kMessageNull;
+	// Message msg = Process::kMessageNull;
 
-	{
-		Locker<SpinlockMutex> messaging_locker(Process::messaging_mutex, Scheduler::threadId());
-		Process::listen(1);
-	}
+	// {
+	// 	Locker<SpinlockMutex> messaging_locker(Process::messaging_mutex, Scheduler::threadId());
+	// 	Process::listen(1);
+	// }
 
 	for(;;) {
 
-		while((msg = Process::postbox.pop(1)) != Process::kMessageNull) {
-			bcprintf("Recv. message '%c' (port 1)\n", msg.data);
+		bcprintf("one ");
+		// while((msg = Process::postbox.pop(1)) != Process::kMessageNull) {
+		// 	bcprintf("Recv. message '%c' (port 1)\n", msg.data);
 
-			// this sends the keyboard packet to port 2, at the moment is the TTY driver
-			Process::SendMessage(2,Scheduler::threadId(), msg.data); // maybe make a "process::forwardmessage" function...
-		}
+		// 	// this sends the keyboard packet to port 2, at the moment is the TTY driver
+		// 	Process::SendMessage(2,Scheduler::threadId(), msg.data); // maybe make a "process::forwardmessage" function...
+		// }
 
 	}
 }

@@ -39,9 +39,24 @@ void Scheduler::next(registers * r) {
 	if(!thread_list[task_idx]->ran) {
 		// if this is the first time the thread has been scheduled,
 		// we need to initialize it's state register beforehand
-		memcpy(&thread_list[task_idx]->state_reg, &base_state, sizeof(registers));
+		//memcpy(&thread_list[task_idx]->state_reg, &base_state, sizeof(registers));
+
+		thread_list[task_idx]->state_reg.eax = 0;
+		thread_list[task_idx]->state_reg.ebx = 0;
+		thread_list[task_idx]->state_reg.ecx = 0;
+		thread_list[task_idx]->state_reg.edx = 0;
+
+		thread_list[task_idx]->state_reg.esi = 0;
+		thread_list[task_idx]->state_reg.edi = 0;
+
+		thread_list[task_idx]->state_reg.eflags = base_state.eflags;
+		thread_list[task_idx]->state_reg.cs = base_state.cs;
+		thread_list[task_idx]->state_reg.ss = base_state.ss;
+		//thread_list[task_idx]->state_reg.cr3 = r->cr3;
 
 		thread_list[task_idx]->state_reg.eip = (uint32_t)thread_list[task_idx]->entry_ptr;
+		thread_list[task_idx]->state_reg.esp = (uint32_t)thread_list[task_idx]->stack_ptr;
+
 		thread_list[task_idx]->ran = true;
 	}
 
@@ -53,13 +68,28 @@ void Scheduler::next(registers * r) {
 
 		// check if the thread is actually awake!
 		if(thread_list[lastThread]->t_status == ThreadStatus::T_RUNNING) {
+			MAGIC_BREAK;
+			bcprintf("---------------\n");
+
 			bcprintf("thread: %s\n", thread_list[task_idx]->title);
 
-			// save the previous threads state
+			// bcprintf(">>> eax=%x, ebx=%x, ecx=%x, edx=%x\n", r->eax, r->ebx, r->ecx, r->edx);
+			// bcprintf(">>> esp=%x, ebp=%x, esi=%x, edi=%x\n", r->esp, r->ebp, r->esi, r->edi);
+			// bcprintf(">>> eip=%x\n", r->eip);
+
+			// bcprintf("-----\n");
+
+			// // save the previous threads state
 			memcpy(&thread_list[lastThread]->state_reg, r, sizeof(registers));
 
 			// set the registers from the current thread's saved state
 			memcpy(r, &thread_list[task_idx]->state_reg, sizeof(registers));
+
+			// bcprintf(">>> eax=%x, ebx=%x, ecx=%x, edx=%x\n", r->eax, r->ebx, r->ecx, r->edx);
+			// bcprintf(">>> esp=%x, ebp=%x, esi=%x, edi=%x\n", r->esp, r->ebp, r->esi, r->edi);
+			bcprintf(">>> eip=%x\n", r->eip);
+
+			// set_stack_ptr(thread_list[task_idx]->stack_ptr, thread_list[task_idx]->state_reg.eip);
 		}
 
 		task_idx++;

@@ -111,6 +111,7 @@ _boot:
 %include "asm/idt.s"
 %include "asm/interrupts.s"
 %include "asm/memory.s"
+%include "asm/switch.s"
 
 global kstack
 section .bss

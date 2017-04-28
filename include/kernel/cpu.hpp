@@ -35,7 +35,7 @@ typedef struct registers {
   uint32_t ss;
 } __attribute__((packed)) registers_t;
 
-extern "C" void switch_registers(registers_t*);
+extern "C" void set_stack_ptr(uint32_t, uint32_t);
 
 uint8_t inportb (uint16_t port);
 void outportb (uint16_t port, uint8_t data);

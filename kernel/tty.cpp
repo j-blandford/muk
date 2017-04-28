@@ -122,32 +122,38 @@ void tty_set_cursor_x(size_t x) {
 *	This function is used for the "tty_driver" thread
 */
 void tty_update() {
-	Process::Message msg = Process::kMessageNull;
+	// Process::Message msg = Process::kMessageNull;
 
-	{
-		using namespace Process;
-		Locker<SpinlockMutex> messaging_locker(messaging_mutex, Scheduler::threadId());
-		Process::listen(2);
-	}
+	// {
+	// 	using namespace Process;
+	// 	Locker<SpinlockMutex> messaging_locker(messaging_mutex, Scheduler::threadId());
+	// 	Process::listen(2);
+	// }
 
 	for(;;) {
-		bool parsing = false;
-		size_t c_idx = 0;
+		// bool parsing = false;
+		// size_t c_idx = 0;
 
-		terminal_writestring("\n[", Graphics::RGB(0xe4e4c8));
-		terminal_writestring("james", Graphics::RGB(0xff6064));
-		terminal_writestring("@", Graphics::RGB(0xff6064));
-		terminal_writestring("localhost", Graphics::RGB(0xff6064));
-		terminal_writestring("0:", Graphics::RGB(0x288acc));
-		terminal_writestring("/", Graphics::RGB(0x288acc));
-		terminal_writestring("] ", Graphics::RGB(0xe4e4c8));
+		// terminal_writestring("\n[", Graphics::RGB(0xe4e4c8));
+		// terminal_writestring("james", Graphics::RGB(0xff6064));
+		// terminal_writestring("@", Graphics::RGB(0xff6064));
+		// terminal_writestring("localhost", Graphics::RGB(0xff6064));
+		// terminal_writestring("0:", Graphics::RGB(0x288acc));
+		// terminal_writestring("/", Graphics::RGB(0x288acc));
+		// terminal_writestring("] ", Graphics::RGB(0xe4e4c8));
 
-		for(;;) {
-			while((msg = Process::postbox.pop(2)) != Process::kMessageNull) {
-				bcprintf("TTY receiving data '%c'\n", msg.data);
-				terminal_putchar(msg.data);
-			}
-		}
+		// for(;;) {
+		// 	while((msg = Process::postbox.pop(2)) != Process::kMessageNull) {
+		// 		bcprintf("TTY receiving data '%c'\n", msg.data);
+		// 		terminal_putchar(msg.data);
+		// 	}
+		// }
+
+
+		bcprintf("two ");
+
+
+
 		// while(!parsing) {
 
 		// 	for(size_t idx = 0; idx < keyboard_buffer.size; idx++) {
