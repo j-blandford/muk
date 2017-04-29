@@ -34,85 +34,39 @@ void Scheduler::next(registers * r) {
 		// copy upon being ran.
 		memcpy(&base_state, r, sizeof(registers));
 		has_initialised = true;
+
+		return;
 	}
 
-	if(!thread_list[task_idx]->ran) {
+	if(!thread_running->ran) {
 		// if this is the first time the thread has been scheduled,
 		// we need to initialize it's state register beforehand
-		//memcpy(&thread_list[task_idx]->state_reg, &base_state, sizeof(registers));
+		bcprintf("   . setting up thread (%d)\n",thread_running->thread_id);
 
-		thread_list[task_idx]->state_reg.eax = 0;
-		thread_list[task_idx]->state_reg.ebx = 0;
-		thread_list[task_idx]->state_reg.ecx = 0;
-		thread_list[task_idx]->state_reg.edx = 0;
+		//memcpy((void*)&(thread_running->state_reg), &base_state, sizeof(registers)); 
 
-		thread_list[task_idx]->state_reg.esi = 0;
-		thread_list[task_idx]->state_reg.edi = 0;
+		thread_running->state_reg.eflags = base_state.eflags;
+		thread_running->state_reg.esp = base_state.esp;
+		thread_running->state_reg.isr_num = 0;
+		thread_running->state_reg.err_code = 0;
 
-		thread_list[task_idx]->state_reg.eflags = base_state.eflags;
-		thread_list[task_idx]->state_reg.cs = base_state.cs;
-		thread_list[task_idx]->state_reg.ss = base_state.ss;
-		//thread_list[task_idx]->state_reg.cr3 = r->cr3;
-
-		thread_list[task_idx]->state_reg.eip = (uint32_t)thread_list[task_idx]->entry_ptr;
-		thread_list[task_idx]->state_reg.esp = (uint32_t)thread_list[task_idx]->stack_ptr;
-
-		thread_list[task_idx]->ran = true;
-	}
-
-	if(running || lock_count > 10) {
-		int lastThread = task_idx - 1;
-
-		if(task_idx == 0)
-			lastThread = thread_list.size()-1;
-
-		// check if the thread is actually awake!
-		if(thread_list[lastThread]->t_status == ThreadStatus::T_RUNNING) {
-			MAGIC_BREAK;
-			bcprintf("---------------\n");
-
-			bcprintf("thread: %s\n", thread_list[task_idx]->title);
-
-			// bcprintf(">>> eax=%x, ebx=%x, ecx=%x, edx=%x\n", r->eax, r->ebx, r->ecx, r->edx);
-			// bcprintf(">>> esp=%x, ebp=%x, esi=%x, edi=%x\n", r->esp, r->ebp, r->esi, r->edi);
-			// bcprintf(">>> eip=%x\n", r->eip);
-
-			// bcprintf("-----\n");
-
-			// // save the previous threads state
-			memcpy(&thread_list[lastThread]->state_reg, r, sizeof(registers));
-
-			// set the registers from the current thread's saved state
-			memcpy(r, &thread_list[task_idx]->state_reg, sizeof(registers));
-
-			// bcprintf(">>> eax=%x, ebx=%x, ecx=%x, edx=%x\n", r->eax, r->ebx, r->ecx, r->edx);
-			// bcprintf(">>> esp=%x, ebp=%x, esi=%x, edi=%x\n", r->esp, r->ebp, r->esi, r->edi);
-			bcprintf(">>> eip=%x\n", r->eip);
-
-			// set_stack_ptr(thread_list[task_idx]->stack_ptr, thread_list[task_idx]->state_reg.eip);
-		}
-
-		task_idx++;
-
-		// Loop around 0 -> 1 -> 2 -> 0 -> ...
-		if(task_idx >= thread_list.size()) {
-			task_idx = 0;
-		}
-
-		// check whether the lock count has been exceeded on the previous thread
-		if(lock_count > 10) {
-			// thread has 99% hanged :( let's take it out of the scheduler
-			thread_list[lastThread]->t_status = ThreadStatus::T_HANGED;
-
-			bcprintf("|--------------------|\n");
-			bcprintf("| Thread has hung :( |\n");
-			bcprintf("|--------------------|\n");
-		}
-
-		lock_count = 0; // reset the lock counter
+		thread_running->state_reg.eip = (uint32_t)thread_running->entry_ptr;
+	
+		thread_running->ran = true;
 	} 
 	else {
-		lock_count++;
+		// save the previous threads state
+		memcpy((void*)&(thread_running->state_reg), r, sizeof(registers));
+	}
+
+	// Lets move on with task switching!
+	thread_running = thread_running->next;
+
+	if(thread_running->ran) {
+		bcprintf("\nthread: %s (%d)", thread_running->title, thread_running->thread_id);
+
+		// set the registers from the current thread's saved state
+		memcpy(r, (void*)&(thread_running->state_reg), sizeof(registers));	
 	}
 }
 
@@ -142,7 +96,7 @@ void Scheduler::yield() {
 }
 
 int Scheduler::threadId() {
-	return task_idx;
+	return thread_running->thread_id;
 }
 
 void Scheduler::init() {

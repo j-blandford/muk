@@ -5,9 +5,9 @@
 
 // this function does NOT belong here - TODO create an extendable method for commands
 static void ps_p(int proc_id) {
-	for(auto t : thread_list)
-		if(t->proc_id == proc_id)
-			terminal_printf("%d\t%d\t00:00:01\t%s\n",proc_id,t->thread_id, t->title);
+	// for(auto t : thread_list)
+	// 	if(t->proc_id == proc_id)
+	// 		terminal_printf("%d\t%d\t00:00:01\t%s\n",proc_id,t->thread_id, t->title);
 }
 // this function does NOT belong here - TODO create an extendable method for commands
 static void ps(std::vector<string>  args) {

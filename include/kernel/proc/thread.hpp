@@ -9,7 +9,7 @@
 #include <std/vector.hpp>
 #include <kernel/idt.hpp>
 
-using void_fn = void(*)(void);
+using void_fn = void(*)();
 
 enum class ThreadStatus {
 	T_RUNNING,
@@ -24,12 +24,15 @@ public:
 	size_t proc_id;
 	char *title;
 
-	void_fn entry_ptr;
-	registers state_reg;
+	uintptr_t entry_ptr;
+	registers volatile state_reg;
 	uintptr_t stack_ptr;
 	bool ran;
 
-	uint32_t stack[THREAD_STACK_SIZE];
+	Thread* prev;
+	Thread* next;
+
+	//uint32_t stack[THREAD_STACK_SIZE];
 
 	ThreadStatus t_status;
 
@@ -37,10 +40,13 @@ public:
 	: proc_id(1)
 	, title(new char[255])
 	, ran(false)
+	, prev(nullptr)
+	, next(nullptr)
 	, t_status(ThreadStatus::T_RUNNING) {}
 };
 
-extern std::vector<Thread *> thread_list;
+extern Thread* thread_root;
+extern Thread* thread_running;
 
 void start_thread(char* title, void_fn entry);
 
