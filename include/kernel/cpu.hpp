@@ -35,7 +35,7 @@ typedef struct registers {
 	uint32_t ss;
 } __attribute__((packed)) registers_t;
 
-extern "C" void set_stack_ptr(uint32_t, uint32_t);
+extern "C" void switch_to_task(uint32_t last_esp, uint32_t next_esp);
 
 uint8_t inportb (uint16_t port);
 void outportb (uint16_t port, uint8_t data);

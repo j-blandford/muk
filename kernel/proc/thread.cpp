@@ -34,7 +34,9 @@ void start_thread(char* title, void_fn entry) {
 	thread->thread_id = next_tid;
 
 	thread->entry_ptr = reinterpret_cast<uintptr_t>(entry);
-	//thread->stack_ptr = (uintptr_t)(&thread->stack)+4092; // 4kib of local thread stack
+	thread->stack_ptr = (uintptr_t)(&thread->stack)+4092; // 4kib of local thread stack
+
+	bcprintf("thread stack pointer: %x\n", thread->stack_ptr);
 
 	thread->state_reg.eax = 0;
 	thread->state_reg.ebx = 0;
@@ -53,10 +55,15 @@ void start_thread(char* title, void_fn entry) {
 
 	thread->state_reg.useresp = 0;
 	thread->state_reg.ebp = 0;
+	thread->state_reg.eip = (uint32_t)thread->entry_ptr;
+	thread->state_reg.esp = (uint32_t)thread->stack_ptr;
+
+	thread->state_reg.eflags = (1 << 9) | 1;
 
 	if(thread_root == nullptr) {
-		thread->next = thread;
 		thread_root = thread;
+		thread_root->next = thread_root;
+		
 	}
 	else {
 		Thread* t = thread_root;
@@ -71,6 +78,7 @@ void start_thread(char* title, void_fn entry) {
 }
 
 void kbb() {
+	bcprintf("FIRST ");
 	for(;;) {
 		bcprintf("kbb ");
 	}
@@ -82,4 +90,8 @@ void init_kthreads() {
 	start_thread("tty_driver", tty_update); // updates the terminal text and parses commands
 
 	thread_running = thread_root;
+
+	for(Thread* t = thread_root; t->next != thread_root; t = t->next) {
+		bcprintf("t=%d, '%s', t->next={t=%d, '%s'}\n", t->proc_id, t->title, t->next->proc_id, t->next->title);
+	}
 }

@@ -130,6 +130,8 @@ void tty_update() {
 	// 	Process::listen(2);
 	// }
 
+	bcprintf("FIRST ");
+
 	for(;;) {
 		// bool parsing = false;
 		// size_t c_idx = 0;

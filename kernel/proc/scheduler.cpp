@@ -28,46 +28,31 @@ static void scheduler_isr130(registers * r) {
 // basic at the moment, with only a single process allowed and no
 // ability to skip or change the time slice itself.
 void Scheduler::next(registers * r) {
-	if(!has_initialised) {
-		// the first time our scheduler gets called, we need to
-		// grab the initial registers so that each thread gets a 
-		// copy upon being ran.
-		memcpy(&base_state, r, sizeof(registers));
-		has_initialised = true;
+	if(has_initialised) {
+		uint32_t last_esp = thread_running->state_reg.esp;
 
-		return;
-	}
+		// save the previous threads state
+		memcpy(&(thread_running->state_reg), r, sizeof(registers));
 
-	if(!thread_running->ran) {
-		// if this is the first time the thread has been scheduled,
-		// we need to initialize it's state register beforehand
-		bcprintf("   . setting up thread (%d)\n",thread_running->thread_id);
+		// Lets move on with task switching!
+		thread_running = thread_running->next;
 
-		//memcpy((void*)&(thread_running->state_reg), &base_state, sizeof(registers)); 
+		bcprintf("\nthread: %s (%d)\nesp=%x\n", thread_running->title, thread_running->thread_id, thread_running->state_reg.esp);
+		
+		// set the registers from the current thread's saved state
+		memcpy(r, &(thread_running->state_reg), sizeof(registers));	
 
-		thread_running->state_reg.eflags = base_state.eflags;
-		thread_running->state_reg.esp = base_state.esp;
-		thread_running->state_reg.isr_num = 0;
-		thread_running->state_reg.err_code = 0;
+		bcprintf("last_esp=%x\n",last_esp);
 
-		thread_running->state_reg.eip = (uint32_t)thread_running->entry_ptr;
-	
-		thread_running->ran = true;
+		switch_to_task(last_esp, thread_running->state_reg.esp);
 	} 
 	else {
-		// save the previous threads state
-		memcpy((void*)&(thread_running->state_reg), r, sizeof(registers));
+		// this code is to fix the edge case where t=0
+		memcpy(r, &(thread_running->state_reg), sizeof(registers));	
+		has_initialised = true;
 	}
 
-	// Lets move on with task switching!
-	thread_running = thread_running->next;
-
-	if(thread_running->ran) {
-		bcprintf("\nthread: %s (%d)", thread_running->title, thread_running->thread_id);
-
-		// set the registers from the current thread's saved state
-		memcpy(r, (void*)&(thread_running->state_reg), sizeof(registers));	
-	}
+	MAGIC_BREAK;
 }
 
 // this is used to allow threads to perform blocking I/O calculations.

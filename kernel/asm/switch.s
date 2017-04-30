@@ -77,22 +77,34 @@ switch_registers:
 get_eip: mov eax, [esp]
          ret
 
-global set_stack_ptr
-set_stack_ptr:
-	xchg bx, bx
-	mov eax, [esp + 4]
-	mov ebx, esp
-	mov esp, eax
+global switch_to_task
+switch_to_task:
+    mov eax, [esp + 4*1]      ;eax = address to store this task's ESP
+    mov ecx, [esp + 4*2]      ;ecx = address to get next task's ESP
 
-	xchg bx, bx
+    ;Save general purpose registers for previous task
+    ; Note: EAX, ECX, EDX and "return EIP" are saved by caller, so don't need to be saved again
 
-	mov ecx, 16
-loop_stack:
-	mov edx, [ebx + 4*ecx]
-	push edx
-	dec ecx
-loop_bottom:
-	cmp ecx, 1
-	jne loop_stack
+    push ebx
+    push esi
+    push edi
+    push ebp
 
-	ret
+    ;Save previous task's ESP
+
+    mov [eax],esp
+
+    ;Load next task's ESP
+
+    mov esp,[ecx]
+
+    ;Load general purpose registers for next task
+
+    pop ebp
+    pop edi
+    pop esi
+    pop ebx
+
+    ;Return to next task's EIP
+
+    ret

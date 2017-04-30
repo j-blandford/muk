@@ -109,6 +109,8 @@ void postbox_debug() {
 	// 	Process::listen(1);
 	// }
 
+	bcprintf("FIRST ");
+
 	for(;;) {
 
 		bcprintf("one ");
