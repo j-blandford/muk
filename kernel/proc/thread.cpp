@@ -72,6 +72,8 @@ void start_thread(char* title, void_fn entry) {
 		thread->prev = t;
 		thread->next = thread_root;
 		t->next = thread;
+
+		thread_root->prev = t; // stitch up the beginning node into a real doubly linked ring list
 	}
 
 	next_tid++;
@@ -84,7 +86,12 @@ void kbb() {
 	}
 }
 
+void idle() {
+	for(;;);
+}
+
 void init_kthreads() {
+	start_thread("kernel", idle);
 	start_thread("keyboard_driver", kbb); // adds to the ringbuffer
 	start_thread("postbox_debug", postbox_debug);
 	start_thread("tty_driver", tty_update); // updates the terminal text and parses commands

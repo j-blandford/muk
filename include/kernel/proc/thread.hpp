@@ -19,7 +19,6 @@ enum class ThreadStatus {
 
 class Thread {
 public:
-	//registers_t * r;
 	size_t thread_id;
 	size_t proc_id;
 	char *title;
