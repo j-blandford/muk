@@ -34,9 +34,11 @@ void start_thread(char* title, void_fn entry) {
 	thread->thread_id = next_tid;
 
 	thread->entry_ptr = reinterpret_cast<uintptr_t>(entry);
-	thread->stack_ptr = (uintptr_t)(&thread->stack)+4092; // 4kib of local thread stack
+	thread->stack_ptr = (uintptr_t)(&thread->stack)+4096; // 32kib of local thread stack
 
 	bcprintf("thread stack pointer: %x\n", thread->stack_ptr);
+	
+	PUSH(thread->stack_ptr, uintptr_t, thread->entry_ptr);
 
 	thread->state_reg.eax = 0;
 	thread->state_reg.ebx = 0;
@@ -87,16 +89,30 @@ void kbb() {
 }
 
 void idle() {
-	for(;;);
+	bcprintf("FIRST ");
+	for(;;) {
+		bcprintf("IDLE ");
+	}
 }
 
+void idle2() {
+	bcprintf("FIRST ");
+	for(;;) {
+		bcprintf("IDLE2 ");
+	}
+}
+
+
 void init_kthreads() {
-	start_thread("kernel", idle);
-	start_thread("keyboard_driver", kbb); // adds to the ringbuffer
-	start_thread("postbox_debug", postbox_debug);
-	start_thread("tty_driver", tty_update); // updates the terminal text and parses commands
+	start_thread("kernel", &idle);
+	start_thread("kernel22", &idle2);
+	//start_thread("keyboard_driver", kbb); // adds to the ringbuffer
+	//start_thread("postbox_debug", postbox_debug);
+	//start_thread("tty_driver", tty_update); // updates the terminal text and parses commands
 
 	thread_running = thread_root;
+
+	//thread_running = thread_running->next; // because the root thread "idle" is currently running
 
 	for(Thread* t = thread_root; t->next != thread_root; t = t->next) {
 		bcprintf("t=%d, '%s', t->next={t=%d, '%s'}\n", t->proc_id, t->title, t->next->proc_id, t->next->title);

@@ -15,6 +15,8 @@
 unsigned int Scheduler::lock_count(0); 
 volatile bool Scheduler::running(true);
 
+static bool started = false;
+
 // this function currently isn't used. I need to work out how
 // to call interrupts from within the IRQ0 (timer) interrupt.
 static void scheduler_isr130(registers * r) {
@@ -25,39 +27,63 @@ static void scheduler_isr130(registers * r) {
 // basic at the moment, with only a single process allowed and no
 // ability to skip or change the time slice itself.
 void Scheduler::next(registers * r) {
+
 	// save the previous threads state
-	memcpy(&(thread_running->state_reg), r, sizeof(registers));
+	if(started)
+		memcpy(&(thread_running->state_reg), r, sizeof(registers));
 
 	// Lets move on with task switching!
 	thread_running = thread_running->next;
 
-	bcprintf("\n/////////////////");
+	bcprintf("\n/////////////////\n");
 
-	bcprintf("\nthread: %s (%d)\nesp=%x\n", thread_running->title, thread_running->thread_id, thread_running->state_reg.esp);
+	bcprintf("thread: %s (%d)\n", thread_running->title, thread_running->thread_id);
+	bcprintf("esp=%x, eip=%x\n", thread_running->state_reg.esp, thread_running->state_reg.eip);
 
-	bcprintf("\n");
-	bcprintf("  eax=%x, ebx=%x, ecx=%x, edx=%x\n", thread_running->state_reg.eax, 
-		thread_running->state_reg.ebx, 
-		thread_running->state_reg.ecx, 
-		thread_running->state_reg.edx);
-	bcprintf("  esi=%x, edi=%x\n", thread_running->state_reg.esi, thread_running->state_reg.edi);
+	bcprintf("---------\n");
 
-	bcprintf("  ebp=%x, esp=%x, eip=%x\n", thread_running->state_reg.ebp, 
-		thread_running->state_reg.esp, thread_running->state_reg.eip);
-
-	bcprintf("\n");
-
-	bcprintf("prev->state_reg.esp=%x\n",thread_running->prev->state_reg.esp);
+	bcprintf("prev->esp=%x, prev->eip=%x\n",thread_running->prev->state_reg.esp,
+											thread_running->prev->state_reg.eip);
 
 	// set the registers from the current thread's saved state
-	memcpy(r, &(thread_running->state_reg), sizeof(registers));	
+	// memcpy(r, &(thread_running->state_reg), sizeof(registers));	
 
-	switch_to_task(&thread_running->prev->state_reg.esp, &thread_running->state_reg.esp);
-	
 	bcprintf("\\\\\\\\\\\\\\\\\\\\\\\n");
 
+	started = true;
+
 	MAGIC_BREAK;
+
+	// change registers
+	asm volatile (
+		"mov %0, %%eax\n"
+		"mov %1, %%ebx\n"
+		"mov %2, %%ecx\n"
+		"mov %3, %%edx\n"
+		: : "r" (thread_running->state_reg.eax),
+			"r" (thread_running->state_reg.ebx),
+			"r" (thread_running->state_reg.ecx),
+			"r" (thread_running->state_reg.edx)
+		: "memory"); // clobber regs
+
+	// change ESP
+	asm volatile (
+		"mov %0, %%ebx\n"
+		"mov %1, %%esp\n"
+		"mov %2, %%ebp\n"
+		"mov %3, %%esi\n"
+		"mov %4, %%edi\n"
+		"sti\n"
+		"jmp *%%ebx"
+		: : "r" (thread_running->state_reg.eip),
+			"r" (thread_running->state_reg.esp),
+			"r" (thread_running->state_reg.ebp),
+			"r" (thread_running->state_reg.esi),
+			"r" (thread_running->state_reg.edi)
+		: "%ebx", "memory"); // clobber regs
 }
+
+
 
 // this is used to allow threads to perform blocking I/O calculations.
 // it stops schedule_next from switching context to another thread until

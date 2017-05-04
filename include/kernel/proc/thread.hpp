@@ -4,7 +4,7 @@
 #define USER_STACK_BEGIN 0xB0000000
 #define USER_STACK_END 0xC0000000
 
-#define THREAD_STACK_SIZE 4096
+#define THREAD_STACK_SIZE 16384
 
 #include <std/vector.hpp>
 #include <kernel/idt.hpp>

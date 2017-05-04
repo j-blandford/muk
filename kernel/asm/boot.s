@@ -6,7 +6,7 @@ MB_VIDEO_MODE equ 1<<2           ; request a video mode
 MB_FLAGS equ (MB_PAGE_ALIGN | MB_MEMORY_INFO | MB_VIDEO_MODE)
 MB_CHECKSUM equ -(MB_HEADER_MAGIC + MB_FLAGS)
 
-KERNEL_STACK_LENGTH equ 32768
+KERNEL_STACK_LENGTH equ 16384
 
 KERNEL_VIRTUAL_OFFSET equ 0xC0000000
 KERNEL_PAGE_NUMBER equ (KERNEL_VIRTUAL_OFFSET >> 22) ; this is what the kernel's offset is in the page directory = 768

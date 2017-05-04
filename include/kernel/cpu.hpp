@@ -35,8 +35,14 @@ typedef struct registers {
 	uint32_t ss;
 } __attribute__((packed)) registers_t;
 
+// thanks to Kevin Lange for this function :) really helpful
+#define PUSH(stack, type, item) stack -= sizeof(type); \
+							*((type *) stack) = item
+
 extern "C" void switch_to_task(uint32_t* last_esp, uint32_t* next_esp);
-extern "C" void set_stack_ptr(uint32_t* next_esp, uint32_t* next_eip);
+extern "C" void set_esp(uint32_t* last_esp, uint32_t* next_esp);
+
+extern uint32_t* kstack;
 
 uint8_t inportb (uint16_t port);
 void outportb (uint16_t port, uint8_t data);
