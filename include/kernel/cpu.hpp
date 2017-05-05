@@ -39,8 +39,8 @@ typedef struct registers {
 #define PUSH(stack, type, item) stack -= sizeof(type); \
 							*((type *) stack) = item
 
-extern "C" void switch_to_task(uint32_t* last_esp, uint32_t* next_esp);
-extern "C" void set_esp(uint32_t* last_esp, uint32_t* next_esp);
+extern "C" void set_context(uint32_t* next_esp);
+extern "C" void switch_context(uint32_t* last_esp, uint32_t* next_esp, uint32_t last_eip);
 
 extern uint32_t* kstack;
 
@@ -71,15 +71,6 @@ inline void BochsBreak() {
 
 void BochsConsolePrint(char *s);
 void bcprintf(const char* fmt, ...);
-
-
-inline void bcprint_regs(registers r) {
-	bcprintf("/////////////////\n");
-	bcprintf("  eax=%x, ebx=%x, ecx=%x, edx=%x\n", r.eax, r.ebx, r.ecx, r.edx);
-	bcprintf("  esi=%x, edi=%x\n", r.esi, r.edi);
-	bcprintf("  ebp=%x, esp=%x, eip=%x\n", r.ebp, r.esp, r.eip);
-	bcprintf("/////////////////\n");
-}
 
 // this cannot be an inline function as __FILE__ and __LINE__ would be incorrect.
 #define assert(n) ({if(!(n)){ \

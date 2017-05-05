@@ -59,25 +59,49 @@ switch_to_task:
     ;Return to next task's EIP
     ret
 
-global set_esp
-set_esp:
-	cli
-
-	mov eax, [esp + 4*1]      ;eax = last esp
-	mov ecx, [esp + 4*2]      ;ebx = new esp
-
-	; load the new stack pointer
-	; Save previous task's ESP
-    mov [eax],esp
+global set_context
+set_context:
+	mov ecx, [esp + 4]      ;ebx = new esp
 
     ;Load next task's ESP
-    mov esp,[ecx]
+    mov esp, [ecx]
 
-	push dword [ebx]	; push new EIP for the ret statement below
+	pop edi
+    pop esi
+    pop ebx
+    pop ebp
+
+    sti
+
+	;jmp back to the task's eip
+	ret
+
+global switch_context
+switch_context:
+	mov eax, [esp + 4*1]      ;eax = last esp
+	mov ecx, [esp + 4*2]      ;ecx = new esp
+    mov edx, [esp + 4*3]      ;edx = last eip
+
+    xchg bx, bx
+
+    push edx
+
+	push ebp
+    push ebx
+    push esi
+    push edi
+
+	; Save previous task's ESP
+    mov [eax], esp
+    ;Load next task's ESP
+    mov esp, [ecx]
+
+	pop edi
+    pop esi
+    pop ebx
+    pop ebp
 
 	sti
-
-	xchg bx, bx
 
 	;jmp back to the task's eip
 	ret

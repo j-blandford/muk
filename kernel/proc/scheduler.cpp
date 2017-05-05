@@ -28,59 +28,42 @@ static void scheduler_isr130(registers * r) {
 // ability to skip or change the time slice itself.
 void Scheduler::next(registers * r) {
 
-	// save the previous threads state
-	if(started)
-		memcpy(&(thread_running->state_reg), r, sizeof(registers));
-
-	// Lets move on with task switching!
-	thread_running = thread_running->next;
-
-	bcprintf("\n/////////////////\n");
-
-	bcprintf("thread: %s (%d)\n", thread_running->title, thread_running->thread_id);
-	bcprintf("esp=%x, eip=%x\n", thread_running->state_reg.esp, thread_running->state_reg.eip);
-
-	bcprintf("---------\n");
-
-	bcprintf("prev->esp=%x, prev->eip=%x\n",thread_running->prev->state_reg.esp,
-											thread_running->prev->state_reg.eip);
-
-	// set the registers from the current thread's saved state
-	// memcpy(r, &(thread_running->state_reg), sizeof(registers));	
-
-	bcprintf("\\\\\\\\\\\\\\\\\\\\\\\n");
-
-	started = true;
-
 	MAGIC_BREAK;
 
-	// change registers
-	asm volatile (
-		"mov %0, %%eax\n"
-		"mov %1, %%ebx\n"
-		"mov %2, %%ecx\n"
-		"mov %3, %%edx\n"
-		: : "r" (thread_running->state_reg.eax),
-			"r" (thread_running->state_reg.ebx),
-			"r" (thread_running->state_reg.ecx),
-			"r" (thread_running->state_reg.edx)
-		: "memory"); // clobber regs
+	interrupts_disable();
 
-	// change ESP
-	asm volatile (
-		"mov %0, %%ebx\n"
-		"mov %1, %%esp\n"
-		"mov %2, %%ebp\n"
-		"mov %3, %%esi\n"
-		"mov %4, %%edi\n"
-		"sti\n"
-		"jmp *%%ebx"
-		: : "r" (thread_running->state_reg.eip),
-			"r" (thread_running->state_reg.esp),
-			"r" (thread_running->state_reg.ebp),
-			"r" (thread_running->state_reg.esi),
-			"r" (thread_running->state_reg.edi)
-		: "%ebx", "memory"); // clobber regs
+	if(started) {
+		// save the previous threads state
+		if(r->esp > 0xE0000000) {
+			bcprintf("Setting last thread esp=%x\n",r->esp);
+			memcpy(&(thread_running->state_reg), r, sizeof(registers));
+		}
+
+		// Lets move on with task switching!
+		thread_running = thread_running->next;
+
+		bcprintf("\n/////////////////\n");
+
+		bcprintf("thread: %s (%d)\n", thread_running->title, thread_running->thread_id);
+		bcprintf("esp=%x, eip=%x\n", thread_running->state_reg.esp, thread_running->state_reg.eip);
+
+		bcprintf("prev->esp=%x, prev->eip=%x\n",thread_running->prev->state_reg.esp,
+												thread_running->prev->state_reg.eip);
+
+		// set the registers from the current thread's saved state
+		memcpy(r, &(thread_running->state_reg), sizeof(registers));	
+
+		switch_context(&(thread_running->prev->state_reg.esp),
+						 &(thread_running->state_reg.esp),
+						 thread_running->prev->state_reg.eip);
+	} 
+	else {
+		bcprintf("Setting esp=%x\n",thread_running->stack_ptr);
+		started = true;
+		set_context(&(thread_running->stack_ptr));
+	}
+
+	
 }
 
 

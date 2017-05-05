@@ -36,9 +36,14 @@ void start_thread(char* title, void_fn entry) {
 	thread->entry_ptr = reinterpret_cast<uintptr_t>(entry);
 	thread->stack_ptr = (uintptr_t)(&thread->stack)+4096; // 32kib of local thread stack
 
-	bcprintf("thread stack pointer: %x\n", thread->stack_ptr);
-	
-	PUSH(thread->stack_ptr, uintptr_t, thread->entry_ptr);
+	bcprintf("thread stack ptr: %x\n", thread->stack_ptr);
+
+	PUSH(thread->stack_ptr, uintptr_t, thread->entry_ptr); // our first interrupt "ret" eip
+
+	PUSH(thread->stack_ptr, uint32_t, 0); // seed the stack with zeroes
+	PUSH(thread->stack_ptr, uint32_t, 0);
+	PUSH(thread->stack_ptr, uint32_t, 0);
+	PUSH(thread->stack_ptr, uint32_t, 0);
 
 	thread->state_reg.eax = 0;
 	thread->state_reg.ebx = 0;
@@ -75,7 +80,7 @@ void start_thread(char* title, void_fn entry) {
 		thread->next = thread_root;
 		t->next = thread;
 
-		thread_root->prev = t; // stitch up the beginning node into a real doubly linked ring list
+		thread_root->prev = thread; // stitch up the beginning node into a real doubly linked ring list
 	}
 
 	next_tid++;
