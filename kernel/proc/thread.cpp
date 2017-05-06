@@ -116,10 +116,4 @@ void init_kthreads() {
 	//start_thread("tty_driver", tty_update); // updates the terminal text and parses commands
 
 	thread_running = thread_root;
-
-	//thread_running = thread_running->next; // because the root thread "idle" is currently running
-
-	for(Thread* t = thread_root; t->next != thread_root; t = t->next) {
-		bcprintf("t=%d, '%s', t->next={t=%d, '%s'}\n", t->proc_id, t->title, t->next->proc_id, t->next->title);
-	}
 }

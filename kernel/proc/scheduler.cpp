@@ -27,7 +27,6 @@ static void scheduler_isr130(registers * r) {
 // basic at the moment, with only a single process allowed and no
 // ability to skip or change the time slice itself.
 void Scheduler::next(registers * r) {
-
 	interrupts_disable();
 
 	if(started) {
@@ -39,28 +38,13 @@ void Scheduler::next(registers * r) {
 		// Lets move on with task switching!
 		thread_running = thread_running->next;
 
-		bcprintf("\n/////////////////\n");
-
-		bcprintf("thread: %s (%d)\n", thread_running->title, thread_running->thread_id);
-		bcprintf("esp=%x, eip=%x\n", thread_running->state_reg.esp, thread_running->state_reg.eip);
-
-		bcprintf("prev->esp=%x, prev->eip=%x\n",thread_running->prev->state_reg.esp,
-												thread_running->prev->state_reg.eip);
-
-		// set the registers from the current thread's saved state
-		//memcpy(r, &(thread_running->state_reg), sizeof(registers));	
-
 		switch_context(&(thread_running->prev->state_reg.esp),
-						 &(thread_running->state_reg.esp)); //,
-						// thread_running->prev->state_reg.eip);
+						 &(thread_running->state_reg.esp));
 	} 
 	else {
-		bcprintf("Setting esp=%x\n",thread_running->stack_ptr);
 		started = true;
 		set_context(&(thread_running->stack_ptr));
 	}
-
-	
 }
 
 
