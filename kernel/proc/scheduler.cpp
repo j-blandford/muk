@@ -29,6 +29,8 @@ static void scheduler_isr130(registers * r) {
 void Scheduler::next(registers * r) {
 	interrupts_disable();
 
+	MAGIC_BREAK;
+
 	if(started) {
 		// save the previous threads state
 		if(r->esp > 0xE0000000) {
