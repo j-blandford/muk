@@ -86,32 +86,11 @@ void start_thread(char* title, void_fn entry) {
 	next_tid++;
 }
 
-// void kbb() {
-// 	bcprintf("FIRST ");
-// 	for(;;) {
-// 		bcprintf("kbb ");
-// 	}
-// }
-
-// void idle() {
-// 	bcprintf("FIRST ");
-// 	for(;;) {
-// 		bcprintf("IDLE ");
-// 	}
-// }
-
-// void idle2() {
-// 	bcprintf("FIRST ");
-// 	for(;;) {
-// 		bcprintf("IDLE2 ");
-// 	}
-// }
-
-
 void init_kthreads() {
 	start_thread("keyboard_driver", kb_update); // adds to the ringbuffer
+	start_thread("graphics_driver", surface_update); // keeps the frontbuffer synchronised
 	start_thread("postbox_debug", postbox_debug);
 	start_thread("tty_driver", tty_update); // updates the terminal text and parses commands
-
+	
 	thread_running = thread_root;
 }

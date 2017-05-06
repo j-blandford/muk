@@ -147,6 +147,8 @@ void tty_update() {
 				bcprintf("TTY receiving data '%c'\n", msg.data);
 				terminal_putchar(msg.data);
 			}
+
+		//	surface_update();
 		}
 
 		// while(!parsing) {
