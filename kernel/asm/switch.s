@@ -63,6 +63,8 @@ global set_context
 set_context:
 	mov ecx, [esp + 4]      ;ebx = new esp
 
+    xchg bx, bx
+
     ;Load next task's ESP
     mov esp, [ecx]
 
@@ -80,11 +82,11 @@ global switch_context
 switch_context:
 	mov eax, [esp + 4*1]      ;eax = last esp
 	mov ecx, [esp + 4*2]      ;ecx = new esp
-    mov edx, [esp + 4*3]      ;edx = last eip
+   ; mov edx, [esp + 4*3]      ;edx = last eip
 
     xchg bx, bx
 
-    push edx
+   ; push edx
 
 	push ebp
     push ebx

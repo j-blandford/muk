@@ -40,7 +40,7 @@ typedef struct registers {
 							*((type *) stack) = item
 
 extern "C" void set_context(uint32_t* next_esp);
-extern "C" void switch_context(uint32_t* last_esp, uint32_t* next_esp, uint32_t last_eip);
+extern "C" void switch_context(uint32_t* last_esp, uint32_t* next_esp); //, uint32_t last_eip);
 
 extern uint32_t* kstack;
 

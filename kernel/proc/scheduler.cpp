@@ -28,14 +28,11 @@ static void scheduler_isr130(registers * r) {
 // ability to skip or change the time slice itself.
 void Scheduler::next(registers * r) {
 
-	MAGIC_BREAK;
-
 	interrupts_disable();
 
 	if(started) {
 		// save the previous threads state
 		if(r->esp > 0xE0000000) {
-			bcprintf("Setting last thread esp=%x\n",r->esp);
 			memcpy(&(thread_running->state_reg), r, sizeof(registers));
 		}
 
@@ -51,11 +48,11 @@ void Scheduler::next(registers * r) {
 												thread_running->prev->state_reg.eip);
 
 		// set the registers from the current thread's saved state
-		memcpy(r, &(thread_running->state_reg), sizeof(registers));	
+		//memcpy(r, &(thread_running->state_reg), sizeof(registers));	
 
 		switch_context(&(thread_running->prev->state_reg.esp),
-						 &(thread_running->state_reg.esp),
-						 thread_running->prev->state_reg.eip);
+						 &(thread_running->state_reg.esp)); //,
+						// thread_running->prev->state_reg.eip);
 	} 
 	else {
 		bcprintf("Setting esp=%x\n",thread_running->stack_ptr);
