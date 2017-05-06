@@ -10,7 +10,7 @@ SpinlockMutex Process::messaging_mutex;
 
 bool Process::SendMessage(int port_id, int src_thread, char data) {
 	//Scheduler::lock();
-	bcprintf("Sending message \"%c\" on port %d\n", data, port_id ); // data.getChar()
+	// bcprintf("Sending message \"%c\" on port %d\n", data, port_id ); // data.getChar()
 	postbox.push(port_id, Message(src_thread, data));
 	//Scheduler::unlock();
 	
@@ -56,8 +56,6 @@ void Process::MessageQueue::push(int port_id, Message msg) {
 
 	if(port_it != postbox.ports.end()) {
 		(*port_it)->messages.push(msg);
-
-		bcprintf("Adding to port %d postbox. Size is now %d\n", port_id, (*port_it)->messages.size());
 	}
 }
 
@@ -111,8 +109,6 @@ void postbox_debug() {
 
 	for(;;) {
 		while((msg = Process::postbox.pop(1)) != Process::kMessageNull) {
-			bcprintf("Recv. message '%c' (port 1)\n", msg.data);
-
 			// this sends the keyboard packet to port 2, at the moment is the TTY driver
 			Process::SendMessage(2,Scheduler::threadId(), msg.data); // maybe make a "process::forwardmessage" function...
 		}
