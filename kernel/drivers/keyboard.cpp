@@ -64,10 +64,8 @@ char getc() {
 			__asm__ __volatile__ ("hlt"); // wait a bit
 		} 
 		else {
-			//Scheduler::lock();
 			bcprintf("Pressed key '%c' (%d)\n", c, (int)c);
-			Process::SendMessage(1, 1, c);
-			//Scheduler::unlock();
+			Process::SendMessage(1, c);
 			
 			return c;
 		}
@@ -105,7 +103,6 @@ void kb_update() {
 				keyboard_buffer.buffer[i] = 0;
 				bcprintf("sending buffer to command processor...\n");
 				break;
-				//return keyboard_buffer.buffer;
 			} 
 			else if (c == '\b') {
 				

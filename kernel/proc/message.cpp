@@ -9,10 +9,13 @@ Message Process::kMessageNull;
 SpinlockMutex Process::messaging_mutex;
 
 bool Process::SendMessage(int port_id, int src_thread, char data) {
-	//Scheduler::lock();
-	// bcprintf("Sending message \"%c\" on port %d\n", data, port_id ); // data.getChar()
 	postbox.push(port_id, Message(src_thread, data));
-	//Scheduler::unlock();
+	
+	return true;
+}
+
+bool Process::SendMessage(int port_id, char data) {
+	postbox.push(port_id, Message(Scheduler::threadId(), data));
 	
 	return true;
 }

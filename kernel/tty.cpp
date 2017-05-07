@@ -123,6 +123,8 @@ void tty_set_cursor_x(size_t x) {
 */
 void tty_update() {
 	Process::Message msg = Process::kMessageNull;
+	char tty_buffer[1024];
+	int tty_idx = 0;
 
 	{
 		using namespace Process;
@@ -132,7 +134,8 @@ void tty_update() {
 
 	for(;;) {
 		bool parsing = false;
-		size_t c_idx = 0;
+
+		memset(&tty_buffer, 0, sizeof(char)*1024);
 
 		terminal_writestring("\n[", Graphics::RGB(0xe4e4c8));
 		terminal_writestring("james", Graphics::RGB(0xff6064));
@@ -142,39 +145,23 @@ void tty_update() {
 		terminal_writestring("/", Graphics::RGB(0x288acc));
 		terminal_writestring("] ", Graphics::RGB(0xe4e4c8));
 
-		for(;;) {
+		while(!parsing) {
+
 			while((msg = Process::postbox.pop(2)) != Process::kMessageNull) {
-				bcprintf("TTY receiving data '%c'\n", msg.data);
-				terminal_putchar(msg.data);
+				tty_buffer[tty_idx] = msg.data;
+				tty_idx++;
+	
+				if(msg.data != '\n')
+					terminal_putchar(msg.data);
 			}
 
-		//	surface_update();
+			for(size_t idx = 0; idx < 1024; idx++) {
+				if(tty_buffer[idx] == '\n') {
+					parsing = true;
+					tty_idx = 0;
+					break;
+				} 				
+			}
 		}
-
-		// while(!parsing) {
-
-		// 	for(size_t idx = 0; idx < keyboard_buffer.size; idx++) {
-		// 		if(keyboard_buffer.buffer[idx] == 28) {
-		// 			parsing = true;
-		// 			break;
-		// 		} 
-		// 		else {
-		// 			command[c_idx] = keyboard_buffer.buffer[idx];
-
-		// 			// char to_print = command[c_idx];
-		// 			// if(to_print != 0) {
-		// 			// 	bcprintf("Printing char '%c'\n",to_print);
-		// 			// 	terminal_putchar(to_print);
-		// 			// }
-
-		// 			parsing = false;
-		// 			c_idx++;
-		// 		}
-		// 	}
-
-		// }
-		// buffer_clear(&keyboard_buffer);
-
-		// Command::Parse(kb_buffer);
 	}
 }

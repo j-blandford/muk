@@ -34,9 +34,7 @@ void start_thread(char* title, void_fn entry) {
 	thread->thread_id = next_tid;
 
 	thread->entry_ptr = reinterpret_cast<uintptr_t>(entry);
-	thread->stack_ptr = (uintptr_t)(&thread->stack)+4096; // 32kib of local thread stack
-
-	bcprintf("thread stack ptr: %x\n", thread->stack_ptr);
+	thread->stack_ptr = (uintptr_t)(&thread->stack)+4096; // 4kib of local thread stack
 
 	PUSH(thread->stack_ptr, uintptr_t, thread->entry_ptr); // our first interrupt "ret" eip
 
@@ -53,13 +51,6 @@ void start_thread(char* title, void_fn entry) {
 	thread->state_reg.esi = 0;
 	thread->state_reg.edi = 0;
 
-	thread->state_reg.cs = 0x08;
-	thread->state_reg.ds = 0x10;
-	thread->state_reg.ss = 0x10;
-	thread->state_reg.es = 0x10;
-	thread->state_reg.fs = 0x10;
-	thread->state_reg.gs = 0x10;
-
 	thread->state_reg.useresp = 0;
 	thread->state_reg.ebp = 0;
 	thread->state_reg.eip = (uint32_t)thread->entry_ptr;
@@ -70,7 +61,6 @@ void start_thread(char* title, void_fn entry) {
 	if(thread_root == nullptr) {
 		thread_root = thread;
 		thread_root->next = thread_root;
-		
 	}
 	else {
 		Thread* t = thread_root;
@@ -80,7 +70,7 @@ void start_thread(char* title, void_fn entry) {
 		thread->next = thread_root;
 		t->next = thread;
 
-		thread_root->prev = thread; // stitch up the beginning node into a real doubly linked ring list
+		thread_root->prev = thread; // stitch up the beginning node into a doubly linked ring list
 	}
 
 	next_tid++;

@@ -139,6 +139,7 @@ namespace Process {
 	extern SpinlockMutex messaging_mutex;
 
 	bool SendMessage(int port_id, int src_thread, char data);
+	bool SendMessage(int port_id, char data);
 	void listen(int port_id);
 	
 }

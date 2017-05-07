@@ -41,9 +41,6 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_ph
 
     ENV::initialise();
 
-    terminal_writestring("[OK]", Graphics::RGB(0x00FF00));
-    terminal_writestring(" muk boot successful.\n");
-
     // this line starts to run the threads and drivers, the LAST thing to enable!!!
     interrupts_enable();
 
