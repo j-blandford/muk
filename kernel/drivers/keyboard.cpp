@@ -64,7 +64,7 @@ char getc() {
 			__asm__ __volatile__ ("hlt"); // wait a bit
 		} 
 		else {
-			bcprintf("Pressed key '%c' (%d)\n", c, (int)c);
+			bcprintf("Pressed key %d\n", (int)c);
 			Process::SendMessage(1, c);
 			
 			return c;

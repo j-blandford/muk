@@ -2,7 +2,7 @@
 #include <stddef.h>
 
 #include <std.hpp>
-
+#include <kernel/cpu.hpp>
 // TODO: Fix string class
 int strlen( char * ptr );
 int strcmp(const char *s1, const char *s2);
@@ -15,7 +15,7 @@ public:
 	// Constructors
 	string() : length(0), buff(NULL) { }
 	string(char* init_val) : length(strlen(init_val)), buff(new char[length+1]) {
-//		terminal_printf("INIT string(char*): %s @ %x", init_val, &init_val);
+		bcprintf("INIT string(char*): %s @ %x", init_val, &init_val);
 		strncpy( buff, init_val, length );  // copy init value into storage
 	}
 	string(char init_val) : length(1), buff(new char[1]) {
@@ -41,6 +41,18 @@ public:
 		}
 		return *this;
 	}
+
+	string& operator= ( char* other ) {
+		bcprintf("fofoasfj\n");
+		length = strlen(other);       // allocate new memory
+		bcprintf("length=%d\n",length);
+		buff = new char[length];
+		bcprintf("buff=%x\n",buff);
+		strncpy( buff, other, length );
+
+		return *this;
+	}
+
 
 	char& operator[] (int index ) {
 		if( index < 0 || index > length ) {

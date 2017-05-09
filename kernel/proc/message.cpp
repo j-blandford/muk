@@ -113,7 +113,7 @@ void postbox_debug() {
 	for(;;) {
 		while((msg = Process::postbox.pop(1)) != Process::kMessageNull) {
 			// this sends the keyboard packet to port 2, at the moment is the TTY driver
-			Process::SendMessage(2,Scheduler::threadId(), msg.data); // maybe make a "process::forwardmessage" function...
+			Process::SendMessage(2, msg.data);
 		}
 	}
 }

@@ -69,7 +69,7 @@ namespace std {
 namespace std {
 
 	template<class T>
-	vector<T>::vector() : _capacity(0), _size(0), buffer(new T[_capacity]) { }
+	vector<T>::vector() : _capacity(0), _size(0) { bcprintf("creating\n"); }
 
 	template<class T>
 	vector<T>::vector(const vector<T>& vec) : _capacity(vec._capacity), _size(vec._size), buffer(new T[_capacity]) { 
@@ -83,6 +83,7 @@ namespace std {
 
 	template<class T> 
 	void vector<T>::push_back(T value) {
+		bcprintf("push_back\n");
 		if(_size >= _capacity) {
 			reserve(_capacity*1.5+1); // 1.5 is a bit less than the golden ratio, perfect for our memory allocation uses
 		}

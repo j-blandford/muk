@@ -163,5 +163,86 @@ void tty_update() {
 				} 				
 			}
 		}
+
+		parse((char*)&tty_buffer);
 	}
+}
+
+
+// this function does NOT belong here - TODO create an extendable method for commands
+static void ps_p(int proc_id) {
+	for(Thread* t = thread_root; t->next != thread_root; t = t->next)
+		if(t->proc_id == proc_id)
+			terminal_printf("%d\t%d\t00:00:01\t%s\n",proc_id,t->thread_id, t->title);
+}
+// this function does NOT belong here - TODO create an extendable method for commands
+static void ps(std::vector<string>  args) {
+	terminal_writestring("PID\tTID\tTIME\tSTR\n");
+
+	for(int i = 1; i < args.size(); i++) {
+		if(strncmp(args[i], "-p", 2) == 0) {
+			ps_p(atoi((char*)args[i+1]));
+		}
+	}
+}
+
+// static void ls(std::vector<string> args) {
+// 	//						this zero should be "ENV::get(drive)"    VV 
+
+// 	string currentPath;
+
+// 	// Is this an absolute or relative path? 
+// 	// we need to add the current working directory if it's relative
+// 	if(args[1][0] == '/') {
+// 		// absolute path, do nothing to it :)
+// 		currentPath = args[1];
+// 	} 
+// 	else {
+// 		// Relative path
+// 		currentPath = ENV::get("cd");
+// 		currentPath += args[1];
+// 		currentPath += '/';
+// 	}
+
+// 	std::vector<Filesystem::DirectoryEntry> dir = Filesystem::devices[0]->readDirectory(currentPath);
+
+// 	//terminal_writestring("PID\tTID\tTIME\tSTR\n");
+
+// 	for(auto it = dir.begin(); it != dir.end(); it++) {
+// 		char* fileType = new char[5];
+
+// 		if((*it).attributes == Filesystem::FATAttributes::shortNameFile) {
+// 			strncpy(fileType, "FILE", 5);
+// 		} 
+// 		else {
+// 			strncpy(fileType, "DIR", 4);
+// 		}
+		
+// 		terminal_printf("%s ", (*it).name);
+
+// 		if(strlen((*it).name) < 11) {
+// 			terminal_writestring("\t");
+// 		}
+
+// 		terminal_printf("\t %s @ %x\n", fileType, (*it).location);
+// 	}
+// }
+
+void parse(char* buffer) {
+	bcprintf("parsing buffer: %s\nlength=%d\n",buffer, strlen(buffer));
+	string to_parse;
+
+	bcprintf("gere!\n");
+	to_parse = buffer;
+
+
+	bcprintf("commandTokens created!\n");
+	// char* s = strtok(buffer, " ");
+
+	// // Lets split the command buffer
+	// while(s != NULL) {
+	// 	//commandTokens.push_back(s);
+	// 	s = strtok(NULL, " ");
+	// }
+	// //ps(args);
 }

@@ -11,11 +11,9 @@ namespace Process {
 		Locker(Lockable& mutex, int thread_id)
 		: lock(mutex)
 		, l_threadid(thread_id) { 
-			bcprintf("ctor Locker called, locked mutex (thread=%d)\n", l_threadid);
 			lock.Lock(l_threadid); 
 		}
 		~Locker() { 
-			bcprintf("dtor Locker called, unlocked mutex!\n");
 			lock.Unlock(l_threadid); 
 		}
 	};

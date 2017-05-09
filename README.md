@@ -9,9 +9,11 @@ A very basic microkernel. This isn't meant to be a full-featured kernel+OS, but 
     * A very fragile, tiny version of libstd++ is included
 		* std::vector
 		* std::string
-		* [TODO] std::bitset
+		* std::bitset
+        * std::find / find_if / move / copy
 * GRUB2 bootloader
 * Page tables
+    * [TODO] processes have own CR3
 * Memory management
     * Virtual Memory management
     * Heap manager (kernel only for the moment)
@@ -22,11 +24,13 @@ A very basic microkernel. This isn't meant to be a full-featured kernel+OS, but 
 	* Lock/Unlock the scheduler per thread
 	* [TODO] Exception handling
 * Higher-half kernel loading
-* Basic time-slicing scheduler
-    * Multiple threads can run concurrently!
+* Time-slicing Scheduler
+    * Multiple threads can run concurrently
+        * Kernel is completely multithreaded
+    * Local kernel thread stack space
 	* [TODO] thread priorities
-    * Graphics driver as a thread
-* Starting to implement a POSIX-compatible terminal
+    * [TODO] per-process Page tables 
+* Starting to implement a TTY (future: POSIX compatibility)
 * Filesystems
     * FAT16 (almost finished)
     * [TODO] ext2

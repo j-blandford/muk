@@ -67,10 +67,11 @@ void start_thread(char* title, void_fn entry) {
 		for(; t->next != thread_root; t = t->next) { }
 
 		thread->prev = t;
-		thread->next = thread_root;
 		t->next = thread;
 
-		thread_root->prev = thread; // stitch up the beginning node into a doubly linked ring list
+		// stitch up the beginning node + end node into a doubly linked ring list
+		thread->next = thread_root;
+		thread_root->prev = thread; 
 	}
 
 	next_tid++;

@@ -28,3 +28,5 @@ void update_cursor(int row, int col);
 
 size_t tty_get_cursor_x();
 void tty_set_cursor_x(size_t x);
+
+void parse(char buffer[1024]);
