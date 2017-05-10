@@ -7,7 +7,7 @@
 
 std::vector<pair> ENV::environment = std::vector<pair>();
 
-string ENV::get(char* envVar) {
+std::string ENV::get(char* envVar) {
 	for(auto it = environment.begin(); it != environment.end(); it++) {
 		if(strcmp((*it).key, envVar) == 0) 
 			return (*it).value;
@@ -16,7 +16,7 @@ string ENV::get(char* envVar) {
 	return "";
 }
 
-void ENV::set(string envVar, string envVal) {
+void ENV::set(std::string envVar, std::string envVal) {
 
 	for(auto it = environment.begin(); it != environment.end(); it++) {
 		if(strcmp((*it).key, envVar) == 0) {

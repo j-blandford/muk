@@ -11,6 +11,6 @@
 
 class Command {
 public:
-    static std::vector<string> split(char* command);
+    static std::vector<std::string> split(char* command);
     static void Parse(char * buffer);
 };

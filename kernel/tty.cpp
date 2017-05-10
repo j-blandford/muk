@@ -176,7 +176,7 @@ static void ps_p(int proc_id) {
 			terminal_printf("%d\t%d\t00:00:01\t%s\n",proc_id,t->thread_id, t->title);
 }
 // this function does NOT belong here - TODO create an extendable method for commands
-static void ps(std::vector<string>  args) {
+static void ps(std::vector<std::string>  args) {
 	terminal_writestring("PID\tTID\tTIME\tSTR\n");
 
 	for(int i = 1; i < args.size(); i++) {
@@ -229,20 +229,14 @@ static void ps(std::vector<string>  args) {
 // }
 
 void parse(char* buffer) {
-	bcprintf("parsing buffer: %s\nlength=%d\n",buffer, strlen(buffer));
-	string to_parse;
+	//std::vector<std::string> cmd_toks = std::string(buffer).find(" ");
 
-	bcprintf("gere!\n");
-	to_parse = buffer;
+	// char* s = strtok(buff, s);
 
-
-	bcprintf("commandTokens created!\n");
-	// char* s = strtok(buffer, " ");
-
-	// // Lets split the command buffer
+	// // Lets split the buffer
 	// while(s != NULL) {
-	// 	//commandTokens.push_back(s);
-	// 	s = strtok(NULL, " ");
+	// 	s = strtok(NULL, s);
 	// }
-	// //ps(args);
+	
+	//ps(args);
 }

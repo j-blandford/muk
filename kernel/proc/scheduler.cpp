@@ -17,12 +17,6 @@ volatile bool Scheduler::running(true);
 
 static bool started = false;
 
-// this function currently isn't used. I need to work out how
-// to call interrupts from within the IRQ0 (timer) interrupt.
-static void scheduler_isr130(registers * r) {
-	Scheduler::next(r);
-}
-
 // this is the heart of our time slicing algorithm. It's extremely
 // basic at the moment, with only a single process allowed and no
 // ability to skip or change the time slice itself.
@@ -79,5 +73,5 @@ int Scheduler::threadId() {
 }
 
 void Scheduler::init() {
-	set_isr_handler(0x82, scheduler_isr130); // currently not used
+
 }

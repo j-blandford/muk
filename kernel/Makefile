@@ -5,7 +5,7 @@ ARCH = i386
 CPPFLAGS  = -O2 -g -std=gnu++11 -fno-rtti #-nostdinc++ 
 CPPFLAGS += -finline-functions -ffreestanding -nostdlib
 CPPFLAGS += -Wall -Wextra -fno-exceptions -Warray-bounds
-CPPFLAGS += -Wno-write-strings -Wno-unused-variable -Wno-unused-parameter
+CPPFLAGS += -Wno-write-strings -Wno-unused-variable -Wno-unused-parameter -Wno-ignored-qualifiers
 CPPFLAGS += -DKERNEL
 
 NASM = nasm

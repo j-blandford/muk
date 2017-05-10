@@ -8,16 +8,16 @@
 class pair {
 public:
     char* key;
-    string value;
+    std::string value;
     pair() { }
-    pair(char* key, string value) : key(key), value(value) { }
+    pair(char* key, std::string value) : key(key), value(value) { }
 };
 
 namespace ENV {
     extern std::vector<pair> environment;
 
-    string get(char* envVar);
-    void set(string envVar, string envVal);
+    std::string get(char* envVar);
+    void set(std::string envVar, std::string envVal);
     
     void initialise();
 };

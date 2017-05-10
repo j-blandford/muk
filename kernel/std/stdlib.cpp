@@ -363,7 +363,7 @@ int sprintf(char* buffer, const char* format, ...) {
 		}
 		else if (*format == 's') {
 			format++;
-			string str = va_arg(parameters, string);
+			std::string str = va_arg(parameters, std::string);
 
 			written += str.size();
 		}

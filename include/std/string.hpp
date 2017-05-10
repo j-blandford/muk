@@ -2,117 +2,165 @@
 #include <stddef.h>
 
 #include <std.hpp>
+#include <std/algorithm.hpp>
 #include <kernel/cpu.hpp>
-// TODO: Fix string class
-int strlen( char * ptr );
-int strcmp(const char *s1, const char *s2);
-void strncpy( char * ptr_dest, char * ptr_src, int n );
 
-class string {
-	int length;               // length of the string
-	char * buff;              // pointer to strorage
-public:
-	// Constructors
-	string() : length(0), buff(NULL) { }
-	string(char* init_val) : length(strlen(init_val)), buff(new char[length+1]) {
-		bcprintf("INIT string(char*): %s @ %x", init_val, &init_val);
-		strncpy( buff, init_val, length );  // copy init value into storage
-	}
-	string(char init_val) : length(1), buff(new char[1]) {
-		buff[0] = init_val;
-	}
-	string(const string& other) : length(other.length), buff(new char[length]) {
-		strncpy( buff, other.buff, length );
-	}
-	~string() {
-		delete [] buff;
-	}
+int strlen( char* ptr );
+int strcmp( const char* s1, const char* s2 );
+void strncpy( char* ptr_dest, char* ptr_src, int n );
 
-	// Member methods (need to provide more to meet the STL standards...)
-	int size() { return length; }
-	char* c_str() { return buff; }
-
-	// Operator overloads
-	string& operator= ( const string& other ) {
-		if( this != &other ){          // guard against  a = a;
-			length = other.length;       // allocate new memory
-			buff = new char[length];
+namespace std {
+	class string {
+	public:
+		typedef size_t size_type;
+		static const size_type npos = -1; // maximum size_t value
+		
+		// Constructors
+		string() : length(0), buff(NULL) { }
+		string(char* init_val) : length(strlen(init_val)), buff(new char[length+1]) {
+			strncpy( buff, init_val, length );  // copy init value into storage
+		}
+		string(char init_val) : length(1), buff(new char[1]) {
+			buff[0] = init_val;
+		}
+		string(const string& other) : length(other.length), buff(new char[length]) {
 			strncpy( buff, other.buff, length );
 		}
-		return *this;
-	}
-
-	string& operator= ( char* other ) {
-		bcprintf("fofoasfj\n");
-		length = strlen(other);       // allocate new memory
-		bcprintf("length=%d\n",length);
-		buff = new char[length];
-		bcprintf("buff=%x\n",buff);
-		strncpy( buff, other, length );
-
-		return *this;
-	}
-
-
-	char& operator[] (int index ) {
-		if( index < 0 || index > length ) {
-		//	return '\0';
+		~string() {
+			delete [] buff;
 		}
-		return buff[index];
-	}
 
-	friend string operator+( const string& s1, const string& s2 );
-	friend string operator+( const string& s, char c );
-	friend string operator+( char c, const string& s );
+		size_type size() const { return length; }
+		char* c_str() { return buff; }
+		const char* data() const { return buff; }
+		const char data(size_type index) const { return buff[index]; }
 
-	bool operator== (const string& rhs) {
-		return strcmp(buff, rhs.buff) == 0;
-	}
-	bool operator== (const char* rhs) {
-		return strcmp(buff, rhs) == 0;
-	}
+		char* data() { return buff; }
+		char data(size_type index) { return buff[index]; }
 
-	string& operator+=( const string& s2 ) {
-		char* newBuff = new char[this->length+s2.length];
+		int compare( size_type pos1, size_type count1, const string& str ) const {
+			int result = 0;
 
-		strncpy( newBuff, this->buff, this->length);
-		strncpy( newBuff + this->length, s2.buff, s2.length);
+			if(pos1+count1 > this->size() || count1 == std::string::npos) 
+				count1 = this->size() - pos1;
 
-		this->buff = newBuff;
-		this->length += s2.length;
+			for(size_type p = 0; p < std::min<size_type>(count1, str.size()); p++) {
+				if((int)this->data(p + pos1) > (int)str.data(p)) {
+					++result;
+					break;
+				} 
+				else if((int)this->data(p + pos1) < (int)str.data(p)) {
+					--result;
+					break;
+				}
+			}
 
-		return *this;
-	}
+			return result;
+		}
 
-	string& operator+=( const char& s2 ) {
-		char* newBuff = new char[this->length+1];
-		strncpy( newBuff, buff, this->length);
+		size_type find( const string& str, size_type pos = 0 ) const {
+			for(size_type i = pos; i < this->size(); ++i) {
+				if(this->compare(i, std::string::npos, str) == 0) {
+					return i;
+				}
+			}
 
-		newBuff[this->length] = s2;
+			return std::string::npos;
+		}
 
-		this->buff = newBuff;
-		this->length += 1;
+		// size_type find( const char* s, size_type pos = 0 ) const {
+		// 	string comp = string(s);
+		// 	for(size_type i = pos; i < this->size(); ++i) {
+		// 		if(this->compare(i, std::string::npos, comp) == 0) {
+		// 			return i;
+		// 		}
+		// 	}
+		// }
 
-		return *this;
-	}
+		// Operator overloads
+		string& operator= ( const string& other ) {
+			if( this != &other ){          // guard against  a = a;
+				length = other.length;       // allocate new memory
+				buff = new char[length];
+				strncpy( buff, other.buff, length );
+			}
+			return *this;
+		}
 
-	// string& operator+=( const char* s2 ) {
-	// 	char* newBuff = new char[this->length+strlen((char*)s2)+1];
-	// 	strncpy( newBuff, buff, this->length);
-	// 	strncpy( *(&newBuff+this->length), (char*)s2, strlen((char*)s2));
+		string& operator= ( char* other ) {
+			length = strlen(other);       // allocate new memory
+			buff = new char[length];
+			strncpy( buff, other, length );
 
-	// 	this->buff = newBuff;
-	// 	this->length = strlen(this->buff);
+			return *this;
+		}
 
-	// 	return *this;
-	// }
 
-	operator char*() const {
-		char * nullBuffer = new char[this->length+1];
+		char& operator[] ( size_type index ) {
+			return buff[index];
+		}
 
-		strncpy( nullBuffer, buff, this->length);
-		nullBuffer[this->length] = '\0';
+		char operator[] ( size_type index ) const {
+			return buff[index];
+		}
 
-		return nullBuffer;
+		friend string operator+( const string& s1, const string& s2 );
+		friend string operator+( const string& s, char c );
+		friend string operator+( char c, const string& s );
+
+		bool operator== (const string& rhs) {
+			return strcmp(buff, rhs.buff) == 0;
+		}
+		bool operator== (const char* rhs) {
+			return strcmp(buff, rhs) == 0;
+		}
+
+		string& operator+=( const string& s2 ) {
+			char* newBuff = new char[this->length+s2.length];
+
+			strncpy( newBuff, this->buff, this->length);
+			strncpy( newBuff + this->length, s2.buff, s2.length);
+
+			this->buff = newBuff;
+			this->length += s2.length;
+
+			return *this;
+		}
+
+		string& operator+=( const char& s2 ) {
+			char* newBuff = new char[this->length+1];
+			strncpy( newBuff, buff, this->length);
+
+			newBuff[this->length] = s2;
+
+			this->buff = newBuff;
+			this->length += 1;
+
+			return *this;
+		}
+
+		// string& operator+=( const char* s2 ) {
+		// 	char* newBuff = new char[this->length+strlen((char*)s2)+1];
+		// 	strncpy( newBuff, buff, this->length);
+		// 	strncpy( *(&newBuff+this->length), (char*)s2, strlen((char*)s2));
+
+		// 	this->buff = newBuff;
+		// 	this->length = strlen(this->buff);
+
+		// 	return *this;
+		// }
+
+		operator char*() const {
+			char * nullBuffer = new char[this->length+1];
+
+			strncpy( nullBuffer, buff, this->length);
+			nullBuffer[this->length] = '\0';
+
+			return nullBuffer;
+		}
+
+	private:
+		size_type length;               // length of the string
+		char* buff;              // pointer to strorage
 	};
-};
+}

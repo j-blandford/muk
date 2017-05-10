@@ -3,14 +3,14 @@
 #include <kernel/command.hpp>
 #include <kernel/fs.hpp>
 
-std::vector<string> Command::split(char* command) {
-	std::vector<string> commandTokens;
+std::vector<std::string> Command::split(char* command) {
+	std::vector<std::string> commandTokens;
 
 	char* s = strtok(command, " ");
 
 	// Lets split the command buffer
 	while(s != NULL) {
-		commandTokens.push_back(string(s));
+		commandTokens.push_back(std::string(s));
 		s = strtok(NULL, " ");
 	}
 
