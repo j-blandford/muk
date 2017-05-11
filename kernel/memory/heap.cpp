@@ -16,8 +16,8 @@ void map_heap_pages(uintptr_t end_addr) {
 }
 
 // kernel heap memory allocation
-void* kmalloc(size_t size) {
-    bcprintf("> kmalloc(%d)\n",size);
+void* vmalloc(size_t size) {
+   // bcprintf("> vmalloc(%d)\n",size);
 
     interrupts_disable();
 
@@ -64,9 +64,18 @@ void* kmalloc(size_t size) {
     return (void*)to_ret;
 }
 
+void* malloc(size_t size) {
+    return vmalloc(size);
+}
+
+void* kmalloc(size_t size) {
+    return vmalloc(size);
+}
+
+
 // alloc and zero memory
 void* kcalloc(size_t size) {
-    void* result = kmalloc(size);
+    void* result = vmalloc(size);
     memset(result, 0, size);
     return result;
 }

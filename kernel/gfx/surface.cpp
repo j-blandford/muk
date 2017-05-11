@@ -15,9 +15,9 @@ BaseSurface::BaseSurface(Graphics::Vector2 pos, Graphics::Vector2 dim) {
     float pitchRatio = (float)Graphics::frame_pitch / (float)Graphics::frame_width;
     this->s_pitch = pitchRatio*dim.x; 
 
-    this->buff_loc = (uint8_t*)kmalloc(dim.y*this->s_pitch);
+    this->buff_loc = (uint8_t*)vmalloc(dim.y*this->s_pitch);
 
-    this->dirty_buffer = (bool*)kmalloc(dim.y*sizeof(bool));
+    this->dirty_buffer = (bool*)vmalloc(dim.y*sizeof(bool));
     memset(this->dirty_buffer, false, dim.y*sizeof(bool));
 }
 

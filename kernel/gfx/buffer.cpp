@@ -58,9 +58,9 @@ void Graphics::Setup(multiboot_info_t* mboot) {
     }
 
     front_buffer = ScreenBuffer((uint8_t*)fb_addr_base, frame_width, frame_height, frame_depth);
-    back_buffer = ScreenBuffer((uint8_t*)kmalloc(frame_height*frame_pitch), frame_width, frame_height, frame_depth);
+    back_buffer = ScreenBuffer((uint8_t*)vmalloc(frame_height*frame_pitch), frame_width, frame_height, frame_depth);
     
-    dirty_buffer = (bool*)kmalloc(sizeof(bool)*frame_height);
+    dirty_buffer = (bool*)vmalloc(sizeof(bool)*frame_height);
     memset(dirty_buffer, false, sizeof(bool)*frame_height);
 }
 

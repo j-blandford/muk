@@ -11,13 +11,16 @@ void strncpy( char* ptr_dest, char* ptr_src, int n );
 
 namespace std {
 	class string {
-	public:
 		typedef size_t size_type;
+
+		size_type length;               // length of the string
+		char* buff;              // pointer to strorage
+	public:
 		static const size_type npos = -1; // maximum size_t value
 		
 		// Constructors
 		string() : length(0), buff(NULL) { }
-		string(char* init_val) : length(strlen(init_val)), buff(new char[length+1]) {
+		string(char* init_val) : length(strlen(init_val)), buff(new char[length]) {
 			strncpy( buff, init_val, length );  // copy init value into storage
 		}
 		string(char init_val) : length(1), buff(new char[1]) {
@@ -32,6 +35,7 @@ namespace std {
 
 		size_type size() const { return length; }
 		char* c_str() { return buff; }
+
 		const char* data() const { return buff; }
 		const char data(size_type index) const { return buff[index]; }
 
@@ -80,10 +84,13 @@ namespace std {
 		// Operator overloads
 		string& operator= ( const string& other ) {
 			if( this != &other ){          // guard against  a = a;
-				length = other.length;       // allocate new memory
-				buff = new char[length];
-				strncpy( buff, other.buff, length );
+				this->length = other.length;       // allocate new memory
+				this->buff = new char[length];
+
+				strncpy( this->buff, (char*)other.data(), this->length );
 			}
+
+			bcprintf("         AFTER: %s (%x)\n", this->buff, &(this->buff));
 			return *this;
 		}
 
@@ -153,14 +160,11 @@ namespace std {
 		operator char*() const {
 			char * nullBuffer = new char[this->length+1];
 
-			strncpy( nullBuffer, buff, this->length);
+			strncpy( nullBuffer, this->buff, this->length);
 			nullBuffer[this->length] = '\0';
 
 			return nullBuffer;
 		}
 
-	private:
-		size_type length;               // length of the string
-		char* buff;              // pointer to strorage
 	};
 }

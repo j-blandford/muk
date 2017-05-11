@@ -102,16 +102,11 @@ namespace std {
 	auto begin( C& c ) -> decltype(c.begin()) { return c.begin(); }
 	template< class C > 
 	auto begin( const C& c ) -> decltype(c.begin()) { return c.begin(); }
-	// template< class T, std::size_t N > 
-	// T* begin( T (&array)[N] );
-
 	// std::end
 	template< class C > 
 	auto end( C& c ) -> decltype(c.end()) { return c.end(); }
 	template< class C > 
 	auto end( const C& c ) -> decltype(c.end()) { return c.end(); }
-	// template< class T, std::size_t N > 
-	// T* end( T (&array)[N] );
 
 	// std::for_each
 	template<typename Container, typename Function>
@@ -130,5 +125,10 @@ namespace std {
 	// std::min
 	template <class T> const T& min (const T& a, const T& b) {
 		return !(b<a)?a:b;
+	}
+
+	// std::max
+	template <class T> const T& max (const T& a, const T& b) {
+		return (a<b)?b:a;
 	}
 }

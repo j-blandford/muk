@@ -35,15 +35,16 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_ph
     keyboard_install();
 
     
-    std::string buffer = "hello world lol cano";
+    // // TESTING STD::STRING
+    // std::string buffer = "hello world lol cano";
 
-    bcprintf("Finding ' ': %d (exp. 5)\n", buffer.find(" "));
-    bcprintf("Finding 2nd ' ': %d (exp. 11)\n", buffer.find(" ", 6));
-    bcprintf("Finding 'a': %d (exp. 17)\n", buffer.find("a"));
-    bcprintf("Finding 'w': %d (exp. 6)\n", buffer.find("w"));
-    bcprintf("Finding 'world': %d (exp. 6)\n", buffer.find("world"));
+    // bcprintf("Finding ' ': %d (exp. 5)\n", buffer.find(" "));
+    // bcprintf("Finding 2nd ' ': %d (exp. 11)\n", buffer.find(" ", 6));
+    // bcprintf("Finding 'a': %d (exp. 17)\n", buffer.find("a"));
+    // bcprintf("Finding 'w': %d (exp. 6)\n", buffer.find("w"));
+    // bcprintf("Finding 'world': %d (exp. 6)\n", buffer.find("world"));
     
-    for(;;);
+    // for(;;);
 
 
     // this loads our driver threads into the scheduler

@@ -3,11 +3,11 @@
 #include <kernel/memory/heap.hpp>
 
 void *operator new(size_t size) {
-    return kmalloc(size);
+    return vmalloc(size);
 }
 
 void *operator new[](size_t size) {
-    return kmalloc(size);
+    return vmalloc(size);
 }
 
 void operator delete(void *p) {

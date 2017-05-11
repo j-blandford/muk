@@ -10,8 +10,8 @@
 // this is a linked list
 class BlockHeader {
 public:
-	bool in_use;	// this field isn't used for the moment
-	uint32_t size;
+	uint32_t in_use : 1;	// this field isn't used for the moment
+	uint32_t size : 31;
 	BlockHeader* next; // ptr to the next block header
 	BlockHeader* prev; // "" previous block header
 
@@ -28,6 +28,6 @@ public:
 	, prev(prev) { }
 };
 
-void* kmalloc(size_t size);
+void* vmalloc(size_t size);
 void* kcalloc(size_t size);
 void kfree(void* addr);

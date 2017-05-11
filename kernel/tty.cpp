@@ -172,15 +172,15 @@ void tty_update() {
 // this function does NOT belong here - TODO create an extendable method for commands
 static void ps_p(int proc_id) {
 	for(Thread* t = thread_root; t->next != thread_root; t = t->next)
-		if(t->proc_id == proc_id)
-			terminal_printf("%d\t%d\t00:00:01\t%s\n",proc_id,t->thread_id, t->title);
+		//if(t->proc_id == proc_id)
+		terminal_printf("%d\t%d\t00:00:01\t%s\n",t->proc_id,t->thread_id, t->title);
 }
 // this function does NOT belong here - TODO create an extendable method for commands
 static void ps(std::vector<std::string>  args) {
 	terminal_writestring("PID\tTID\tTIME\tSTR\n");
 
 	for(int i = 1; i < args.size(); i++) {
-		if(strncmp(args[i], "-p", 2) == 0) {
+		if(strncmp((char*)args[i], "-p", 2) == 0) {
 			ps_p(atoi((char*)args[i+1]));
 		}
 	}
@@ -229,14 +229,18 @@ static void ps(std::vector<std::string>  args) {
 // }
 
 void parse(char* buffer) {
-	//std::vector<std::string> cmd_toks = std::string(buffer).find(" ");
+	std::vector<std::string> args;
+	std::string str = buffer;
 
-	// char* s = strtok(buff, s);
-
-	// // Lets split the buffer
-	// while(s != NULL) {
-	// 	s = strtok(NULL, s);
-	// }
+	Scheduler::lock();
 	
-	//ps(args);
+	for (auto i = strtok(str.data(), " "); i != nullptr; i = strtok(nullptr, " ")) {
+		args.push_back(std::string(i));
+	}
+
+	terminal_writestring("\n");
+
+	ps(args);
+
+	Scheduler::unlock();
 }

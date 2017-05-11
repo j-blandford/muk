@@ -1,23 +1,29 @@
 import sys, getopt
-
-from subprocess import call
+import subprocess
 
 solutions = ["kernel", "modules"]
 
 for opt in sys.argv:
-    if opt == "build" or opt == "run" or opt == "bochs":
+    if opt == "clean" or opt == "cbochs":
+        # Clean the solutions
+        for project in solutions:
+            subprocess.call(["make", "clean"], cwd=project)
+
+        print("/*** FINISHED CLEANING ***/")
+
+    if opt == "build" or opt == "run" or opt == "bochs" or opt == "cbochs":
         # Compile all of the solutions:
         for project in solutions:
-            call(["make", "compile"], cwd=project)
+            subprocess.run(["make", "compile"], cwd=project, check=True)
 
         # build it into an .iso
-        call(["grub-mkrescue /usr/lib/grub/i386-pc -o muk.iso build"], shell=True)
+        subprocess.call(["grub-mkrescue /usr/lib/grub/i386-pc -o muk.iso build"], shell=True)
 
         print("/*** FINISHED BUILDING ***/")
 
     if opt == "run":
         # run with Qemu
-        call(["qemu-system-i386 \
+        subprocess.call(["qemu-system-i386 \
                 -s \
                 -cdrom muk.iso \
                 -m 32 \
@@ -27,12 +33,6 @@ for opt in sys.argv:
                 -vga cirrus \
                 -rtc base=localtime"], shell=True)
     
-    if opt == "bochs":
-        call(["bochs"], shell=True)
+    if opt == "bochs" or opt == "cbochs":
+        subprocess.call(["bochs"], shell=True)
 
-    if opt == "clean":
-        # Clean the solutions
-        for project in solutions:
-            call(["make", "clean"], cwd=project)
-
-        print("/*** FINISHED CLEANING ***/")
