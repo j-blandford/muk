@@ -4,7 +4,7 @@
 #include <kernel/multiboot.hpp>
 #include <kernel/icxxabi.hpp>
 #include <kernel/cpu.hpp>
-#include <kernel/module.hpp>
+#include <kernel/ext.hpp>
 #include <kernel/tty.hpp>
 #include <kernel/gdt.hpp>
 #include <kernel/idt.hpp>
@@ -29,30 +29,17 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_ph
     // Set up the Memory manager (botrh physical and virtual)
     Memory::Setup(mb_info, k_phys_end);
 
+    Ext::load();
+
     // IRQ0
     Timer::initTimer();
     // IRQ1
     keyboard_install();
 
-    
-    // // TESTING STD::STRING
-    // std::string buffer = "hello world lol cano";
-
-    // bcprintf("Finding ' ': %d (exp. 5)\n", buffer.find(" "));
-    // bcprintf("Finding 2nd ' ': %d (exp. 11)\n", buffer.find(" ", 6));
-    // bcprintf("Finding 'a': %d (exp. 17)\n", buffer.find("a"));
-    // bcprintf("Finding 'w': %d (exp. 6)\n", buffer.find("w"));
-    // bcprintf("Finding 'world': %d (exp. 6)\n", buffer.find("world"));
-    
-    // for(;;);
-
-
     // this loads our driver threads into the scheduler
     init_kthreads();
-    
-    start_display_driver(mb_info);
 
-    ENV::initialise();
+    start_display_driver(mb_info);
 
     // this line starts to run the threads and drivers, the LAST thing to enable!!!
     interrupts_enable();

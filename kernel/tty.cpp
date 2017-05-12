@@ -6,6 +6,7 @@
 #include <kernel/cpu.hpp>
 #include <kernel/tty.hpp>
 #include <kernel/command.hpp>
+#include <kernel/ext.hpp>
 #include <kernel/memory/alloc.hpp>
 #include <kernel/drivers/keyboard.hpp>
 #include <kernel/user/env.hpp>
@@ -132,18 +133,23 @@ void tty_update() {
 		Process::listen(2);
 	}
 
+	terminal_writestring("[INFO] Welcome to muK!\n");
+
 	for(;;) {
 		bool parsing = false;
 
 		memset(&tty_buffer, 0, sizeof(char)*1024);
 
-		terminal_writestring("\n[", Graphics::RGB(0xe4e4c8));
-		terminal_writestring("james", Graphics::RGB(0xff6064));
-		terminal_writestring("@", Graphics::RGB(0xff6064));
-		terminal_writestring("localhost", Graphics::RGB(0xff6064));
-		terminal_writestring("0:", Graphics::RGB(0x288acc));
-		terminal_writestring("/", Graphics::RGB(0x288acc));
-		terminal_writestring("] ", Graphics::RGB(0xe4e4c8));
+		{
+			using namespace Graphics;
+			terminal_writestring("\n[", RGB(0xe4e4c8));
+			terminal_writestring("james", RGB(0xff6064));
+			terminal_writestring("@", RGB(0xff6064));
+			terminal_writestring("localhost ", RGB(0xff6064));
+			terminal_writestring("0:", RGB(0x288acc));
+			terminal_writestring("/", RGB(0x288acc));
+			terminal_writestring("] ", RGB(0xe4e4c8));
+		}
 
 		while(!parsing) {
 
@@ -165,24 +171,6 @@ void tty_update() {
 		}
 
 		parse((char*)&tty_buffer);
-	}
-}
-
-
-// this function does NOT belong here - TODO create an extendable method for commands
-static void ps_p(int proc_id) {
-	for(Thread* t = thread_root; t->next != thread_root; t = t->next)
-		//if(t->proc_id == proc_id)
-		terminal_printf("%d\t%d\t00:00:01\t%s\n",t->proc_id,t->thread_id, t->title);
-}
-// this function does NOT belong here - TODO create an extendable method for commands
-static void ps(std::vector<std::string>  args) {
-	terminal_writestring("PID\tTID\tTIME\tSTR\n");
-
-	for(int i = 1; i < args.size(); i++) {
-		if(strncmp((char*)args[i], "-p", 2) == 0) {
-			ps_p(atoi((char*)args[i+1]));
-		}
 	}
 }
 
@@ -240,7 +228,14 @@ void parse(char* buffer) {
 
 	terminal_writestring("\n");
 
-	ps(args);
+	if(Ext::lib.present((char*)args[0])) {
+		Ext::Function fn = Ext::lib.get((char*)args[0]);
+
+		fn(args);
+	} 
+	else {
+		terminal_printf("%s: command not found\n", (char*)args[0]);
+	}
 
 	Scheduler::unlock();
 }

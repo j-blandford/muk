@@ -30,7 +30,7 @@ void BaseSurface::setPixel(uint32_t x, uint32_t y, Graphics::RGB color) {
     this->buff_loc[where + 1] = color.g;
     this->buff_loc[where + 2] = color.r;
 
-    //this->dirty_buffer[y] = true;
+    this->dirty_buffer[y] = true;
 }
 
 void BaseSurface::apply(bool full_refresh) {
@@ -100,11 +100,13 @@ void init_screens(multiboot_info_t* mboot) {
 
 void surface_update() {
     for(;;) {
-        //Scheduler::lock();
         interrupts_disable();
+        Scheduler::lock();
+        
         Graphics::UpdateBuffers(Graphics::Update::DELTA_REFRESH);  
+        
+        Scheduler::unlock();
         interrupts_enable();
-        //Scheduler::unlock();
         Scheduler::yield();
     }
 }

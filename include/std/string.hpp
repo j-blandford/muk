@@ -11,7 +11,7 @@ void strncpy( char* ptr_dest, char* ptr_src, int n );
 
 namespace std {
 	class string {
-		typedef size_t size_type;
+		using size_type = std::size_t;
 
 		size_type length;               // length of the string
 		char* buff;              // pointer to strorage
@@ -90,7 +90,6 @@ namespace std {
 				strncpy( this->buff, (char*)other.data(), this->length );
 			}
 
-			bcprintf("         AFTER: %s (%x)\n", this->buff, &(this->buff));
 			return *this;
 		}
 
