@@ -19,7 +19,7 @@ int ls(std::vector<std::string> args) {
 		currentPath += '/';
 	}
 
-	for(auto dir : Filesystem::devices[0]->readDirectory(currentPath)) {
+	for(auto dir : Filesystem::devices[0]->readDirectory(512)) {
 		char* fileType = new char[5];
 
 		if(dir.attributes == Filesystem::FATAttributes::shortNameFile) {

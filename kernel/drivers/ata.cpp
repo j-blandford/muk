@@ -51,24 +51,9 @@ uint16_t* ATA::readPIO(int size) {
 	
 	for(int i = 0; i < size/2; i++) {
 		buffer[i] = inports(device_offsets[bus][drive] + ATA_DATA);
-
-		//sleep(1);
-		//bcprintf("buffer[%d]=%x\n", i, buffer[i]);
-		//MAGIC_BREAK;
 	}
 
-	// if((int)(buffer[27] >> 8) != 0)
- 	// 	terminal_printf("[ATA] Device (%d,%d): ", bus, drive);
-
-	// for(int i = 27; i < 47; i++) {
-	// 	// uint16_t is actually TWO char's long!
-	// 	terminal_printf("%c", (int)(buffer[i] >> 8));
-	// 	terminal_printf("%c", (int)(buffer[i] & 0xFF));
-	// }
-
 	Scheduler::unlock();
-
-	MAGIC_BREAK;
 
 	return buffer;
 }
@@ -194,7 +179,7 @@ uint8_t* ATA::read_u8(size_t num_blocks, int offset) {
 		}
 
 		// Splits u16_t into 2*u8_t
-		for(int i = 0; i < ATA_BLOCKSIZE; i++) {
+		for(int i = 0; i < ATA_BLOCKSIZE / 2; i++) {
 			buffer[i*2] = (int)(buffer_short[i]);
 			buffer[i*2 + 1] = (int)((buffer_short[i] >> 8) & 0xFF);
 		}

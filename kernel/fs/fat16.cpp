@@ -66,74 +66,74 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigne
 	// Grab the dir table
 	uint8_t* dir_bytes = this->device->read_u8(n_sectors, sectorIndex);
 
-	// size_t index = 0;
-	//	while(index < n_sectors*ATA_BLOCKSIZE) {
-	//	DirectoryEntry* dir_entry = new DirectoryEntry();
+	size_t index = 0;
+	while(index < n_sectors*ATA_BLOCKSIZE) {
+		DirectoryEntry* dir_entry = new DirectoryEntry();
 
-	// 	dir_entry->attributes = static_cast<FATAttributes>(dir_bytes[index+11]);
+		dir_entry->attributes = static_cast<FATAttributes>(dir_bytes[index+11]);
 
-	// 	if(dir_entry->attributes == FATAttributes::shortName || dir_entry->attributes == FATAttributes::shortNameFile) {
-	// 		// Normal short name (8+3) structure
-	// 		char name[11] = {0};
-	// 		int length = 0;
+		if(dir_entry->attributes == FATAttributes::shortName || dir_entry->attributes == FATAttributes::shortNameFile) {
+			// Normal short name (8+3) structure
+			char name[11] = {0};
+			int length = 0;
 
-	// 		bool addSeperator = false; // adds a '.' char into the filename if 0x20 is found (might be bugged if the folder name has a space in it...)
+			bool addSeperator = false; // adds a '.' char into the filename if 0x20 is found (might be bugged if the folder name has a space in it...)
 
-	// 		dir_entry->location = dir_bytes[index+26] | (dir_bytes[index+27] << 8); // 16-bit cluster location
+			dir_entry->location = dir_bytes[index+26] | (dir_bytes[index+27] << 8); // 16-bit cluster location
 
-	// 		// the first 11 bytes store the full short foldername. Let us extract it out...
-	// 		for(size_t offset = 0; offset <= 11; offset++) {
-	// 			char dirChar = dir_bytes[index+offset];
+			// the first 11 bytes store the full short foldername. Let us extract it out...
+			for(size_t offset = 0; offset <= 11; offset++) {
+				char dirChar = dir_bytes[index+offset];
 
-	// 			if(dirChar != 0x20 && dirChar != 0x10) { // 0x20 and 0x10 are padding or "file+ext" seperator byte
-	// 				if(addSeperator) {
-	// 					dir_entry->name[length] = '.';
-	// 					length++;
+				if(dirChar != 0x20 && dirChar != 0x10) { // 0x20 and 0x10 are padding or "file+ext" seperator byte
+					if(addSeperator) {
+						dir_entry->name[length] = '.';
+						length++;
 
-	// 					addSeperator = false;
-	// 				}
+						addSeperator = false;
+					}
 
-	// 				dir_entry->name[length] = tolower(dirChar);
+					dir_entry->name[length] = tolower(dirChar);
 
-	// 				length++;
-	// 			} 
-	// 			else {
-	// 				addSeperator = true;
-	// 			}
-	// 		}
+					length++;
+				} 
+				else {
+					addSeperator = true;
+				}
+			}
 
-	// 		dir_entry->name[length] = '\0';
-	// 	} 
-	// 	else if(dir_entry->attributes == FATAttributes::longName) {
-	// 		// We have found a LONG FOLDERNAME
-	// 		char name[32];
-	// 		int length = 0;
+			dir_entry->name[length] = '\0';
+		} 
+		else if(dir_entry->attributes == FATAttributes::longName) {
+			// We have found a LONG FOLDERNAME
+			char name[32];
+			int length = 0;
 
-	// 		// Our foldername is embedded inside 32-bytes. We have to extract it out the long way
-	// 		for(size_t j = 0; j <= 32; j++) {
-	// 			// our bitmask contains a series of 0 and 1s which allow us to extract the name correctly
-	// 			if(bitMask.test(31-j) && dir_bytes[index+j] != 0xFF && dir_bytes[index+j] != 0x00) {
-	// 				dir_entry->name[length] = dir_bytes[index+j];
-	// 				length++;
-	// 			}
-	// 		}
+			// Our foldername is embedded inside 32-bytes. We have to extract it out the long way
+			for(size_t j = 0; j <= 32; j++) {
+				// our bitmask contains a series of 0 and 1s which allow us to extract the name correctly
+				if(bitMask.test(31-j) && dir_bytes[index+j] != 0xFF && dir_bytes[index+j] != 0x00) {
+					dir_entry->name[length] = dir_bytes[index+j];
+					length++;
+				}
+			}
 
-	// 		dir_entry->name[length] = '\0';
+			dir_entry->name[length] = '\0';
 			
-	// 		// now we grab some details which are located in the short-name entry...
-	// 		index += 32; 
+			// now we grab some details which are located in the short-name entry...
+			index += 32; 
 
-	// 		dir_entry->attributes = static_cast<FATAttributes>(dir_bytes[index+11]);
-	// 	}
-	// 	else if(dir_entry->attributes == FATAttributes::noEntry) {
-	// 		// there isn't a file here, so just skip to the next index entry
-	// 		index += 32;
-	// 		continue;
-	// 	}
+			dir_entry->attributes = static_cast<FATAttributes>(dir_bytes[index+11]);
+		}
+		else if(dir_entry->attributes == FATAttributes::noEntry) {
+			// there isn't a file here, so just skip to the next index entry
+			index += 32;
+			continue;
+		}
 
-	// 	dir.push_back(*dir_entry);
-	// 	index += 32;
-	// }
+		dir.push_back(*dir_entry);
+		index += 32;
+	}
 
 	return dir;
 }

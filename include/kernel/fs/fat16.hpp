@@ -53,7 +53,7 @@ namespace Filesystem {
 			} 
 			else {
 				bcprintf("[FAT16] Verified FAT header.\n");
-				//terminal_writestring("[FAT16] Verified FAT header.\n");
+				
 				this->getFAT();
 			}
 		}
