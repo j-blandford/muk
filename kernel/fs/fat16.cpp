@@ -1,12 +1,6 @@
 #include <std/bitset.hpp>
 #include <kernel/fs/fat16.hpp>
 
-void Filesystem::FileAllocationTable::printFAT() {
-	// for(int i = 0; i < 512; i++) {
-	// 	terminal_printf("%x ", table[i]);
-	// }	
-}
-
 std::vector<uint16_t> Filesystem::FileAllocationTable::walk(uint16_t start) {
 	// "start" is the value grabbed from the directory tables!!!
 	std::vector<uint16_t> *chain = new std::vector<uint16_t>();
@@ -23,10 +17,11 @@ std::vector<uint16_t> Filesystem::FileAllocationTable::walk(uint16_t start) {
 // this function gets called in the object constructor and verifies
 // that the device's header is actually FAT16-compliant.
 bool Filesystem::FAT16::open() {
-	uint8_t* temp_header = new uint8_t[512];
-
-	device->read(&temp_header, 1, 0);
+	uint8_t* temp_header = device->read_u8(1, 0);
 	memcpy(&header_bytes, temp_header, 512);
+	delete temp_header;
+
+	bcprintf("Opening FS device...\n");
 
 	for(int i = 0; i < 3; i++) {
 		if(*(header_bytes + i*sizeof(char)) != header[i]) return false;
@@ -48,104 +43,97 @@ bool Filesystem::FAT16::open() {
 					| (*(header_bytes + 41*sizeof(char)) << 16) 
 					| (*(header_bytes + 42*sizeof(char)) << 24);
 
-	terminal_printf("\tVolume serial: %x\n", volume_serial);
+	bcprintf(">>> Opened! Volume serial: %x\n", volume_serial);
 
 	return true;
-}
-
-void Filesystem::FAT16::read(uint16_t** buffer, size_t numBytes, size_t offset) {
-
 }
 
 void Filesystem::FAT16::getFAT() {
 	// Let us grab the allocation table
 	fat = FileAllocationTable(header_info.numReservedSectors);
 
-	uint8_t* temp_fat = new uint8_t[512];
-	this->device->read(&temp_fat, 1, header_info.numReservedSectors);
+	uint8_t* temp_fat = this->device->read_u8(1, header_info.numReservedSectors);
 	memcpy(&(fat.table), temp_fat, 512);
+	delete temp_fat;
 }
 
 std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigned int sectorIndex) {
 	const std::bitset<32> bitMask(0x5542AA8A); // this is used to select out the long filename's data
 	const size_t n_sectors = 1; // may be above 1 sector... look into this
 
-	this->getFAT();
-
 	std::vector<Filesystem::DirectoryEntry> dir = std::vector<Filesystem::DirectoryEntry>();
-	uint8_t* dir_bytes = new uint8_t[512]; 
 
 	// Grab the dir table
-	this->device->read(&dir_bytes, n_sectors, sectorIndex);
+	uint8_t* dir_bytes = this->device->read_u8(n_sectors, sectorIndex);
 
-	size_t index = 0;
-	while(index < n_sectors*ATA_BLOCKSIZE) {
-		DirectoryEntry* dir_entry = new DirectoryEntry();
+	// size_t index = 0;
+	//	while(index < n_sectors*ATA_BLOCKSIZE) {
+	//	DirectoryEntry* dir_entry = new DirectoryEntry();
 
-		dir_entry->attributes = static_cast<FATAttributes>(dir_bytes[index+11]);
+	// 	dir_entry->attributes = static_cast<FATAttributes>(dir_bytes[index+11]);
 
-		if(dir_entry->attributes == FATAttributes::shortName || dir_entry->attributes == FATAttributes::shortNameFile) {
-			// Normal short name (8+3) structure
-			char name[11] = {0};
-			int length = 0;
+	// 	if(dir_entry->attributes == FATAttributes::shortName || dir_entry->attributes == FATAttributes::shortNameFile) {
+	// 		// Normal short name (8+3) structure
+	// 		char name[11] = {0};
+	// 		int length = 0;
 
-			bool addSeperator = false; // adds a '.' char into the filename if 0x20 is found (might be bugged if the folder name has a space in it...)
+	// 		bool addSeperator = false; // adds a '.' char into the filename if 0x20 is found (might be bugged if the folder name has a space in it...)
 
-			dir_entry->location = dir_bytes[index+26] | (dir_bytes[index+27] << 8); // 16-bit cluster location
+	// 		dir_entry->location = dir_bytes[index+26] | (dir_bytes[index+27] << 8); // 16-bit cluster location
 
-			// the first 11 bytes store the full short foldername. Let us extract it out...
-			for(size_t offset = 0; offset <= 11; offset++) {
-				char dirChar = dir_bytes[index+offset];
+	// 		// the first 11 bytes store the full short foldername. Let us extract it out...
+	// 		for(size_t offset = 0; offset <= 11; offset++) {
+	// 			char dirChar = dir_bytes[index+offset];
 
-				if(dirChar != 0x20 && dirChar != 0x10) { // 0x20 and 0x10 are padding or "file+ext" seperator byte
-					if(addSeperator) {
-						dir_entry->name[length] = '.';
-						length++;
+	// 			if(dirChar != 0x20 && dirChar != 0x10) { // 0x20 and 0x10 are padding or "file+ext" seperator byte
+	// 				if(addSeperator) {
+	// 					dir_entry->name[length] = '.';
+	// 					length++;
 
-						addSeperator = false;
-					}
+	// 					addSeperator = false;
+	// 				}
 
-					dir_entry->name[length] = tolower(dirChar);
+	// 				dir_entry->name[length] = tolower(dirChar);
 
-					length++;
-				} 
-				else {
-					addSeperator = true;
-				}
-			}
+	// 				length++;
+	// 			} 
+	// 			else {
+	// 				addSeperator = true;
+	// 			}
+	// 		}
 
-			dir_entry->name[length] = '\0';
-		} 
-		else if(dir_entry->attributes == FATAttributes::longName) {
-			// We have found a LONG FOLDERNAME
-			char name[32];
-			int length = 0;
+	// 		dir_entry->name[length] = '\0';
+	// 	} 
+	// 	else if(dir_entry->attributes == FATAttributes::longName) {
+	// 		// We have found a LONG FOLDERNAME
+	// 		char name[32];
+	// 		int length = 0;
 
-			// Our foldername is embedded inside 32-bytes. We have to extract it out the long way
-			for(size_t j = 0; j <= 32; j++) {
-				// our bitmask contains a series of 0 and 1s which allow us to extract the name correctly
-				if(bitMask.test(31-j) && dir_bytes[index+j] != 0xFF && dir_bytes[index+j] != 0x00) {
-					dir_entry->name[length] = dir_bytes[index+j];
-					length++;
-				}
-			}
+	// 		// Our foldername is embedded inside 32-bytes. We have to extract it out the long way
+	// 		for(size_t j = 0; j <= 32; j++) {
+	// 			// our bitmask contains a series of 0 and 1s which allow us to extract the name correctly
+	// 			if(bitMask.test(31-j) && dir_bytes[index+j] != 0xFF && dir_bytes[index+j] != 0x00) {
+	// 				dir_entry->name[length] = dir_bytes[index+j];
+	// 				length++;
+	// 			}
+	// 		}
 
-			dir_entry->name[length] = '\0';
+	// 		dir_entry->name[length] = '\0';
 			
-			// now we grab some details which are located in the short-name entry...
-			index += 32; 
+	// 		// now we grab some details which are located in the short-name entry...
+	// 		index += 32; 
 
-			dir_entry->attributes = static_cast<FATAttributes>(dir_bytes[index+11]);
-		}
-		else if(dir_entry->attributes == FATAttributes::noEntry) {
-			// there isn't a file here, so just skip to the next index entry
-			index += 32;
-			continue;
-		}
+	// 		dir_entry->attributes = static_cast<FATAttributes>(dir_bytes[index+11]);
+	// 	}
+	// 	else if(dir_entry->attributes == FATAttributes::noEntry) {
+	// 		// there isn't a file here, so just skip to the next index entry
+	// 		index += 32;
+	// 		continue;
+	// 	}
 
-		dir.push_back(*dir_entry);
-		index += 32;
-	}
+	// 	dir.push_back(*dir_entry);
+	// 	index += 32;
+	// }
 
 	return dir;
 }
@@ -186,77 +174,81 @@ std::vector<int> Filesystem::FAT16::walkSectors(uint16_t startSector) {
 std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(char* path) {
 	std::vector<Filesystem::DirectoryEntry> dir = std::vector<Filesystem::DirectoryEntry>();
 
-	// First we determine how many folders deep the path is: eg. "/home" is ONE deep, "/home/james" is TWO deep
-	// this gives us a way of determining when we can stop the search below
-	int folderDepth = 0;
-	int pathIndex = 0;
-	while(path[pathIndex] != '\0') {
-		if(path[pathIndex] == '/') 
-			folderDepth++;
+	// // First we determine how many folders deep the path is: eg. "/home" is ONE deep, "/home/james" is TWO deep
+	// // this gives us a way of determining when we can stop the search below
+	// int folderDepth = 0;
+	// int pathIndex = 0;
+	// while(path[pathIndex] != '\0') {
+	// 	if(path[pathIndex] == '/') 
+	// 		folderDepth++;
 
-		pathIndex++;
-	}
+	// 	pathIndex++;
+	// }
 
-	// this function splits "path" into tokens delimited by '/' and then extracts out each folder, 
-	//		mapping the structure (from the root node) to find the right table directory entry sector
-	bool foundPath = false;
-	bool error = false;
-	size_t currentSector = 512; // 512 = root dir table sector
+	// // this function splits "path" into tokens delimited by '/' and then extracts out each folder, 
+	// //		mapping the structure (from the root node) to find the right table directory entry sector
+	// bool foundPath = false;
+	// bool error = false;
+	// size_t currentSector = 512; // 512 = root dir table sector
 
-	if(strlen(path) > 2) {
-		while(!foundPath && !error) {
-			// Now we split the path by '/' and search for that token
-			char* folderSplit = strtok(path, "/");
-			folderSplit = strtok(NULL, "/"); // get past the first folder deep
+	// if(strlen(path) > 2) {
+	// 	while(!foundPath && !error) {
+	// 		// Now we split the path by '/' and search for that token
+	// 		char* folderSplit = strtok(path, "/");
+	// 		folderSplit = strtok(NULL, "/"); // get past the first folder deep
 
-			int folderCount = 1; // keep track of how many folders deep we are currently searching in (giving us a stop condition)
+	// 		int folderCount = 1; // keep track of how many folders deep we are currently searching in (giving us a stop condition)
 
-			while(folderSplit != NULL) {		
-				bool foundInner = false;
+	// 		while(folderSplit != NULL) {		
+	// 			bool foundInner = false;
 
-				std::vector<Filesystem::DirectoryEntry> currDir = this->readDirectory(currentSector);
+	// 			std::vector<Filesystem::DirectoryEntry> currDir = this->readDirectory(currentSector);
 
-				terminal_printf("SEARCHING FOR FOLDER: %s\n", folderSplit);
-				terminal_printf("currSector=%d\n", currentSector);
+	// 			terminal_printf("SEARCHING FOR FOLDER: %s\n", folderSplit);
+	// 			terminal_printf("currSector=%d\n", currentSector);
 
-				// here's the search in the current working directory for the particular folder name (one of the tokens of the path)
-				for(auto it = currDir.begin(); it != currDir.end(); it++) {
-					if(strcmp((*it).name, folderSplit) == 0) {
-						currentSector = this->walkSectors((*it).location)[0];
-						dir = this->readDirectory(currentSector);
+	// 			// here's the search in the current working directory for the particular folder name (one of the tokens of the path)
+	// 			for(auto it = currDir.begin(); it != currDir.end(); it++) {
+	// 				if(strcmp((*it).name, folderSplit) == 0) {
+	// 					currentSector = this->walkSectors((*it).location)[0];
+	// 					dir = this->readDirectory(currentSector);
 
-						foundInner = ((*it).attributes != Filesystem::FATAttributes::shortNameFile); // only accept directories!
-						break;
-					}
-				}
+	// 					foundInner = ((*it).attributes != Filesystem::FATAttributes::shortNameFile); // only accept directories!
+	// 					break;
+	// 				}
+	// 			}
 
-				if(foundInner) {
-					currDir = dir;
-					folderCount++;
+	// 			if(foundInner) {
+	// 				currDir = dir;
+	// 				folderCount++;
 
-					// is this the last folder? if so, just escape the while loop and return this directory
-					if(folderCount >= folderDepth) {
-						foundPath = true;
-						error = false;
-					}
-				} 
-				else {
-					error = true;
-				}
+	// 				// is this the last folder? if so, just escape the while loop and return this directory
+	// 				if(folderCount >= folderDepth) {
+	// 					foundPath = true;
+	// 					error = false;
+	// 				}
+	// 			} 
+	// 			else {
+	// 				error = true;
+	// 			}
 
-				folderSplit = strtok(NULL, "/");
-			}
-		}
-	}
-	else {
-		// this means we just list the root directory
-		dir = this->readDirectory(512);
-		foundPath = true;
-	}
+	// 			folderSplit = strtok(NULL, "/");
+	// 		}
+	// 	}
+	// }
+	// else {
+	// 	// this means we just list the root directory
+	// 	dir = this->readDirectory(512);
+	// 	foundPath = true;
+	// }
 
-	if(error) {
-		terminal_printf("Error: directory not found\n");
-	}
+	// if(error) {
+	// 	terminal_printf("Error: directory not found\n");
+	// }
 	
 	return dir;
+}
+
+uint16_t* Filesystem::FAT16::read(size_t numBytes, size_t offset) {
+	return nullptr;
 }

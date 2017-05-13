@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kernel/tty.hpp>
 #include <kernel/fs.hpp>
 #include <kernel/drivers/ata.hpp>
 #include <kernel/memory/alloc.hpp>
@@ -48,17 +49,18 @@ namespace Filesystem {
 			device = new ATA(bus, drive);
 
 			if(!open()) {
-				terminal_writestring("[FAT16] Device not recognised.\n");
+				//terminal_writestring("[FAT16] Device not recognised.\n");
 			} 
 			else {
-				terminal_writestring("[FAT16] Verified FAT header.\n");
+				bcprintf("[FAT16] Verified FAT header.\n");
+				//terminal_writestring("[FAT16] Verified FAT header.\n");
 				this->getFAT();
 			}
 		}
 		~FAT16() { }
 
 		bool open();
-		void read(uint16_t** buffer, size_t numBytes, size_t offset);
+		uint16_t* read(size_t numBytes, size_t offset);
 		void getFAT();
 		std::vector<int> walkSectors(uint16_t startSector);
 		std::vector<DirectoryEntry> readDirectory(unsigned int sectorIndex);

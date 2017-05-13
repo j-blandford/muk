@@ -174,47 +174,7 @@ void tty_update() {
 	}
 }
 
-// static void ls(std::vector<string> args) {
-// 	//						this zero should be "ENV::get(drive)"    VV 
 
-// 	string currentPath;
-
-// 	// Is this an absolute or relative path? 
-// 	// we need to add the current working directory if it's relative
-// 	if(args[1][0] == '/') {
-// 		// absolute path, do nothing to it :)
-// 		currentPath = args[1];
-// 	} 
-// 	else {
-// 		// Relative path
-// 		currentPath = ENV::get("cd");
-// 		currentPath += args[1];
-// 		currentPath += '/';
-// 	}
-
-// 	std::vector<Filesystem::DirectoryEntry> dir = Filesystem::devices[0]->readDirectory(currentPath);
-
-// 	//terminal_writestring("PID\tTID\tTIME\tSTR\n");
-
-// 	for(auto it = dir.begin(); it != dir.end(); it++) {
-// 		char* fileType = new char[5];
-
-// 		if((*it).attributes == Filesystem::FATAttributes::shortNameFile) {
-// 			strncpy(fileType, "FILE", 5);
-// 		} 
-// 		else {
-// 			strncpy(fileType, "DIR", 4);
-// 		}
-		
-// 		terminal_printf("%s ", (*it).name);
-
-// 		if(strlen((*it).name) < 11) {
-// 			terminal_writestring("\t");
-// 		}
-
-// 		terminal_printf("\t %s @ %x\n", fileType, (*it).location);
-// 	}
-// }
 
 void parse(char* buffer) {
 	std::vector<std::string> args;

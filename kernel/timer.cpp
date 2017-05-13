@@ -11,12 +11,13 @@
 
 volatile uint64_t timer_ticks;
 volatile uint32_t timer_tenths;
+volatile bool is_sleeping;
 
 static void timer_irq0(struct registers * r) {
     timer_ticks++;
     timer_tenths++;
 
-    if(timer_tenths > 25) {
+    if(timer_tenths > 25 && !is_sleeping) {
         timer_tenths = 0;
 
         Scheduler::next(r);
@@ -25,8 +26,8 @@ static void timer_irq0(struct registers * r) {
     return;
 }
 
-void Timer::setCount(int hz) {
-    int count = 1193182 / hz;
+void Timer::setCount(double hz) {
+    int count = (int)(1193182.0f / hz);
 
     outportb(0x43, 0x34);  // ‭"0 011 01 00" on the command port
 
@@ -37,10 +38,15 @@ void Timer::setCount(int hz) {
 void Timer::sleep(int ticks) {
 	uint64_t eticks = timer_ticks + ticks;
 
+    is_sleeping = true;
+
 	while(timer_ticks < eticks)
 	{
+       // bcprintf("tick: %d, etick: %d\n", timer_ticks, eticks);
 		__asm__ __volatile__ ("sti//hlt//cli");
 	}
+
+    is_sleeping = false;
 }
 
 void Timer::yield() {
@@ -51,19 +57,23 @@ void Timer::yield() {
 void Timer::initTimer() {
     timer_ticks = 0;
     timer_tenths = 0;
+    is_sleeping = false;
     
-    Timer::setCount(8008);
+    Timer::setCount(1000.99125);
 
     set_irq_handler(0, timer_irq0);
 
 }
 
 void Timer::testTimer() {
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 100; i++) {
         Timer::sleep(500);
-        terminal_writestring("Waited 500ms.\n");
+        bcprintf("Waited 500ms\n");
+        //terminal_writestring("Waited 500ms.\n");
 //        update_buffer();
     }
+
+    MAGIC_BREAK;
 }
 
 void sleep(int ticks) {

@@ -36,6 +36,8 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_ph
     // IRQ1
     keyboard_install();
 
+    Filesystem::initialise();
+
     // this loads our driver threads into the scheduler
     init_kthreads();
 

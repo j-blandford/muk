@@ -3,10 +3,6 @@
 #include <stddef.h>
 #include <std.hpp>
 
-#include <kernel/cpu.hpp>
-#include <kernel/timer.hpp>
-#include <kernel/tty.hpp>
-
 #define ATA_BLOCKSIZE 512
 
 // In/output offsets
@@ -64,7 +60,7 @@ public:
 	void initialise();
 
 	bool prepare(int command, size_t num_blocks, int offset); // prepares the device for a command's data packet
-	bool read(uint16_t** buffer, size_t num_blocks, int offset);
-	bool read(uint8_t** buffer, size_t num_blocks, int offset);
+	uint8_t* read_u8(size_t num_blocks, int offset);
+	uint16_t* read_u16(size_t num_blocks, int offset);
 	bool wait(int mask, int waitForState);
 };

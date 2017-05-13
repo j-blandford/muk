@@ -17,7 +17,7 @@ namespace Ext {
 		: cmd(cmd)
 		, ptr(ptr) { }
 		std::string getCmd() { return cmd; }
-		Function getPtr() { return *ptr; }
+		Function getPtr() { return ptr; }
 	};
 
 	class Library {

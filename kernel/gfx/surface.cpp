@@ -86,7 +86,7 @@ void BaseSurface::setBackground(Graphics::RGB bg_color) {
 void init_screens(multiboot_info_t* mboot) {
 	screen_surfaces.push_back(new BaseSurface(Graphics::Vector2(0,0), Graphics::Vector2(mboot->framebuffer_width,mboot->framebuffer_height)));
 	
-	screen_surfaces[0]->setBackground(Graphics::RGB(0x2a2b31));
+	//screen_surfaces[0]->setBackground(Graphics::RGB(0x2a2b31));
 	screen_surfaces[0]->apply(true);
 
     //test_surfaces();

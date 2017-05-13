@@ -43,7 +43,7 @@ namespace Filesystem {
     class IDevice {
     public:
         virtual bool open() = 0;
-        virtual void read(uint16_t** buffer, size_t numBytes, size_t offset) = 0;
+        virtual uint16_t* read(size_t numBytes, size_t offset) = 0;
         virtual std::vector<DirectoryEntry> readDirectory(unsigned int sectorIndex) = 0;
         virtual std::vector<DirectoryEntry> readDirectory(char* path) = 0;
     };
