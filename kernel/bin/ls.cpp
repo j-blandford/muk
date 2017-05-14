@@ -19,23 +19,14 @@ int ls(std::vector<std::string> args) {
 		currentPath += '/';
 	}
 
-	for(auto dir : Filesystem::devices[0]->readDirectory(512)) {
-		char* fileType = new char[5];
-
-		if(dir.attributes == Filesystem::FATAttributes::shortNameFile) {
-			strncpy(fileType, "FILE", 5);
-		} 
-		else {
-			strncpy(fileType, "DIR", 4);
-		}
-		
+	for(auto dir : Filesystem::devices[0]->readDirectory(512)) {		
 		terminal_printf("%s ", dir.name);
 
 		if(strlen(dir.name) < 11) {
 			terminal_writestring("\t");
 		}
 
-		terminal_printf("\t %s @ %x\n", fileType, dir.location);
+		terminal_printf("\t %s @ %x\n", dir.attributes == Filesystem::FATAttributes::shortNameFile ? "FILE" : "DIR", dir.location);
 	}
 
 	return 0;

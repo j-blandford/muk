@@ -173,78 +173,48 @@ std::vector<int> Filesystem::FAT16::walkSectors(uint16_t startSector) {
 
 std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(char* path) {
 	std::vector<Filesystem::DirectoryEntry> dir = std::vector<Filesystem::DirectoryEntry>();
+	std::vector<std::string> path_tokens;
+	std::string str = path;
 
-	// // First we determine how many folders deep the path is: eg. "/home" is ONE deep, "/home/james" is TWO deep
-	// // this gives us a way of determining when we can stop the search below
-	// int folderDepth = 0;
-	// int pathIndex = 0;
-	// while(path[pathIndex] != '\0') {
-	// 	if(path[pathIndex] == '/') 
-	// 		folderDepth++;
+	// split "path" into tokens delimited by '/' and then extracts out each folder, 
+	for (auto i = strtok(str.data(), "/"); i != nullptr; i = strtok(nullptr, "/")) {
+		path_tokens.push_back(std::string(i));
+	}
 
-	// 	pathIndex++;
-	// }
+	bool error = false;
+	size_t current_sec = 512; // 512 = root dir table sector
 
-	// // this function splits "path" into tokens delimited by '/' and then extracts out each folder, 
-	// //		mapping the structure (from the root node) to find the right table directory entry sector
-	// bool foundPath = false;
-	// bool error = false;
-	// size_t currentSector = 512; // 512 = root dir table sector
+	// this code follows the structure (from the root node) to find the right table directory entry sector
+	if(strlen(path) > 2) {
+		for(std::string folder : path_tokens) {
+			// We have to search the current sector for this particular folder token
+			auto current_dir = this->readDirectory(current_sec);
 
-	// if(strlen(path) > 2) {
-	// 	while(!foundPath && !error) {
-	// 		// Now we split the path by '/' and search for that token
-	// 		char* folderSplit = strtok(path, "/");
-	// 		folderSplit = strtok(NULL, "/"); // get past the first folder deep
+			auto res = std::find_if(current_dir.begin(), 
+							current_dir.end(), 
+							[&folder] (DirectoryEntry dir) { return strcmp(dir.name, (char*)folder) == 0; });
 
-	// 		int folderCount = 1; // keep track of how many folders deep we are currently searching in (giving us a stop condition)
+			if(res != current_dir.end()) {
+				// Folder was found! Set the current sector...
+				current_sec = this->walkSectors((*res).location)[0];
+			} 
+			else {
+				// Folder not found :(
+				error = true;
+				break;
+			}
+		}
 
-	// 		while(folderSplit != NULL) {		
-	// 			bool foundInner = false;
+		// "current_sec" now contains the found directory sector index
+		dir = this->readDirectory(current_sec);
+	}
+	else {
+		dir = this->readDirectory(512);
+	}
 
-	// 			std::vector<Filesystem::DirectoryEntry> currDir = this->readDirectory(currentSector);
-
-	// 			terminal_printf("SEARCHING FOR FOLDER: %s\n", folderSplit);
-	// 			terminal_printf("currSector=%d\n", currentSector);
-
-	// 			// here's the search in the current working directory for the particular folder name (one of the tokens of the path)
-	// 			for(auto it = currDir.begin(); it != currDir.end(); it++) {
-	// 				if(strcmp((*it).name, folderSplit) == 0) {
-	// 					currentSector = this->walkSectors((*it).location)[0];
-	// 					dir = this->readDirectory(currentSector);
-
-	// 					foundInner = ((*it).attributes != Filesystem::FATAttributes::shortNameFile); // only accept directories!
-	// 					break;
-	// 				}
-	// 			}
-
-	// 			if(foundInner) {
-	// 				currDir = dir;
-	// 				folderCount++;
-
-	// 				// is this the last folder? if so, just escape the while loop and return this directory
-	// 				if(folderCount >= folderDepth) {
-	// 					foundPath = true;
-	// 					error = false;
-	// 				}
-	// 			} 
-	// 			else {
-	// 				error = true;
-	// 			}
-
-	// 			folderSplit = strtok(NULL, "/");
-	// 		}
-	// 	}
-	// }
-	// else {
-	// 	// this means we just list the root directory
-	// 	dir = this->readDirectory(512);
-	// 	foundPath = true;
-	// }
-
-	// if(error) {
-	// 	terminal_printf("Error: directory not found\n");
-	// }
+	if(error) {
+		terminal_printf("Error: directory not found\n");
+	}
 	
 	return dir;
 }
