@@ -13,7 +13,7 @@ volatile uint64_t timer_ticks;
 volatile uint32_t timer_tenths;
 volatile bool is_sleeping;
 
-static void timer_irq0(struct registers * r) {
+static void timer_irq(struct registers * r) {
     timer_ticks++;
     timer_tenths++;
 
@@ -61,7 +61,7 @@ void Timer::initTimer() {
     
     Timer::setCount(1000.99125);
 
-    set_irq_handler(0, timer_irq0);
+    Interrupt::Register(0, timer_irq);
 
 }
 

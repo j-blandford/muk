@@ -12,8 +12,8 @@ NASM = nasm
 NASM_FLAGS = -f bin		# output in raw BIN format (for the moment...)
 NASM_FLAGS+= -g 		# include debug information
 
-GCC = ${TARGET}-gcc
-GPP = ${TARGET}-g++
+GCC = ${TARGET}-gcc -m32
+GPP = ${TARGET}-g++ -m32
 
 INFO = ../scripts/print-msg.sh
 

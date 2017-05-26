@@ -15,6 +15,8 @@
 #include <kernel/gfx/buffer.hpp>
 #include <kernel/gfx/surface.hpp>
 
+Process::SpinlockMutex print_mutex;
+
 volatile size_t terminal_row = 0;
 volatile size_t terminal_column = 0;
 uint16_t* terminal_buffer;
@@ -26,10 +28,15 @@ static Graphics::Vector2 cursor_pos(0,0);
 
 char kb_buffer[1024];
 
-void terminal_writestring(char* data, Graphics::RGB colour) {
-	// if(terminal_row == VGA_HEIGHT) {
-	// //	terminal_scrollup();
-	// }
+void terminal_writestring(char* data, Graphics::RGB colour) {	
+
+	if(terminal_row == VGA_HEIGHT) {
+		terminal_scrollup();
+		terminal_row--; 
+	}
+
+	Process::Locker<Process::SpinlockMutex> str_print_locker(print_mutex, Scheduler::threadId());
+	
 	//Scheduler::lock();
 	for (; *data; ++data) {
 		terminal_putchar((*data), colour);
@@ -49,10 +56,6 @@ void terminal_putchar(char c, Graphics::RGB colour) {
 		terminal_row++;
 
 		return;
-	}
-
-	if(terminal_row == VGA_HEIGHT) {
-		terminal_scrollup();
 	}
 
 	if(c == '\t') {
@@ -82,6 +85,16 @@ void terminal_printf(const char* fmt, ...) {
 	va_end(parameters);
 }
 
+void terminal_printf_rgba(const char* fmt, Graphics::RGB color, ...) {
+	va_list parameters;
+	char temp_buffer[80] = {0};
+
+	va_start(parameters, color);
+	vsprintf(temp_buffer, fmt, parameters);
+	terminal_writestring((char*)temp_buffer, color);
+	va_end(parameters);
+}
+
 void terminal_clearline(size_t y) {
 	// for (size_t x = 0; x < VGA_WIDTH; x++) {
 	// 	const size_t index = y * VGA_WIDTH + x;
@@ -92,14 +105,16 @@ void terminal_clearline(size_t y) {
 void terminal_scrollup() {
 	terminal_row = VGA_HEIGHT-1;
 
-	for(size_t y = 1; y <= VGA_HEIGHT; y++) {
-		int dest_idx = (y-1)*VGA_WIDTH;
-		int src_idx = (y)*VGA_WIDTH;
+	Process::SendMessage(3, 1);
 
-		terminal_clearline(y-1);
+	// for(size_t y = 1; y <= VGA_HEIGHT; y++) {
+	// 	int dest_idx = (y-1)*VGA_WIDTH;
+	// 	int src_idx = (y)*VGA_WIDTH;
 
-		//memcpy(&terminal_buffer[dest_idx], &terminal_buffer[src_idx], VGA_WIDTH * sizeof(uint16_t));
-	}
+	// 	terminal_clearline(y-1);
+
+	// 	//memcpy(&terminal_buffer[dest_idx], &terminal_buffer[src_idx], VGA_WIDTH * sizeof(uint16_t));
+	// }
 }
 
 void update_cursor(int row, int col) {
@@ -130,7 +145,8 @@ void tty_update() {
 	{
 		using namespace Process;
 		Locker<SpinlockMutex> messaging_locker(messaging_mutex, Scheduler::threadId());
-		Process::listen(2);
+		Process::listen(2); // keyboard "stdout" -> tty "stdin"
+		Process::listen(3); // used for tty control packets
 	}
 
 	terminal_writestring("[INFO] Welcome to muK!\n");
@@ -142,7 +158,7 @@ void tty_update() {
 
 		{
 			using namespace Graphics;
-			terminal_writestring("\n[", RGB(0xe4e4c8));
+			terminal_writestring("[", RGB(0xe4e4c8));
 			terminal_writestring("james", RGB(0xff6064));
 			terminal_writestring("@", RGB(0xff6064));
 			terminal_writestring("localhost ", RGB(0xff6064));
@@ -161,6 +177,11 @@ void tty_update() {
 					terminal_putchar(msg.data);
 			}
 
+			while((msg = Process::postbox.pop(3)) != Process::kMessageNull) {
+				bcprintf("[TTY] Scrolling...\n");
+				screen_surfaces[0]->scrollUp(Y_FONTWIDTH);
+			}
+
 			for(size_t idx = 0; idx < 1024; idx++) {
 				if(tty_buffer[idx] == '\n') {
 					parsing = true;
@@ -171,6 +192,8 @@ void tty_update() {
 		}
 
 		parse((char*)&tty_buffer);
+
+		terminal_writestring("\n");
 	}
 }
 
@@ -179,10 +202,11 @@ void tty_update() {
 void parse(char* buffer) {
 	std::vector<std::string> args;
 	std::string str = buffer;
+	std::string clipped_str = str.substr(0, strlen(str)-1); // take off \n at the end
 
 	Scheduler::lock();
 	
-	for (auto i = strtok(str.data(), " "); i != nullptr; i = strtok(nullptr, " ")) {
+	for (auto i = strtok(clipped_str.data(), " "); i != nullptr; i = strtok(nullptr, " ")) {
 		args.push_back(std::string(i));
 	}
 

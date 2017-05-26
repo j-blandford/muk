@@ -83,5 +83,7 @@ void init_kthreads() {
 	start_thread("postbox_debug", postbox_debug);
 	start_thread("tty_driver", tty_update); // updates the terminal text and parses commands
 	
+	
+
 	thread_running = thread_root;
 }

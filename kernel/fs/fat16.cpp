@@ -153,7 +153,6 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigne
 // }
 
 std::vector<int> Filesystem::FAT16::walkSectors(uint16_t startSector) {
-
 	this->getFAT();
 
 	std::vector<uint16_t> chain = this->fat.walk(startSector);
@@ -172,17 +171,14 @@ std::vector<int> Filesystem::FAT16::walkSectors(uint16_t startSector) {
 }
 
 std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(char* path) {
-	std::vector<Filesystem::DirectoryEntry> dir = std::vector<Filesystem::DirectoryEntry>();
-	std::vector<std::string> path_tokens;
+	std::vector<std::string> path_tokens = std::vector<std::string>();
 	std::string str = path;
+	size_t current_sec = 512; // 512 = root dir table sector
 
 	// split "path" into tokens delimited by '/' and then extracts out each folder, 
 	for (auto i = strtok(str.data(), "/"); i != nullptr; i = strtok(nullptr, "/")) {
 		path_tokens.push_back(std::string(i));
 	}
-
-	bool error = false;
-	size_t current_sec = 512; // 512 = root dir table sector
 
 	// this code follows the structure (from the root node) to find the right table directory entry sector
 	if(strlen(path) > 2) {
@@ -200,23 +196,15 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(char* p
 			} 
 			else {
 				// Folder not found :(
-				error = true;
-				break;
+				terminal_printf("Error: directory not found\n");
+				
+				return std::vector<Filesystem::DirectoryEntry>();
 			}
 		}
-
-		// "current_sec" now contains the found directory sector index
-		dir = this->readDirectory(current_sec);
-	}
-	else {
-		dir = this->readDirectory(512);
 	}
 
-	if(error) {
-		terminal_printf("Error: directory not found\n");
-	}
-	
-	return dir;
+	// "current_sec" now contains the found directory sector index
+	return this->readDirectory(current_sec);
 }
 
 uint16_t* Filesystem::FAT16::read(size_t numBytes, size_t offset) {

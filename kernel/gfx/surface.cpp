@@ -1,10 +1,16 @@
 #include <kernel/gfx/surface.hpp>
 #include <kernel/gfx/buffer.hpp>
 #include <kernel/proc/thread.hpp>
+#include <kernel/proc/message.hpp>
 #include <kernel/proc/scheduler.hpp>
 #include <kernel/cpu.hpp>
+#include <kernel/tty.hpp>
 
 std::vector<BaseSurface*> screen_surfaces;
+bool surfaces_setup = false;
+
+size_t VGA_WIDTH = 80;
+size_t VGA_HEIGHT = 25;
 
 BaseSurface::BaseSurface(Graphics::Vector2 pos, Graphics::Vector2 dim) {
     this->pos = pos;
@@ -60,12 +66,13 @@ void BaseSurface::apply(bool full_refresh) {
 }
 
 void BaseSurface::scrollUp(size_t num_lines) {
-    for(size_t y = num_lines; y < this->dim.y - num_lines; y++) {
-        size_t from_loc = this->pos.x*(Graphics::frame_depth/8) + (y+this->pos.y)*(this->s_pitch);
-        size_t to_loc = this->pos.x*(Graphics::frame_depth/8) + (y+this->pos.y-num_lines)*(this->s_pitch);
-
-        Graphics::back_buffer.Copy(to_loc, &this->buff_loc[from_loc], this->s_pitch);
-    }
+    Process::Locker<Process::SpinlockMutex> str_print_locker(print_mutex, -1); // -1 => lock ALL threads
+    Scheduler::lock();
+    // now copy!
+    size_t from_loc = num_lines*(this->s_pitch);
+    size_t size_cpy = this->s_pitch * (VGA_HEIGHT)*num_lines;
+    memcpy(&this->buff_loc[0], &this->buff_loc[from_loc], size_cpy);
+    Scheduler::unlock();
 }
 
 void BaseSurface::bringToFront() {
@@ -85,21 +92,33 @@ void BaseSurface::setBackground(Graphics::RGB bg_color) {
 
 void init_screens(multiboot_info_t* mboot) {
 	screen_surfaces.push_back(new BaseSurface(Graphics::Vector2(0,0), Graphics::Vector2(mboot->framebuffer_width,mboot->framebuffer_height)));
-	
+    
+    VGA_WIDTH = mboot->framebuffer_width / X_FONTWIDTH;
+    VGA_HEIGHT = mboot->framebuffer_height / (Y_FONTWIDTH) - 1;
+
 	//screen_surfaces[0]->setBackground(Graphics::RGB(0x2a2b31));
 	screen_surfaces[0]->apply(true);
-
-    //test_surfaces();
-
-	// screen_surfaces.push_back(Surface(Vector2(250,250), Vector2(50,50)));
-	// screen_surfaces[1].setBackground(RGBA(0xFFFFFF));
-	// screen_surfaces[1].drawCircle(25, 25, 20, Graphics::RGBA(0xFF0000));
-	// screen_surfaces[1].apply();
-
 }
 
 void surface_update() {
+    Process::Message msg = Process::kMessageNull;
+
+    // {
+	// 	using namespace Process;
+	// 	Locker<SpinlockMutex> messaging_locker(messaging_mutex, Scheduler::threadId());
+	// 	Process::listen(3);
+	// }
+
     for(;;) {
+
+        // while((msg = Process::postbox.pop(3)) != Process::kMessageNull) {
+        //     if((int)msg.data == MSG_SCROLLUP) {
+        //         bcprintf("[GFX] Scrolling UP!\n");
+
+        //     //    screen_surfaces[0]->scrollUp(1);
+        //     }
+        // }
+
         interrupts_disable();
         Scheduler::lock();
         
@@ -116,4 +135,6 @@ void start_display_driver(multiboot_info_t* mboot) {
     init_screens(mboot);
 
     Graphics::UpdateBuffers(Graphics::Update::FULL_REFRESH);  
+
+    surfaces_setup = true;
 }

@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
+#include <kernel/proc/mutex.hpp>
 #include <kernel/gfx/vga.hpp>
 #include <kernel/gfx/buffer.hpp>
 
@@ -13,6 +14,11 @@
 extern volatile size_t terminal_row;
 extern volatile size_t terminal_column;
 extern uint16_t* terminal_buffer;
+
+extern const int X_FONTWIDTH;
+extern const int Y_FONTWIDTH; 
+
+extern Process::SpinlockMutex print_mutex;
 
 void init_tty();
 void tty_update();
@@ -23,6 +29,7 @@ void terminal_putentryat(char c, size_t x, size_t y, Graphics::RGB colour = Grap
 void terminal_putchar(char c, Graphics::RGB colour = Graphics::RGB(0xFFFFFF));
 
 void terminal_printf(const char* fmt, ...);
+void terminal_printf_rgba(const char* fmt, Graphics::RGB color, ...);
 
 void update_cursor(int row, int col);
 

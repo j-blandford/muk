@@ -7,15 +7,12 @@ void SpinlockMutex::Lock(int thread_id) {
 
 	this->l_threadid = thread_id;
 	this->interlock = 1;
-
-	bcprintf("Locked mutex\n");
 }
 
 void SpinlockMutex::Unlock(int thread_id) {
 	if(this->l_threadid == thread_id) {
 		this->interlock = 0;
 		this->l_threadid = 0;
-		bcprintf("Unlocked mutex\n");
 	}
 }
 

@@ -33,9 +33,7 @@ namespace std {
 			private:
 				pointer ptr_;
 		};
-
-		//typedef T* iterator; // used as vector::iterator
-
+		
 		// Constructors
 		vector();
 	   // vector(size_t size);
@@ -70,7 +68,7 @@ namespace std {
 namespace std {
 
 	template<class T>
-	vector<T>::vector() : _capacity(0), _size(0) { }
+	vector<T>::vector() : _capacity(0), _size(0), buffer(nullptr) { }
 
 	template<class T>
 	vector<T>::vector(const vector<T>& vec) : _capacity(vec._capacity), _size(vec._size), buffer(new T[_capacity]) { 

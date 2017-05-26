@@ -1,7 +1,9 @@
 #include <stdint.h>
 #include <stddef.h>
-
+#include <kernel/proc/scheduler.hpp>
 #include <kernel/memory/alloc.hpp>
+
+Process::SpinlockMutex memcpy_lock;
 
 int memcmp(const void* aptr, const void* bptr, size_t size) {
 	const unsigned char* a = (const unsigned char*) aptr;
@@ -20,6 +22,7 @@ void* memcpy(void* dstptr, const void* srcptr, size_t size) {
 	const unsigned char* src = (const unsigned char*) srcptr;
 	for (size_t i = 0; i < size; i++)
 		dst[i] = src[i];
+
 	return dstptr;
 }
 

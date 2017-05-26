@@ -4,29 +4,22 @@
 #include <kernel/fs/fat16.hpp>
 
 int ls(std::vector<std::string> args) {
-	std::string currentPath;
+	std::string c_path = args[1];
+	std::string trim_path = c_path.substr(0,c_path.size()-1);
 
-	// Is this an absolute or relative path? 
-	// we need to add the current working directory if it's relative
-	if(args[1][0] == '/') {
-		// absolute path, do nothing to it :)
-		currentPath = args[1];
-	} 
-	else {
-		// Relative path
-		currentPath = '/';
-		currentPath += args[1];
-		currentPath += '/';
+	// append trailing slash
+	if(trim_path[trim_path.size() - 1] != '/') {
+		trim_path += '/';
 	}
 
-	for(auto dir : Filesystem::devices[0]->readDirectory(512)) {		
-		terminal_printf("%s ", dir.name);
+	for(auto dir : Filesystem::devices[0]->readDirectory((char*)trim_path)) {	
+		bool is_dir = (dir.attributes != Filesystem::FATAttributes::shortNameFile);
+		
+		// metadata
+		terminal_printf("%s- %x\t May 14 17:04\t", is_dir ? "d" : "-", dir.location);
 
-		if(strlen(dir.name) < 11) {
-			terminal_writestring("\t");
-		}
-
-		terminal_printf("\t %s @ %x\n", dir.attributes == Filesystem::FATAttributes::shortNameFile ? "FILE" : "DIR", dir.location);
+		// name
+		terminal_printf_rgba("%s\n", is_dir ? Graphics::RGB(0x3bff6e) : Graphics::RGB(0xFFFFFF), dir.name);
 	}
 
 	return 0;

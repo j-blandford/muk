@@ -9,6 +9,8 @@
 
 #include <kernel/proc/mutex.hpp>
 
+#define MSG_SCROLLUP 1	 // graphics devices use this 
+
 namespace Process {
 
 	inline static int floor(double x) {
@@ -16,31 +18,12 @@ namespace Process {
 		return x < xi ? xi - 1 : xi;
 	}
 
-	struct VariantType {
-		enum Type {
-			Char,
-			Int
-		};
+	struct IMessage {
+		virtual ~IMessage() { }
+	};
 
-		VariantType(const char& val) : type(Char), val(val) { }
-		VariantType(const int& val) : type(Int), val(val) { }
-
-		Type getType() const { return type; }
-		char getChar() const { assert(type == Char); return val.getChar(); }
-		int getInt() const { assert(type == Int);  return val.getInt(); }
-	private:
-		union Union {
-			Union(const char& val) : charValue(val) { }
-			Union(const int& val) : intValue(val) { }
-			char getChar() const { return charValue; }
-			int getInt() const { return intValue; }
-		private:
-			char charValue;
-			int intValue;
-		};
-
-		Type type;
-		Union val;
+	struct KeyboardMessage : IMessage {
+		~KeyboardMessage() { }
 	};
 
 	class Message {

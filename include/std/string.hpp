@@ -72,6 +72,24 @@ namespace std {
 			return std::string::npos;
 		}
 
+		string substr(size_type pos = 0, size_type count = std::string::npos) const {
+			if(pos + count > this->size() || count == std::string::npos) 
+				count = this->size() - pos;
+			
+			char* dest = new char[count+1];
+			
+			for(size_type p = 0; p < count; p++) {
+				dest[p] = this->data(pos + p);
+			}
+
+			dest[count] = '\0';
+			
+			std::string str = dest;
+			delete dest;
+
+			return str;
+		}
+
 		// size_type find( const char* s, size_type pos = 0 ) const {
 		// 	string comp = string(s);
 		// 	for(size_type i = pos; i < this->size(); ++i) {

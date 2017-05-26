@@ -108,13 +108,17 @@ void idt_install() {
 	idt_flush((uint32_t)&idt_p);
 }
 
-isr_t isr_handlers[256];
+namespace Interrupt {
+	using isr_fn = void(*)(registers*);
 
-void set_isr_handler(uint8_t i, isr_t handler) {
-	isr_handlers[i] = handler;
+	isr_fn handlers[256];
+
+	void Register(size_t irq_num, isr_fn ptr) {
+		handlers[irq_num + 0x20] = ptr; // irqs are remapped +32
+	}
 }
 
-extern "C" struct registers * isr_handler(registers_t* registers) {
+extern "C" struct registers * isr_handler(registers* registers) {
 	if ((registers->isr_num >= IRQ0) && (registers->isr_num <= IRQ15)) { // IRQ
 		if (registers->isr_num >= IRQ8) { // IRQ originated from the slave PIC
 			outportb(PIC2_COMMAND, PIC_EOI);
@@ -122,8 +126,8 @@ extern "C" struct registers * isr_handler(registers_t* registers) {
 		outportb(PIC1_COMMAND, PIC_EOI);
 	}
 
-	if (isr_handlers[registers->isr_num] != 0) {
-		isr_handlers[registers->isr_num](registers);
+	if (Interrupt::handlers[registers->isr_num] != nullptr) {
+		Interrupt::handlers[registers->isr_num](registers);
 	}
 
 	return registers;

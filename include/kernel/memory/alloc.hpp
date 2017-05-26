@@ -3,7 +3,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <kernel/proc/mutex.hpp>
+
 extern int end;
+
+extern Process::SpinlockMutex memcpy_lock;
 
 // Fundamental Memory Functions
 int memcmp(const void*, const void*, size_t);

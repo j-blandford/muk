@@ -21,26 +21,23 @@ class Thread {
 public:
 	size_t thread_id;
 	size_t proc_id;
-	char *title;
+	char* title;
 
 	registers state_reg;
 
 	uintptr_t entry_ptr;
 	uintptr_t stack_ptr;
 
-	Thread* prev;
-	Thread* next;
+	Thread* prev = nullptr;
+	Thread* next = nullptr;
 
 	uint32_t stack[THREAD_STACK_SIZE];
 
-	ThreadStatus t_status;
+	ThreadStatus t_status = ThreadStatus::T_RUNNING;
 
 	Thread() 
 	: proc_id(1)
-	, title(new char[255])
-	, prev(nullptr)
-	, next(nullptr)
-	, t_status(ThreadStatus::T_RUNNING) {}
+	, title(new char[255]) {}
 };
 
 extern Thread* thread_root;

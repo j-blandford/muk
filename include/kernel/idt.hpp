@@ -45,6 +45,14 @@ void set_isr_handler(uint8_t i, isr_t handler);
 #define IRQ14 0x2e
 #define IRQ15 0x2f
 
+namespace Interrupt {
+	using isr_fn = void(*)(registers*);
+
+	extern isr_fn handlers[256];
+
+	void Register(size_t irq_num, isr_fn ptr);
+}
+
 // exceptions
 extern "C" void isr0();
 extern "C" void isr1();

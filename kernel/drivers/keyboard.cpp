@@ -66,13 +66,15 @@ char getc() {
 		else {
 			bcprintf("Pressed key %d\n", (int)c);
 			Process::SendMessage(1, c);
+
+			//Process::stdout() << c;
 			
 			return c;
 		}
 	}
 }
 
-static void keyboard_irq1(registers *r) {
+static void keyboard_irq(registers* r) {
 	uint8_t status;
 	char keycode;
 	//Scheduler::lock();
@@ -91,7 +93,8 @@ static void keyboard_irq1(registers *r) {
 }
 
 void keyboard_install() {
-    set_irq_handler(1, (isr_t)&keyboard_irq1); // install the keyboard irq handler
+	Interrupt::Register(1, keyboard_irq);
+    //set_irq_handler(1, (isr_t)&keyboard_irq1); // install the keyboard irq handler
 }
 
 void kb_update() {

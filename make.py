@@ -4,14 +4,14 @@ import subprocess
 solutions = ["kernel", "modules"]
 
 for opt in sys.argv:
-    if opt == "clean" or opt == "cbochs":
+    if opt == "clean" or opt == "cbochs" or opt == "cbuild":
         # Clean the solutions
         for project in solutions:
             subprocess.call(["make", "clean"], cwd=project)
 
         print("/*** FINISHED CLEANING ***/")
 
-    if opt == "build" or opt == "run" or opt == "bochs" or opt == "cbochs":
+    if opt == "build" or opt == "cbuild" or opt == "run" or opt == "bochs" or opt == "cbochs":
         # Compile all of the solutions:
         for project in solutions:
             subprocess.run(["make", "compile"], cwd=project, check=True)
