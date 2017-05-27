@@ -31,3 +31,7 @@ public:
 void* vmalloc(size_t size);
 void* kcalloc(size_t size);
 void kfree(void* addr);
+
+void* malloc(size_t size);
+void* calloc(size_t size);
+void free(void* addr);

@@ -14,13 +14,6 @@ typedef struct idt_entry {
 
 void idt_install();
 
-//typedef void (* isr_t)(registers_t *);
-
-using isr_t = void(*)(registers_t *); // allows us to easily use a function pointer (type named "isr_t")
-
-void set_isr_handler(uint8_t i, isr_t handler);
-#define set_irq_handler(i, h) (set_isr_handler((i)+32, (h))) // +32 because we are remapping the PIC's overlapping interrupt #s
-
 #define PIC1_COMMAND    0x20 // chip 1
 #define PIC1_DATA       0x21
 #define PIC2_COMMAND    0xA0 // chip 2 -> gives us 15 distinct IRQs (+1 for the zeroth)
@@ -28,26 +21,9 @@ void set_isr_handler(uint8_t i, isr_t handler);
 
 #define PIC_EOI         0x20
 
-#define IRQ0 0x20   // these are ALL remapped to IRQ# = 32 + #
-#define IRQ1 0x21
-#define IRQ2 0x22
-#define IRQ3 0x23
-#define IRQ4 0x24
-#define IRQ5 0x25
-#define IRQ6 0x26
-#define IRQ7 0x27
-#define IRQ8 0x28
-#define IRQ9 0x29
-#define IRQ10 0x2a
-#define IRQ11 0x2b
-#define IRQ12 0x2c
-#define IRQ13 0x2d
-#define IRQ14 0x2e
-#define IRQ15 0x2f
-
 namespace Interrupt {
 	using isr_fn = void(*)(registers*);
-
+	extern const size_t kPICRemap;
 	extern isr_fn handlers[256];
 
 	void Register(size_t irq_num, isr_fn ptr);

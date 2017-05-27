@@ -2,9 +2,9 @@
 TARGET = i686-elf
 ARCH = i386
 
-CPPFLAGS  = -O2 -g -std=gnu++11 -fno-rtti #-nostdinc++ 
-CPPFLAGS += -finline-functions -ffreestanding -nostdlib
-CPPFLAGS += -Wall -Wextra -fno-exceptions -Warray-bounds
+CPPFLAGS  = -O2 -g -std=gnu++11 #-fno-rtti #-nostdinc++ 
+CPPFLAGS += -finline-functions -ffreestanding -nostdlib -fpermissive
+CPPFLAGS += -Wall -Warray-bounds
 CPPFLAGS += -Wno-write-strings -Wno-unused-variable -Wno-unused-parameter -Wno-ignored-qualifiers
 CPPFLAGS += -DKERNEL
 
@@ -20,11 +20,10 @@ INFO = ../scripts/print-msg.sh
 OBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 OBJS+= $(patsubst %.cpp,%.o,$(wildcard */*.cpp))
 OBJS+= $(patsubst %.cpp,%.o,$(wildcard */*/*.cpp))
-
 #STD_OBJS = $(patsubst %.cpp,%.o,$(shell find std/ -type f -name '*.cpp'))
 
 HEADERS = $(shell find include/ -type f -name '*.hpp')
-HEADERS+= $(shell find include/stlport/ -type f)
+HEADERS+= $(shell find include/ -type f -name '*.h')
 
 ASMOBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 

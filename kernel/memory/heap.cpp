@@ -83,3 +83,13 @@ void* kcalloc(size_t size) {
 void kfree(void * addr) {
     return; // meh for now
 }
+
+
+
+void* calloc(size_t size) {
+    return kcalloc(size);
+}
+
+void free(void * addr) {
+    kfree(addr);
+}

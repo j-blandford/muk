@@ -31,8 +31,8 @@ void idt_install() {
 	outportb(PIC1_COMMAND, 0x11); // start initialisation on the master
 	outportb(PIC2_COMMAND, 0x11); // and slave PIC
 
-	outportb(PIC1_DATA, 0x20); // IRQ0-7 maps to ISR32-39
-	outportb(PIC2_DATA, 0x28); // IRQ8-15 maps to ISR40-47
+	outportb(PIC1_DATA, Interrupt::kPICRemap);
+	outportb(PIC2_DATA, Interrupt::kPICRemap + 0x08);
 
 	outportb(PIC1_DATA, 0x04); // setup cascading
 	outportb(PIC2_DATA, 0x02);
@@ -109,24 +109,31 @@ void idt_install() {
 }
 
 namespace Interrupt {
-	using isr_fn = void(*)(registers*);
-
+	const size_t kPICRemap = 0x20; // 20h = 32d for pic remapping offset
 	isr_fn handlers[256];
 
 	void Register(size_t irq_num, isr_fn ptr) {
-		handlers[irq_num + 0x20] = ptr; // irqs are remapped +32
+		handlers[irq_num + kPICRemap] = ptr; // irqs are remapped +32
 	}
 }
 
-extern "C" struct registers * isr_handler(registers* registers) {
-	if ((registers->isr_num >= IRQ0) && (registers->isr_num <= IRQ15)) { // IRQ
-		if (registers->isr_num >= IRQ8) { // IRQ originated from the slave PIC
+extern "C" registers* isr_handler(registers* registers) {
+	// first we send a ping back to the device (if it's an IRQ)
+	if (registers->isr_num >= Interrupt::kPICRemap 
+		&& registers->isr_num <= Interrupt::kPICRemap + 0x0F) { 
+		// OK so the ISR corresponds to an IRQ event (ie. between 0 and 15)
+
+		if (registers->isr_num >= Interrupt::kPICRemap + 0x08) {
+			// as the PIC has 2 chips, 0-8 and 9-15, we need to send the EOI
+			// packet to the second chip, too:
 			outportb(PIC2_COMMAND, PIC_EOI);
 		}
+
 		outportb(PIC1_COMMAND, PIC_EOI);
 	}
 
 	if (Interrupt::handlers[registers->isr_num] != nullptr) {
+		// now if a handler is registered for this interrupt, let's call it
 		Interrupt::handlers[registers->isr_num](registers);
 	}
 

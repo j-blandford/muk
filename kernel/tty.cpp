@@ -29,7 +29,6 @@ static Graphics::Vector2 cursor_pos(0,0);
 char kb_buffer[1024];
 
 void terminal_writestring(char* data, Graphics::RGB colour) {	
-
 	if(terminal_row == VGA_HEIGHT) {
 		terminal_scrollup();
 		terminal_row--; 

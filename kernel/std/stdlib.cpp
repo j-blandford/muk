@@ -50,17 +50,17 @@ char *strcat(char *dest, const char *src) {
 }
 
 // taken from GLibC
-char * strpbrk(const char *s, const char *accept) {
-	while (*s != '\0') {
-		const char *a = accept;
+// char * strpbrk(const char *s, const char *accept) {
+// 	while (*s != '\0') {
+// 		const char *a = accept;
 
-		while (*a != '\0')
-			if (*a++ == *s)
-				return (char *) s;
-				++s;
-	}
-	return NULL;
-}
+// 		while (*a != '\0')
+// 			if (*a++ == *s)
+// 				return (char *) s;
+// 				++s;
+// 	}
+// 	return NULL;
+// }
 
 // taken from GLibC
 size_t strspn (const char *s, const char *accept) {
