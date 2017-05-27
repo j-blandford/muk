@@ -34,10 +34,10 @@
  */
 
 #include <stddef.h>
-#include <stdlib.h>
+#include <std.hpp>
 #include <libcxxrt/stdexcept.h>
 #include <libcxxrt/atomic.h>
-
+#include <kernel/memory/heap.hpp>
 
 namespace std
 {
@@ -80,92 +80,73 @@ namespace std
 #endif
 
 
-__attribute__((weak))
-void* operator new(size_t size) BADALLOC
-{
-	if (0 == size)
-	{
-		size = 1;
-	}
-	void * mem = malloc(size);
-	while (0 == mem)
-	{
-		new_handler h = std::get_new_handler();
-		if (0 != h)
-		{
-			h();
-		}
-		else
-		{
-			throw std::bad_alloc();
-		}
-		mem = malloc(size);
-	}
+// __attribute__((weak))
+// void* operator new(size_t size) BADALLOC
+// {
+// 	if (0 == size)
+// 	{
+// 		size = 1;
+// 	}
+// 	void * mem = malloc(size);
+// 	while (0 == mem)
+// 	{
+// 		new_handler h = std::get_new_handler();
+// 		if (0 != h)
+// 		{
+// 			h();
+// 		}
+// 		else
+// 		{
+// 			throw std::bad_alloc();
+// 		}
+// 		mem = malloc(size);
+// 	}
 
-	return mem;
-}
+// 	return mem;
+// }
 
-__attribute__((weak))
-void* operator new(size_t size, const std::nothrow_t &) NOEXCEPT
-{
-	try {
-		return :: operator new(size);
-	} catch (...) {
-		// nothrow operator new should return NULL in case of
-		// std::bad_alloc exception in new handler
-		return NULL;
-	}
-}
-
-
-__attribute__((weak))
-void operator delete(void * ptr) NOEXCEPT
-{
-	free(ptr);
-}
+// __attribute__((weak))
+// void* operator new(size_t size, const std::nothrow_t &) NOEXCEPT
+// {
+// 	try {
+// 		return :: operator new(size);
+// 	} catch (...) {
+// 		// nothrow operator new should return NULL in case of
+// 		// std::bad_alloc exception in new handler
+// 		return NULL;
+// 	}
+// }
 
 
-__attribute__((weak))
-void * operator new[](size_t size) BADALLOC
-{
-	return ::operator new(size);
-}
+// __attribute__((weak))
+// void operator delete(void * ptr) NOEXCEPT
+// {
+// 	free(ptr);
+// }
 
 
-__attribute__((weak))
-void * operator new[](size_t size, const std::nothrow_t &) NOEXCEPT
-{
-	try {
-		return ::operator new[](size);
-	} catch (...) {
-		// nothrow operator new should return NULL in case of
-		// std::bad_alloc exception in new handler
-		return NULL;
-	}
-}
+// __attribute__((weak))
+// void * operator new[](size_t size) BADALLOC
+// {
+// 	return ::operator new(size);
+// }
 
 
-__attribute__((weak))
-void operator delete[](void * ptr) NOEXCEPT
-{
-	::operator delete(ptr);
-}
-
-// C++14 additional delete operators
-
-#if __cplusplus >= 201402L
-
-__attribute__((weak))
-void operator delete(void * ptr, std::size_t) NOEXCEPT
-{
-	::operator delete(ptr);
-}
+// __attribute__((weak))
+// void * operator new[](size_t size, const std::nothrow_t &) NOEXCEPT
+// {
+// 	try {
+// 		return ::operator new[](size);
+// 	} catch (...) {
+// 		// nothrow operator new should return NULL in case of
+// 		// std::bad_alloc exception in new handler
+// 		return NULL;
+// 	}
+// }
 
 
-__attribute__((weak))
-void operator delete[](void * ptr, std::size_t) NOEXCEPT
-{
-	::operator delete(ptr);
-}
-
-#endif
+// __attribute__((weak))
+// void operator delete[](void * ptr)
+// {
+// 	::operator delete(ptr);
+// }

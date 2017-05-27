@@ -24,19 +24,10 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
+#include <std.hpp>
 
 namespace std
 {
-	/**
-	 * Stub implementation of std::abort.  Used when the STL implementation
-	 * doesn't provide one.
-	 */
-	__attribute__((weak))
-	void abort()
-	{
-		return;
-	}
 	/**
 	 * Stub implementation of std::terminate.  Used when the STL implementation
 	 * doesn't provide one.

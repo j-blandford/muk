@@ -1,6 +1,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <libcxxrt/unwind.h>
+#include <libcxxrt/typeinfo.h>
+
 #include <kernel/multiboot.hpp>
 #include <kernel/icxxabi.hpp>
 #include <kernel/cpu.hpp>

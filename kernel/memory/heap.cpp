@@ -64,16 +64,10 @@ void* vmalloc(size_t size) {
     return (void*)to_ret;
 }
 
-void* malloc(size_t size) {
-    return vmalloc(size);
-}
-
 void* kmalloc(size_t size) {
     return vmalloc(size);
 }
 
-
-// alloc and zero memory
 void* kcalloc(size_t size) {
     void* result = vmalloc(size);
     memset(result, 0, size);
@@ -83,3 +77,26 @@ void* kcalloc(size_t size) {
 void kfree(void * addr) {
     return; // meh for now
 }
+
+void* malloc(size_t size) {
+    return vmalloc(size);
+}
+
+void* realloc(void * addr, size_t new_size) {
+    return vmalloc(new_size);
+}
+
+void* calloc(size_t size) {
+    void* result = vmalloc(size);
+    memset(result, 0, size);
+    return result;
+}
+
+void* calloc(int num, size_t size) {
+    return calloc(size);
+}
+
+void free(void * addr) {
+    return; // meh for now
+}
+

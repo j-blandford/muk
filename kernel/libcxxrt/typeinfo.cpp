@@ -25,9 +25,10 @@
  */
 
 #include <libcxxrt/typeinfo.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+//#include <string.h>
+#include <std.hpp>
+#include <kernel/memory/heap.hpp>
+// #include <stdio.h>
 
 using std::type_info;
 

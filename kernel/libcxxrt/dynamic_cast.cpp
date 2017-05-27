@@ -24,8 +24,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "typeinfo.h"
-#include <stdio.h>
+#include <libcxxrt/typeinfo.h>
+// #include <stdio.h>
 
 using namespace ABI_NAMESPACE;
 

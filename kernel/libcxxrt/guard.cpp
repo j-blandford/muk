@@ -41,9 +41,10 @@
  * initialised.  
  */
 #include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <std.hpp>
+//#include <stdio.h>
 #include <pthread.h>
+#include <kernel/proc/scheduler.hpp>
 #include <libcxxrt/atomic.h>
 
 // Older GCC doesn't define __LITTLE_ENDIAN__
@@ -157,7 +158,7 @@ extern "C" int __cxa_guard_acquire(volatile guard_t *guard_object)
 		if (INIT_PART(guard_object) != LOCK_PART(guard_object) &&
 		    INITIALISED == *INIT_PART(guard_object))
 			return 0;
-		sched_yield();
+		Scheduler::yield();
 	}
 }
 

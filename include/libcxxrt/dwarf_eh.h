@@ -31,7 +31,7 @@
  * language-specific code.  It can be used in any personality function for the
  * Itanium ABI.
  */
-#include <assert.h>
+#include <kernel/cpu.hpp>
 
 // TODO: Factor out Itanium / ARM differences.  We probably want an itanium.h
 // and arm.h that can be included by this file depending on the target ABI.

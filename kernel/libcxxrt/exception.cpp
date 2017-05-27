@@ -24,16 +24,16 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
+#include <std.hpp>
 #include <dlfcn.h>
-#include <stdio.h>
-#include <string.h>
+//#include <stdio.h>
+#include <kernel/memory/heap.hpp>
 #include <stdint.h>
 #include <pthread.h>
-#include "typeinfo.h"
-#include "dwarf_eh.h"
-#include "atomic.h"
-#include "cxxabi.h"
+#include <libcxxrt/typeinfo.h>
+#include <libcxxrt/dwarf_eh.h>
+#include <libcxxrt/atomic.h>
+#include <libcxxrt/cxxabi.h>
 
 #pragma weak pthread_key_create
 #pragma weak pthread_setspecific
