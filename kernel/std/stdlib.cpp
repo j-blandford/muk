@@ -62,6 +62,41 @@ char * strpbrk(const char *s, const char *accept) {
 	return NULL;
 }
 
+/**
+ * Copyright (c) 1988-1993 The Regents of the University of California.
+ * All rights reserved.
+*/
+char * strstr(char *string, char *substring) {
+    char *a;
+	char *b;
+
+    /* First scan quickly through the two strings looking for a
+     * single-character match.  When it's found, then compare the
+     * rest of the substring.
+     */
+
+    b = substring;
+    if (*b == 0) {
+		return string;
+    }
+    for ( ; *string != 0; string += 1) {
+		if (*string != *b) {
+			continue;
+		}
+		a = string;
+		while (1) {
+			if (*b == 0) {
+				return string;
+			}
+			if (*a++ != *b++) {
+				break;
+			}
+		}
+		b = substring;
+    }
+    return nullptr;
+}
+
 // taken from GLibC
 size_t strspn (const char *s, const char *accept) {
 	const char *p;

@@ -23,15 +23,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <sys/types.h>
-#include <assert.h>
-#include <ctype.h>
+// #include <sys/types.h>
+#include <kernel/cpu.hpp> // for assert + snprintf (maybe refactor)
+#include <std/ctype.hpp>
 #include <errno.h>
 #include <limits.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <std.hpp>
+#include <stddef.h>
+#include <kernel/memory/heap.hpp>
+
+typedef int ssize_t;
 
 /**
  * @file cpp_demangle.c

@@ -2,6 +2,7 @@
 #include <std.hpp>
 
 #include <kernel/cpu.hpp>
+#include <kernel/memory/alloc.hpp>
 
 uint8_t inportb (uint16_t port) {
     unsigned char rv;
@@ -55,4 +56,26 @@ void bcprintf(const char* fmt, ...) {
 	vsprintf(temp_buffer, fmt, parameters);
 	BochsConsolePrint((char*)temp_buffer);
 	va_end(parameters);
+}
+
+int snprintf(char* buffer, size_t n, const char* fmt, ...) {
+	va_list parameters;
+	char temp_buffer[n] = {0};
+
+	va_start(parameters, fmt);
+	vsprintf(temp_buffer, fmt, parameters);
+	va_end(parameters);
+
+    memcpy(buffer, &temp_buffer[0], n * sizeof(char));
+
+    size_t s = 0;
+
+    for(size_t i = n-1; i > 0; i--) {
+        if((int)temp_buffer[i] != 0) {
+            s = i;
+            break;
+        }
+    }
+
+    return s;
 }

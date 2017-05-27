@@ -26,7 +26,7 @@ inline void  operator delete[](void *, void *) throw() { };
 char *strcat(char *dest, const char *source);
 
 int strncmp(const char *s1, const char *s2, size_t n);
-
+char * strstr(char *string, char *substring);
 char * strpbrk(const char *s, const char *accept);
 size_t strspn (const char *s, const char *accept);
 char * strtok(char *str, const char *delim);
