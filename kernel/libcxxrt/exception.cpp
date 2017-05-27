@@ -60,6 +60,10 @@
 
 using namespace ABI_NAMESPACE;
 
+int dladdr(void*, Dl_info*) {
+	return 0;
+}
+
 /**
  * Saves the result of the landing pad that we have found.  For ARM, this is
  * stored in the generic unwind structure, while on other platforms it is
@@ -444,7 +448,7 @@ static bool buffer_allocated[16];
 /**
  * Lock used to protect emergency allocation.
  */
-static pthread_mutex_t emergency_malloc_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t emergency_malloc_lock = { 0, 0, 0, 0, 0, 0};
 /**
  * Condition variable used to wait when two threads are both trying to use the
  * emergency malloc() buffer at once.
@@ -551,7 +555,7 @@ static char *alloc_or_die(size_t size)
 		// anyone throwing objects that big really should know better.  
 		if (0 == buffer)
 		{
-			fprintf(stderr, "Out of memory attempting to allocate exception\n");
+			bcprintf("Out of memory attempting to allocate exception\n");
 			std::terminate();
 		}
 	}
@@ -666,7 +670,7 @@ static _Unwind_Reason_Code trace(struct _Unwind_Context *context, void *c)
 	{
 		if (mylookup == 0 || strcmp(info.dli_fname, myinfo.dli_fname) != 0)
 		{
-			printf("%p:%s() in %s\n", ip, info.dli_sname, info.dli_fname);
+			bcprintf("%p:%s() in %s\n", ip, info.dli_sname, info.dli_fname);
 		}
 	}
 	return _URC_CONTINUE_UNWIND;
@@ -689,17 +693,17 @@ static void report_failure(_Unwind_Reason_Code err, __cxa_exception *thrown_exce
 	{
 		default: break;
 		case _URC_FATAL_PHASE1_ERROR:
-			fprintf(stderr, "Fatal error during phase 1 unwinding\n");
+			bcprintf("Fatal error during phase 1 unwinding\n");
 			break;
 #if !defined(__arm__) || defined(__ARM_DWARF_EH__)
 		case _URC_FATAL_PHASE2_ERROR:
-			fprintf(stderr, "Fatal error during phase 2 unwinding\n");
+			bcprintf("Fatal error during phase 2 unwinding\n");
 			break;
 #endif
 		case _URC_END_OF_STACK:
 			__cxa_begin_catch (&(thrown_exception->unwindHeader));
  			std::terminate();
-			fprintf(stderr, "Terminating due to uncaught exception %p", 
+			bcprintf("Terminating due to uncaught exception %p", 
 					static_cast<void*>(thrown_exception));
 			thrown_exception = realExceptionFromException(thrown_exception);
 			static const __class_type_info *e_ti =
@@ -713,7 +717,7 @@ static void report_failure(_Unwind_Reason_Code err, __cxa_exception *thrown_exce
 							throw_ti));
 				if (e)
 				{
-					fprintf(stderr, " '%s'", e->what());
+					bcprintf(" '%s'", e->what());
 				}
 			}
 
@@ -722,7 +726,7 @@ static void report_failure(_Unwind_Reason_Code err, __cxa_exception *thrown_exce
 			const char *mangled = thrown_exception->exceptionType->name();
 			int status;
 			demangled = __cxa_demangle(mangled, demangled, &bufferSize, &status);
-			fprintf(stderr, " of type %s\n", 
+			bcprintf(" of type %s\n", 
 				status == 0 ? demangled : mangled);
 			if (status == 0) { free(demangled); }
 			// Print a back trace if no handler is found.
@@ -843,8 +847,7 @@ extern "C" void __cxa_rethrow()
 
 	if (0 == ex)
 	{
-		fprintf(stderr,
-		        "Attempting to rethrow an exception that doesn't exist!\n");
+		bcprintf("Attempting to rethrow an exception that doesn't exist!\n");
 		std::terminate();
 	}
 

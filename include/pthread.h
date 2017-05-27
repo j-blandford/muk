@@ -1,10 +1,13 @@
 #define LIBCXXRT_WEAK_LOCKS 
 
+/* Single execution handling.  */
+#define PTHREAD_ONCE_INIT 0
+
 typedef unsigned int pthread_key_t;
 typedef int pthread_once_t;
 typedef long long int __pthread_cond_align_t;
-
 typedef unsigned long int pthread_t;
+
 struct _pthread_fastlock
 {
   long int __status;
@@ -13,15 +16,13 @@ struct _pthread_fastlock
 
 typedef struct _pthread_descr_struct *_pthread_descr;
 
-typedef struct
-{
+struct pthread_mutex_t {
   int __m_reserved;
   int __m_count;
   _pthread_descr __m_owner;
   int __m_kind;
   struct _pthread_fastlock __m_lock;
-}
-pthread_mutex_t;
+};
 
 typedef struct
 {
@@ -61,6 +62,13 @@ typedef struct
   int __pshared;
 }
 pthread_rwlockattr_t;
+
+# define __PTHREAD_SPINS             0
+# define PTHREAD_MUTEX_INITIALIZER \
+   { 0, 0, 0, 0, 0, __PTHREAD_SPINS, 0, 0 } 
+
+/* Conditional variable handling.  */
+#define PTHREAD_COND_INITIALIZER { 0, 0, 0, 0, 0, (void *) 0, 0, 0 }
 
 namespace { void* threadDataTable[64]; int freeEntry = 0;}
 int pthread_key_create(pthread_key_t* key, void (*)(void*));

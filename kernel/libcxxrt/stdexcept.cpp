@@ -27,7 +27,7 @@
 /**
  * stdexcept.cc - provides stub implementations of the exceptions required by the runtime.
  */
-#include "stdexcept.h"
+#include <libcxxrt/stdexcept.h>
 
 namespace std {
 
