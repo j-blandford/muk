@@ -1974,8 +1974,8 @@ cpp_demangle_read_number(struct cpp_demangle_data *ddata, long *rtn)
 		return (0);
 
 	errno = 0;
-	if ((len = strtol(ddata->cur, (char **) NULL, 10)) == 0 &&
-	    errno != 0)
+	if ((len = atoi(ddata->cur) == 0 &&
+	    errno != 0))
 		return (0);
 
 	while (ELFTC_ISDIGIT(*ddata->cur) != 0)
@@ -1999,10 +1999,10 @@ cpp_demangle_read_number_as_string(struct cpp_demangle_data *ddata, char **str)
 		return (0);
 	}
 
-	if (asprintf(str, "%ld", n) < 0) {
-		*str = NULL;
-		return (0);
-	}
+	// if (asprintf(str, "%ld", n) < 0) {
+	// 	*str = NULL;
+	// 	return (0);
+	// }
 
 	return (1);
 }

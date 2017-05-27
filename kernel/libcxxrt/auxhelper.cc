@@ -34,49 +34,49 @@
 #include <std.hpp>
 #include <libcxxrt/stdexcept.h>
 
-/**
- * Called to generate a bad cast exception.  This function is intended to allow
- * compilers to insert code generating this exception without needing to
- * duplicate the code for throwing the exception in every call site.
- */
-extern "C" void __cxa_bad_cast()
-{
-    throw std::bad_cast();
-}
-
-/**
- * Called to generate a bad typeid exception.  This function is intended to
- * allow compilers to insert code generating this exception without needing to
- * duplicate the code for throwing the exception in every call site.
- */
-extern "C" void __cxa_bad_typeid()
-{
-    throw std::bad_typeid();
-}
-
-/**
- * Compilers may (but are not required to) set any pure-virtual function's
- * vtable entry to this function.  This makes debugging slightly easier, as
- * users can add a breakpoint on this function to tell if they've accidentally
- * called a pure-virtual function.
- */
-// extern "C" void __cxa_pure_virtual()
+// /**
+//  * Called to generate a bad cast exception.  This function is intended to allow
+//  * compilers to insert code generating this exception without needing to
+//  * duplicate the code for throwing the exception in every call site.
+//  */
+// extern "C" void __cxa_bad_cast()
 // {
-//     abort();
+//     throw std::bad_cast();
 // }
 
-/**
- * Compilers may (but are not required to) set any deleted-virtual function's
- * vtable entry to this function.  This makes debugging slightly easier, as
- * users can add a breakpoint on this function to tell if they've accidentally
- * called a deleted-virtual function.
- */
-// extern "C" void __cxa_deleted_virtual()
+// /**
+//  * Called to generate a bad typeid exception.  This function is intended to
+//  * allow compilers to insert code generating this exception without needing to
+//  * duplicate the code for throwing the exception in every call site.
+//  */
+// extern "C" void __cxa_bad_typeid()
 // {
-//     abort();
+//     throw std::bad_typeid();
 // }
 
-extern "C" void __cxa_throw_bad_array_new_length()
-{
-	throw std::bad_array_new_length();
-}
+// /**
+//  * Compilers may (but are not required to) set any pure-virtual function's
+//  * vtable entry to this function.  This makes debugging slightly easier, as
+//  * users can add a breakpoint on this function to tell if they've accidentally
+//  * called a pure-virtual function.
+//  */
+// // extern "C" void __cxa_pure_virtual()
+// // {
+// //     abort();
+// // }
+
+// /**
+//  * Compilers may (but are not required to) set any deleted-virtual function's
+//  * vtable entry to this function.  This makes debugging slightly easier, as
+//  * users can add a breakpoint on this function to tell if they've accidentally
+//  * called a deleted-virtual function.
+//  */
+// // extern "C" void __cxa_deleted_virtual()
+// // {
+// //     abort();
+// // }
+
+// extern "C" void __cxa_throw_bad_array_new_length()
+// {
+// 	throw std::bad_array_new_length();
+// }

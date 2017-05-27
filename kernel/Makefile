@@ -2,7 +2,7 @@
 TARGET = i686-elf
 ARCH = i386
 
-CPPFLAGS  = -O2 -g -std=gnu++11 # -fno-rtti -fno-exceptions  #-nostdinc++ 
+CPPFLAGS  = -O2 -g -std=gnu++11 -fno-exceptions  # -fno-rtti  #-nostdinc++ 
 CPPFLAGS += -finline-functions -ffreestanding -nostdlib -fpermissive
 CPPFLAGS +=  -Warray-bounds
 CPPFLAGS += -Wno-write-strings -Wno-unused-variable -Wno-unused-parameter -Wno-ignored-qualifiers

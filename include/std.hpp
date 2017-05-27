@@ -27,6 +27,7 @@ char *strcat(char *dest, const char *source);
 
 int strncmp(const char *s1, const char *s2, size_t n);
 char * strstr(char *string, char *substring);
+char * strdup(const char *s1);
 char * strpbrk(const char *s, const char *accept);
 size_t strspn (const char *s, const char *accept);
 char * strtok(char *str, const char *delim);
@@ -45,6 +46,8 @@ char* ltoa(unsigned long long value, char* buffer, int radix );
 // Integer functions
 int itoa(int value, char *sp, int radix);
 int atoi(char* str);
+
+long strtol(const char *nptr, char **endptr, int base);
 
 __attribute__((weak))
 void abort();
