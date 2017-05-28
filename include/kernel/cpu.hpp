@@ -82,3 +82,14 @@ int snprintf(char* buffer, size_t n, const char* fmt, ...);
 	bcprintf("%s @ line %d", __FILE__, __LINE__-4); \
   	for(;;);}})
 
+
+// compiler branch optimisations
+#if defined(__GNUC__) || defined(__clang__)
+#define LIKELY(x) __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define ALWAYS_INLINE __attribute__((always_inline))
+#else
+#define LIKELY(x) x
+#define UNLIKELY(x) x
+#define ALWAYS_INLINE __forceinline
+#endif

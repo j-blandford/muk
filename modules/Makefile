@@ -33,7 +33,7 @@ ASMOBJS = $(patsubst %.s,%.bin,$(wildcard *.s))
 
 compile: ${ASMOBJS}
 	cp -r *.bin ../build/modules
-	@${INFO} "---->" "Modules built..."
+	@${INFO} "---->" "Modules compiled..."
 
 # 	@${GPP} -T linker.ld ${CPPFLAGS} -o ../build/boot/kernel.elf asm/boot.o ${OBJS}
 # This provides the object files

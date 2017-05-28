@@ -25,10 +25,8 @@
  */
 
 #include <libcxxrt/typeinfo.h>
-//#include <string.h>
 #include <std.hpp>
 #include <kernel/memory/heap.hpp>
-// #include <stdio.h>
 
 using std::type_info;
 
@@ -69,9 +67,6 @@ ABI_NAMESPACE::__vmi_class_type_info::~__vmi_class_type_info() {}
 ABI_NAMESPACE::__pbase_type_info::~__pbase_type_info() {}
 ABI_NAMESPACE::__pointer_type_info::~__pointer_type_info() {}
 ABI_NAMESPACE::__pointer_to_member_type_info::~__pointer_to_member_type_info() {}
-
-// From libelftc
-extern "C" char    *__cxa_demangle_gnu3(const char *);
 
 extern "C" char* __cxa_demangle(const char* mangled_name,
                                 char* buf,

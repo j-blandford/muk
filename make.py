@@ -1,7 +1,7 @@
 import sys, getopt
 import subprocess
 
-solutions = ["kernel", "modules"]
+solutions = ["libcxxrt", "kernel", "modules"]
 
 for opt in sys.argv:
     if opt == "clean" or opt == "cbochs" or opt == "cbuild":
@@ -15,6 +15,9 @@ for opt in sys.argv:
         # Compile all of the solutions:
         for project in solutions:
             subprocess.run(["make", "compile"], cwd=project, check=True)
+
+        # # we've compiled each of our source files, let's link them all together into the kernel.elf
+        # subprocess.run(["make", "compile"], check=True)
 
         # build it into an .iso
         subprocess.call(["grub-mkrescue /usr/lib/grub/i386-pc -o muk.iso build"], shell=True)

@@ -31,6 +31,9 @@ namespace ABI_NAMESPACE
 {
 	struct __class_type_info;
 }
+
+char * __cxa_demangle_gnu3(const char *org);
+
 namespace std
 {
 	/**

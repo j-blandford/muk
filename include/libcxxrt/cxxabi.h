@@ -234,11 +234,16 @@ char* __cxa_demangle(const char* mangled_name,
                      char* buf,
                      size_t* n,
                      int* status);
+
 #ifdef __cplusplus
 } // extern "C"
 } // namespace
 
 namespace abi = __cxxabiv1;
 
+void __cxa_finalize(void *d );
+
+
 #endif /* __cplusplus */
+
 #endif /* __CXXABI_H_ */

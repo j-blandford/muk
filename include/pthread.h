@@ -1,5 +1,3 @@
-#define LIBCXXRT_WEAK_LOCKS 
-
 /* Single execution handling.  */
 #define PTHREAD_ONCE_INIT 0
 
@@ -65,7 +63,7 @@ pthread_rwlockattr_t;
 
 # define __PTHREAD_SPINS             0
 # define PTHREAD_MUTEX_INITIALIZER \
-   { 0, 0, 0, 0, 0, __PTHREAD_SPINS, 0, 0 } 
+   { 0, 0, 0, 0, 0, __PTHREAD_SPINS } 
 
 /* Conditional variable handling.  */
 #define PTHREAD_COND_INITIALIZER { 0, 0, 0, 0, 0, (void *) 0, 0, 0 }
@@ -74,9 +72,7 @@ namespace { void* threadDataTable[64]; int freeEntry = 0;}
 int pthread_key_create(pthread_key_t* key, void (*)(void*));
 int pthread_once(pthread_once_t* control, void (*init)(void));
  
-void* pthread_getspecific(pthread_key_t key) {
-	return threadDataTable[key];
-}
+void* pthread_getspecific(pthread_key_t key);
  
 int pthread_setspecific(pthread_key_t key, const void* data) ;
 int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t*);

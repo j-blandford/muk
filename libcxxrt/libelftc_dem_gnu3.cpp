@@ -35,6 +35,12 @@
 
 typedef int ssize_t;
 
+int __errno = 0;
+
+int *__errno_location (void) __THROW {
+	return &__errno;
+}
+
 /**
  * @file cpp_demangle.c
  * @brief Decode IA-64 C++ ABI style implementation.

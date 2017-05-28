@@ -21,8 +21,7 @@
  *
  */
 
-
-void __cxa_finalize(void *d );
+#include <libcxxrt/cxxabi.h>
 
 extern void *__dso_handle;
 
