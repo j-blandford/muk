@@ -23,9 +23,9 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #include <libcxxrt/typeinfo.h>
 #include <std.hpp>
+#include <kernel/cpu.hpp>
 #include <kernel/memory/heap.hpp>
 
 using std::type_info;
@@ -46,7 +46,7 @@ bool type_info::before(const type_info &other) const
 }
 const char* type_info::name() const
 {
-	return __type_name;
+	return demangle(__type_name);
 }
 type_info::type_info (const type_info& rhs)
 {
@@ -56,6 +56,21 @@ type_info& type_info::operator= (const type_info& rhs)
 {
 	return *new type_info(rhs);
 }
+
+struct handle {
+    char* p;
+    handle(char* ptr) : p(ptr) { }
+    ~handle() { free(p); }
+};
+
+char* demangle(const char* name) {
+    int status = -4; // some arbitrary value to eliminate the compiler warning
+
+    handle result( __cxa_demangle(name, NULL, NULL, &status) );
+
+    return (status==0) ? result.p : name ;
+}
+
 
 ABI_NAMESPACE::__fundamental_type_info::~__fundamental_type_info() {}
 ABI_NAMESPACE::__array_type_info::~__array_type_info() {}

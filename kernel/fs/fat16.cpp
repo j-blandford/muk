@@ -1,5 +1,6 @@
 #include <std/bitset.hpp>
 #include <kernel/fs/fat16.hpp>
+#include <libcxxrt/typeinfo.h>
 
 std::vector<uint16_t> Filesystem::FileAllocationTable::walk(uint16_t start) {
 	// "start" is the value grabbed from the directory tables!!!
@@ -36,6 +37,8 @@ bool Filesystem::FAT16::open() {
 	header_info.numDirectories = (*(header_bytes + 17*sizeof(char))) | (*(header_bytes + 18*sizeof(char)) << 8);
 	header_info.numSectors = (*(header_bytes + 19*sizeof(char))) | (*(header_bytes + 20*sizeof(char)) << 8);
 	header_info.numSectorsPerFAT = (*(header_bytes + 21*sizeof(char))) | (*(header_bytes + 22*sizeof(char)) << 8);
+
+	bcprintf("FAT16 typeid=%s\n", typeid(this).name());
 
 	// Below we have the Extended BIOSParameter Block (EBPB)
 	volume_serial = (*(header_bytes + 39*sizeof(char))) 

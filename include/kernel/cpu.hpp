@@ -73,6 +73,7 @@ void BochsConsolePrint(char *s);
 void bcprintf(const char* fmt, ...);
 
 int snprintf(char* buffer, size_t n, const char* fmt, ...);
+int asprintf(char** buffer,  const char* fmt, ...);
 
 // this cannot be an inline function as __FILE__ and __LINE__ would be incorrect.
 #define assert(n) ({if(!(n)){ \

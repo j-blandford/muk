@@ -1,20 +1,24 @@
 import sys, getopt
 import subprocess
 
-solutions = ["libcxxrt", "kernel", "modules"]
+solutions = [{ "name": "libcxxrt", "build": False },
+             { "name": "kernel", "build": True }, 
+             { "name": "modules", "build": False }]
 
 for opt in sys.argv:
-    if opt == "clean" or opt == "cbochs" or opt == "cbuild":
+    if opt == "clean" or opt == "cbochs" or opt == "rebuild":
         # Clean the solutions
         for project in solutions:
-            subprocess.call(["make", "clean"], cwd=project)
+            if project['build'] or opt == "cbochs":
+                subprocess.call(["make", "clean"], cwd=project['name'])
 
         print("/*** FINISHED CLEANING ***/")
 
-    if opt == "build" or opt == "cbuild" or opt == "run" or opt == "bochs" or opt == "cbochs":
+    if opt == "build" or opt == "rebuild" or opt == "run" or opt == "bochs" or opt == "cbochs":
         # Compile all of the solutions:
         for project in solutions:
-            subprocess.run(["make", "compile"], cwd=project, check=True)
+            if project['build'] or opt == "rebuild" or opt == "cbochs":
+                subprocess.run(["make", "compile"], cwd=project['name'], check=True)
 
         # # we've compiled each of our source files, let's link them all together into the kernel.elf
         # subprocess.run(["make", "compile"], check=True)

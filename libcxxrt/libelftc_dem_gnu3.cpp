@@ -488,12 +488,14 @@ __cxa_demangle_gnu3(const char *org)
 	if ((org_len < 2) || (org[0] != '_' || org[1] != 'Z' )) {
 		if (!cpp_demangle_data_init(&ddata, org))
 			return (NULL);
-		if (!cpp_demangle_read_type(&ddata, 0))
+		if (!cpp_demangle_read_type(&ddata, 0)) {
+			bcprintf("no type\n");
 			goto clean;
+		}
 		rtn = vector_str_get_flat(&ddata.output, (size_t *) NULL);
+		bcprintf("rtn: %s\n", rtn);
 		goto clean;
 	}
-
 
 	if (!cpp_demangle_data_init(&ddata, org + 2))
 		return (NULL);
@@ -2005,10 +2007,10 @@ cpp_demangle_read_number_as_string(struct cpp_demangle_data *ddata, char **str)
 		return (0);
 	}
 
-	// if (asprintf(str, "%ld", n) < 0) {
-	// 	*str = NULL;
-	// 	return (0);
-	// }
+	if (asprintf(str, "%l", n) < 0) {
+		*str = NULL;
+		return (0);
+	}
 
 	return (1);
 }

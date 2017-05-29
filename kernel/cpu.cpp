@@ -68,14 +68,34 @@ int snprintf(char* buffer, size_t n, const char* fmt, ...) {
 
     memcpy(buffer, &temp_buffer[0], n * sizeof(char));
 
-    size_t s = 0;
+    for(int i = n-1; i > 0; i--) {
+        if((int)temp_buffer[i] != 0) {
+            return i;
+        }
+    }
 
-    for(size_t i = n-1; i > 0; i--) {
+    return -1;
+}
+
+int asprintf(char** buffer,  const char* fmt, ...) {
+	va_list parameters;
+	char temp_buffer[128] = {0};
+
+	va_start(parameters, fmt);
+	vsprintf(temp_buffer, fmt, parameters);
+	va_end(parameters);
+
+    size_t s = 0;
+    for(int i = 127; i > 0; i--) {
         if((int)temp_buffer[i] != 0) {
             s = i;
             break;
         }
     }
+
+    char* rs = new char[s];
+    memcpy(rs, &temp_buffer[0], s * sizeof(char));
+    buffer = &rs;
 
     return s;
 }

@@ -33,6 +33,12 @@ namespace ABI_NAMESPACE
 }
 
 char * __cxa_demangle_gnu3(const char *org);
+char* demangle(const char* name);
+
+extern "C" char* __cxa_demangle(const char* mangled_name,
+                                char* buf,
+                                size_t* n,
+                                int* status);
 
 namespace std
 {
@@ -45,7 +51,7 @@ namespace std
 	  */
 	class type_info
 	{
-		public:
+	public:
 		/**
 		 * Virtual destructor.  This class must have one virtual function to
 		 * ensure that it has a vtable.
@@ -56,7 +62,7 @@ namespace std
 		bool before(const type_info &) const;
 		const char* name() const;
 		type_info();
-		private:
+	private:
 		type_info(const type_info& rhs);
 		type_info& operator= (const type_info& rhs);
 		const char *__type_name;
@@ -71,7 +77,7 @@ namespace std
 		 * libsupc++, so that code linking against this library can subclass
 		 * type_info and correctly fill in the values in the vtables.
 		 */
-		public:
+	public:
 		/**
 		 * Returns true if this is some pointer type, false otherwise.
 		 */
