@@ -11,6 +11,7 @@ A very basic microkernel. This isn't meant to be a full-featured kernel+OS, but 
 		* std::string
 		* std::bitset
         * std::find / find_if / move / copy
+        * [WIP] std::array
 * GRUB2 bootloader
 * Page tables
     * [TODO] processes have own CR3
@@ -27,10 +28,13 @@ A very basic microkernel. This isn't meant to be a full-featured kernel+OS, but 
 * Time-slicing Scheduler
     * Multiple threads can run concurrently
         * Kernel is completely multithreaded
-    * Local kernel thread stack space
+    * Per-thread stack space
 	* [TODO] thread priorities
     * [TODO] per-process Page tables 
 * Starting to implement a TTY (future: POSIX compatibility)
 * Filesystems
     * FAT16 (almost finished)
     * [TODO] ext2
+* libcxxrt ported
+    * allows C++ to use RTTI (for typeid and dynamic_cast<T>)
+    * try/catch exception handling is nearly implemented!

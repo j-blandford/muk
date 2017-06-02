@@ -18,6 +18,11 @@ namespace std {
 		using const_pointer = const value_type*;
 
 		array();
+		
+		array(const array<T, N>& a) 
+		: _buffer(a._buffer)
+		{ }
+
 		~array();
 
 		reference front() { return _buffer[0]; }
