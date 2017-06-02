@@ -29,7 +29,7 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_ph
     tss_install();
     idt_install();
 
-    // Set up the Memory manager (botrh physical and virtual)
+    // Set up the Memory manager (both physical and virtual)
     Memory::Setup(mb_info, k_phys_end);
 
     Ext::load();

@@ -15,6 +15,15 @@ namespace Filesystem {
 		longName = 0x0F
 	};
 
+	struct PathElements {
+		std::string drive;
+		std::vector<std::string> tokens;
+		
+		PathElements()
+		: tokens(std::vector<std::string>()) 
+		{ }
+	};
+
     class DirectoryEntry {
 	public:
 		char* name;
@@ -46,11 +55,14 @@ namespace Filesystem {
         virtual uint16_t* read(size_t numBytes, size_t offset) = 0;
         virtual std::vector<DirectoryEntry> readDirectory(unsigned int sectorIndex) = 0;
         virtual std::vector<DirectoryEntry> readDirectory(char* path) = 0;
+
+
     };
 
 	extern std::vector<IDevice*> devices;
 
 	void initialise();
+	PathElements splitPath(std::string path);
 }
 
 

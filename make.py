@@ -9,7 +9,7 @@ for opt in sys.argv:
     if opt == "clean" or opt == "cbochs" or opt == "rebuild":
         # Clean the solutions
         for project in solutions:
-            if project['build'] or opt == "cbochs":
+            if project['build']:
                 subprocess.call(["make", "clean"], cwd=project['name'])
 
         print("/*** FINISHED CLEANING ***/")
@@ -17,7 +17,7 @@ for opt in sys.argv:
     if opt == "build" or opt == "rebuild" or opt == "run" or opt == "bochs" or opt == "cbochs":
         # Compile all of the solutions:
         for project in solutions:
-            if project['build'] or opt == "rebuild" or opt == "cbochs":
+            if project['build'] or opt == "rebuild":
                 subprocess.run(["make", "compile"], cwd=project['name'], check=True)
 
         # # we've compiled each of our source files, let's link them all together into the kernel.elf

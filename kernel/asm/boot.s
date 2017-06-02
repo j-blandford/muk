@@ -36,8 +36,8 @@ mb_header:
     dd bootstrapper                   ; entry_addr
 
     dd 0                        ; 0 = vbe mode, 1 = linear framebuffer
-    dd 640
-    dd 480
+    dd 800
+    dd 600
     dd 24
 
 ; thanks to Connor Stack for the tutorial on higher-half implementation!
