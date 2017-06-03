@@ -22,7 +22,7 @@ namespace std {
 		void pbump(int n);
 		void setp(char_type* pbeg, char_type* pend);
 
-		basic_filebuf() { }
+		basic_filebuf();
 		~basic_filebuf();
 
 		bool is_open() const;
@@ -38,16 +38,14 @@ namespace std {
 		using char_type = CharT;
 		basic_filebuf<char_type> sb;
 	public:
-		basic_fstream() { }
+		basic_fstream();
+		~basic_fstream();
+
 		explicit basic_fstream(const string& path, ios_base::openmode mode = ios_base::in|ios_base::out);
 		explicit basic_fstream(const char *path, ios_base::openmode mode = ios_base::in|ios_base::out);
 
-		void open(const string& filename, ios_base::openmode mode = ios_base::in|ios_base::out) {
-			// rdbuf()->open(filename, mode);
-		}
-		void open(const char *filename, ios_base::openmode mode = ios_base::in|ios_base::out) {
-			// rdbuf()->open(filename, mode);
-		}
+		void open(const string& filename, ios_base::openmode mode = ios_base::in|ios_base::out);
+		void open(const char *filename, ios_base::openmode mode = ios_base::in|ios_base::out);
 
 		bool is_open() { return rdbuf()->is_open(); }
 		bool is_open() const { return rdbuf()->is_open(); }

@@ -11,7 +11,7 @@ namespace std {
 		using pos_type = std::size_t;
 		using int_type = int;
 
-		virtual ~basic_streambuf();
+		~basic_streambuf() { };
 
 	protected:
 		basic_streambuf() { }

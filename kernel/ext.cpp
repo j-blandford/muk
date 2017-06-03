@@ -5,6 +5,7 @@
 
 #include <kernel/bin/ps.hpp>
 #include <kernel/bin/ls.hpp>
+#include <kernel/bin/cat.hpp>
 
 namespace Ext {
 	Library lib;
@@ -44,5 +45,6 @@ namespace Ext {
 	void load() {
 		lib.add("ps", &ps);
 		lib.add("ls", &ls);
+		lib.add("cat", &cat);
 	}
 }
