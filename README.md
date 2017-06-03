@@ -6,6 +6,8 @@ A very basic microkernel. This isn't meant to be a full-featured kernel+OS, but 
 
 ## Current Features
 * Written in C++ and a small amount of ASM
+    * C++14
+    * NetWide ASM (NASM)
     * A very fragile, tiny version of libstd++ is included
 		* std::vector
 		* std::string

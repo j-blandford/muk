@@ -2,10 +2,9 @@
 TARGET = i686-elf
 ARCH = i386
 
-CPPFLAGS  = -O2 -g -std=gnu++11 -fno-exceptions  # -fno-rtti  #-nostdinc++ 
-CPPFLAGS += -finline-functions -ffreestanding -nostdlib -fpermissive
-CPPFLAGS +=  -Warray-bounds
-CPPFLAGS += -Wno-write-strings -Wno-unused-variable -Wno-unused-parameter -Wno-ignored-qualifiers
+CPPFLAGS  = -O2 -g -std=gnu++14 
+CPPFLAGS += -nostdlib -finline-functions -ffreestanding -fno-exceptions -fpermissive
+CPPFLAGS += -Warray-bounds -Wno-write-strings -Wno-unused-variable -Wno-unused-parameter -Wno-ignored-qualifiers
 CPPFLAGS += -DKERNEL
 
 NASM = nasm

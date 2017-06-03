@@ -31,9 +31,11 @@ public:
 void* vmalloc(size_t size);
 void* kcalloc(size_t size);
 void kfree(void* addr);
+void kfree(void* addr, size_t sz); // for c++14 compatibility
 
 void* malloc(size_t size);
 void* calloc(size_t size);
 void* calloc(int num, size_t size);
 void* realloc(void* addr, size_t new_size);
 void free(void* addr);
+void free(void* addr, size_t sz);

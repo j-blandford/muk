@@ -51,6 +51,7 @@ namespace std {
 		bool is_open() const { return rdbuf()->is_open(); }
 
 		basic_filebuf<char_type>* rdbuf() const { return &sb; };
+		basic_filebuf<char_type>* rdbuf( basic_filebuf<char_type>* statebuffer ) { sb = *statebuffer; }
 	};
 
 	using fstream = basic_fstream<char>;

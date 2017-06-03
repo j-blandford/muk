@@ -11,12 +11,11 @@ namespace std {
 		using pos_type = std::size_t;
 		using int_type = int;
 
-		~basic_streambuf() { };
-
-	protected:
-		basic_streambuf() { }
+		~basic_streambuf();
+		basic_streambuf();
 		basic_streambuf(const basic_streambuf& rhs);
-    	basic_streambuf& operator=(const basic_streambuf& rhs);
+
+    	basic_streambuf<CharT>& operator=(const basic_streambuf<CharT>& rhs);
 
 		char_type* eback() const;
 		char_type* gptr() const;

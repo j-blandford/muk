@@ -78,6 +78,10 @@ void kfree(void * addr) {
     return; // meh for now
 }
 
+void kfree(void * addr, size_t sz) {
+    return; // meh for now
+}
+
 void* malloc(size_t size) {
     return vmalloc(size);
 }
@@ -97,6 +101,10 @@ void* calloc(int num, size_t size) {
 }
 
 void free(void * addr) {
+    return; // meh for now
+}
+
+void free(void * addr, size_t sz) {
     return; // meh for now
 }
 

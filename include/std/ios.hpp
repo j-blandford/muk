@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <std.hpp>
+#include <std/streambuf.hpp>
 
 namespace std {
 	class ios_base {
@@ -26,7 +27,12 @@ namespace std {
 
 	template<class CharT>
 	class basic_ios : public std::ios_base {
+		using char_type = CharT;
+		basic_streambuf<char_type> sb;
 	public:
+		basic_ios() { }
+		~basic_ios() { }
+		
 		iostate rdstate() const { return errorstate; }
 		void clear(iostate state = goodbit) { errorstate = state; }
 		void setstate(iostate state) { clear(rdstate() | state); }
@@ -35,6 +41,10 @@ namespace std {
 		bool fail() const { return (rdstate() | failbit) || bad(); }
 		bool eof() const { return rdstate() | eofbit; }
 		bool bad() const { return rdstate() | badbit; }
+
+		basic_streambuf<char_type>* rdbuf() const { return &sb; };
+		basic_streambuf<char_type>* rdbuf( basic_streambuf<char_type>* sb ) { &this->sb = sb; }
+	
 	};
 
 	using ios = basic_ios<char>;
