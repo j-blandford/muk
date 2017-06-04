@@ -8,17 +8,28 @@
 int cat(std::vector<std::string> args) {
 	std::fstream file;
 	
-	file.open("0:/usr/login.profile", std::ios_base::in);
+	file.open("0:/home/james/login.profile", std::ios_base::in);
 
-	// for(auto dir : Filesystem::devices[0]->readDirectory((char*)trim_path)) {	
-	// 	bool is_dir = (dir.attributes != Filesystem::FATAttributes::shortNameFile);
-		
-	// 	// metadata
-	// 	terminal_printf("%s- %x\t May 14 17:04\t", is_dir ? "d" : "-", dir.location);
+	std::string c_path = "/home/james/";
+	std::string trim_path = c_path.substr(0,c_path.size()-1);
 
-	// 	// name
-	// 	terminal_printf_rgba("%s\n", is_dir ? Graphics::RGB(0x3bff6e) : Graphics::RGB(0xFFFFFF), dir.name);
-	// }
+	// "home/james/login.profile"
+	auto file_metadata = dynamic_cast<Filesystem::FAT16*>(Filesystem::devices[0])->walkSectors(0xC4);
+
+	// "usr/conemu.xml"
+	// auto file_metadata = dynamic_cast<Filesystem::FAT16*>(Filesystem::devices[0])->walkSectors(0xC5); 
+
+	for(int sector : file_metadata) {
+		terminal_printf(">>>> sec=%x\n", sector);
+
+		uint8_t* sector_data = Filesystem::devices[0]->read_u8(27, sector * 0x200);
+
+		if(sector_data != nullptr) 
+			for(int i = 0; i < 26; i++) 
+				terminal_printf("%c", (char)sector_data[i]);
+
+		terminal_printf("\n");
+	}
 
 	return 0;
 }

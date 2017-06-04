@@ -60,7 +60,8 @@ namespace Filesystem {
 		~FAT16() { }
 
 		bool open();
-		uint16_t* read(size_t numBytes, size_t offset);
+		uint16_t* read_u16(size_t numBytes, size_t offset);
+		uint8_t* read_u8(size_t numBytes, size_t offset);
 		void getFAT();
 		std::vector<int> walkSectors(uint16_t startSector);
 		std::vector<DirectoryEntry> readDirectory(unsigned int sectorIndex);

@@ -8,8 +8,12 @@
 namespace std {
 	template<class CharT>
 	class basic_filebuf : public std::basic_streambuf<CharT> {
-		using char_type = CharT;
 	public:
+		using char_type = CharT;
+		using int_type = int;
+
+		int underflow(); // the guts of our streambuf implementation
+
 		char_type* eback() const;
 		char_type* gptr() const;
 		char_type* egptr() const;

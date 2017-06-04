@@ -1,5 +1,7 @@
 #include <std/bitset.hpp>
+#include <kernel/converter.hpp>
 #include <kernel/fs/fat16.hpp>
+
 #include <libcxxrt/typeinfo.h>
 
 std::vector<uint16_t> Filesystem::FileAllocationTable::walk(uint16_t start) {
@@ -82,7 +84,8 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigne
 
 			bool addSeperator = false; // adds a '.' char into the filename if 0x20 is found (might be bugged if the folder name has a space in it...)
 
-			dir_entry->location = dir_bytes[index+26] | (dir_bytes[index+27] << 8); // 16-bit cluster location
+			dir_entry->location = Converter::To_16bit(&(dir_bytes[index+26])); // 16-bit cluster location
+			dir_entry->fsize = Converter::To_32bit(&(dir_bytes[index+28]));
 
 			// the first 11 bytes store the full short foldername. Let us extract it out...
 			for(size_t offset = 0; offset <= 11; offset++) {
@@ -127,6 +130,8 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigne
 			index += 32; 
 
 			dir_entry->attributes = static_cast<FATAttributes>(dir_bytes[index+11]);
+			dir_entry->location = Converter::To_16bit(&(dir_bytes[index+26])); // 16-bit cluster location
+			dir_entry->fsize = Converter::To_32bit(&(dir_bytes[index+28]));
 		}
 		else if(dir_entry->attributes == FATAttributes::noEntry) {
 			// there isn't a file here, so just skip to the next index entry
@@ -210,8 +215,9 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(char* p
 	return this->readDirectory(current_sec);
 }
 
+uint8_t* Filesystem::FAT16::read_u8(size_t numBytes, size_t offset) {
+	// uint8_t* read_bytes = new uint8_t[num_bytes];
+	// return read_bytes;
 
-
-uint16_t* Filesystem::FAT16::read(size_t numBytes, size_t offset) {
-	return nullptr;
+	return device->read_u8(1, offset / ATA_BLOCKSIZE);
 }

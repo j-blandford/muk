@@ -29,6 +29,11 @@ namespace std {
 		return true;
 	}
 
+	template<class CharT>
+	int basic_filebuf<CharT>::underflow() {
+		return 0;
+	}
+
 	// ctor
 	template<class CharT>
 	basic_filebuf<CharT>::basic_filebuf() { }
@@ -43,13 +48,13 @@ namespace std {
 
 	template<class CharT>
 	void basic_fstream<CharT>::open(const string& filename, ios_base::openmode mode) {
-		terminal_writestring("opening (string)...\n");
+	//	terminal_writestring("opening (string)...\n");
 		this->rdbuf()->open(filename, mode);
 	}
 
 	template<class CharT>
 	void basic_fstream<CharT>::open(const char *filename, ios_base::openmode mode) {
-		terminal_writestring("opening (char*)...\n");
+	//	terminal_writestring("opening (char*)...\n");
 		this->rdbuf()->open(filename, mode);
 	}
 

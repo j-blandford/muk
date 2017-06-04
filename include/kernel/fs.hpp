@@ -38,9 +38,20 @@ namespace Filesystem {
 		short crt_date;      // creation date
 
 		short location;     // generic "cluster" location
+		int fsize;     // generic "cluster" location
 
-		DirectoryEntry() : name(new char[32]), location(0)  { memset(name, 0, 11); }
-		DirectoryEntry(char* name) : location(0) { }
+		DirectoryEntry() 
+		: name(new char[32])
+		, location(0) 
+		, fsize(0)
+		{ 
+			memset(name, 0, 11); 
+		}
+
+		DirectoryEntry(char* name) 
+		: location(0)
+		, fsize(0) { }
+
 		~DirectoryEntry() {
 			delete name;
 			delete altName;
@@ -52,11 +63,9 @@ namespace Filesystem {
     class IDevice {
     public:
         virtual bool open() = 0;
-        virtual uint16_t* read(size_t numBytes, size_t offset) = 0;
-        virtual std::vector<DirectoryEntry> readDirectory(unsigned int sectorIndex) = 0;
+        virtual uint8_t* read_u8(size_t numBytes, size_t offset) = 0;
+		virtual std::vector<DirectoryEntry> readDirectory(unsigned int sectorIndex) = 0;
         virtual std::vector<DirectoryEntry> readDirectory(char* path) = 0;
-
-
     };
 
 	extern std::vector<IDevice*> devices;

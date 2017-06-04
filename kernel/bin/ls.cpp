@@ -16,7 +16,7 @@ int ls(std::vector<std::string> args) {
 		bool is_dir = (dir.attributes != Filesystem::FATAttributes::shortNameFile);
 		
 		// metadata
-		terminal_printf("%s- %x\t May 14 17:04\t", is_dir ? "d" : "-", dir.location);
+		terminal_printf("%s- %x\t %d \tMay 14 17:04\t", is_dir ? "d" : "-", dir.location, dir.fsize);
 
 		// name
 		terminal_printf_rgba("%s\n", is_dir ? Graphics::RGB(0x3bff6e) : Graphics::RGB(0xFFFFFF), dir.name);

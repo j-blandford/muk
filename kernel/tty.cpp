@@ -58,6 +58,9 @@ void terminal_putchar(char c, Graphics::RGB colour) {
 		return;
 	}
 
+	if(c == '\r') 
+		return;
+
 	if(c == '\t') {
 		// support tabs
 		terminal_column += TAB_WIDTH - terminal_column % TAB_WIDTH;
