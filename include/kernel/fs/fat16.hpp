@@ -35,7 +35,7 @@ namespace Filesystem {
 	};
 
 	class FAT16 : public IDevice {
-		const uint8_t header[3] = {0xEB, 0x3C, 0x90}; // FAT16 header bytes
+		static constexpr uint8_t header[3] = {0xEB, 0x3C, 0x90}; // FAT16 header bytes
 		ATA* device;
 
 		uint8_t header_bytes[512]; 
@@ -66,6 +66,8 @@ namespace Filesystem {
 		std::vector<int> walkSectors(uint16_t startSector);
 		std::vector<DirectoryEntry> readDirectory(unsigned int sectorIndex);
 		std::vector<DirectoryEntry> readDirectory(char* path);
+
+		FileEntry readFile(char* path);
 	};
 
 

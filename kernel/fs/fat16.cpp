@@ -4,7 +4,9 @@
 
 #include <libcxxrt/typeinfo.h>
 
-std::vector<uint16_t> Filesystem::FileAllocationTable::walk(uint16_t start) {
+using namespace Filesystem;
+
+std::vector<uint16_t> FileAllocationTable::walk(uint16_t start) {
 	// "start" is the value grabbed from the directory tables!!!
 	std::vector<uint16_t> *chain = new std::vector<uint16_t>();
 
@@ -19,41 +21,37 @@ std::vector<uint16_t> Filesystem::FileAllocationTable::walk(uint16_t start) {
 
 // this function gets called in the object constructor and verifies
 // that the device's header is actually FAT16-compliant.
-bool Filesystem::FAT16::open() {
+bool FAT16::open() {
 	uint8_t* temp_header = device->read_u8(1, 0);
 	memcpy(&header_bytes, temp_header, 512);
 	delete temp_header;
 
 	bcprintf("Opening FS device...\n");
 
+	// lets check to see if the device is FAT-formatted
 	for(int i = 0; i < 3; i++) {
-		if(*(header_bytes + i*sizeof(char)) != header[i]) return false;
+		if(*(header_bytes + i*sizeof(char)) != header[i]) 
+			return false;
 	}
 
 	// the below variables scope out the "BIOS Parameter Block" (BPB)
-	// TODO: make a struct that follows the byte pattern of the header so we can hydrate the class in with malloc+memset
-	header_info.sectorSize = (*(header_bytes + 11*sizeof(char))) | (*(header_bytes + 12*sizeof(char)) << 8); // little-endian -> big-endian
-	header_info.secPerCluster = *(header_bytes + 13*sizeof(char));
-	header_info.numReservedSectors = *(header_bytes + 14*sizeof(char)); // offset 15 would be zero in like 99.9999% of cases
-	header_info.numFATs = *(header_bytes + 16*sizeof(char));
-	header_info.numDirectories = (*(header_bytes + 17*sizeof(char))) | (*(header_bytes + 18*sizeof(char)) << 8);
-	header_info.numSectors = (*(header_bytes + 19*sizeof(char))) | (*(header_bytes + 20*sizeof(char)) << 8);
-	header_info.numSectorsPerFAT = (*(header_bytes + 21*sizeof(char))) | (*(header_bytes + 22*sizeof(char)) << 8);
-
-	bcprintf("FAT16 typeid=%s\n", typeid(this).name());
+	header_info.sectorSize = Converter::To_16bit(&header_bytes[11]);
+	header_info.secPerCluster = header_bytes[13];
+	header_info.numReservedSectors = Converter::To_16bit(&header_bytes[14]);
+	header_info.numFATs = header_bytes[13];
+	header_info.numDirectories = Converter::To_16bit(&header_bytes[17]);
+	header_info.numSectors = Converter::To_16bit(&header_bytes[19]);
+	header_info.numSectorsPerFAT = Converter::To_16bit(&header_bytes[21]);
 
 	// Below we have the Extended BIOSParameter Block (EBPB)
-	volume_serial = (*(header_bytes + 39*sizeof(char))) 
-					| (*(header_bytes + 40*sizeof(char)) << 8) 
-					| (*(header_bytes + 41*sizeof(char)) << 16) 
-					| (*(header_bytes + 42*sizeof(char)) << 24);
+	volume_serial = Converter::To_32bit(&header_bytes[39]);
 
 	bcprintf(">>> Opened! Volume serial: %x\n", volume_serial);
 
 	return true;
 }
 
-void Filesystem::FAT16::getFAT() {
+void FAT16::getFAT() {
 	// Let us grab the allocation table
 	fat = FileAllocationTable(header_info.numReservedSectors);
 
@@ -62,11 +60,11 @@ void Filesystem::FAT16::getFAT() {
 	delete temp_fat;
 }
 
-std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigned int sectorIndex) {
+std::vector<DirectoryEntry> FAT16::readDirectory(unsigned int sectorIndex) {
 	const std::bitset<32> bitMask(0x5542AA8A); // this is used to select out the long filename's data
 	const size_t n_sectors = 1; // may be above 1 sector... look into this
 
-	std::vector<Filesystem::DirectoryEntry> dir = std::vector<Filesystem::DirectoryEntry>();
+	std::vector<DirectoryEntry> dir = std::vector<DirectoryEntry>();
 
 	// Grab the dir table
 	uint8_t* dir_bytes = this->device->read_u8(n_sectors, sectorIndex);
@@ -146,7 +144,7 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigne
 	return dir;
 }
 
-// uint16_t* Filesystem::FAT16::getChain(std::vector<uint16_t> chain) {
+// uint16_t* FAT16::getChain(std::vector<uint16_t> chain) {
 // 	// pass the return value of fat->walk() into this to grab the actual data
 // 	uint16_t dataStart = 512 + ((header_info.numDirectories * 32) / header_info.sectorSize); // disk.img: this evaluates to 512+32 = 544
 // 	uint16_t* chainBuffer = new uint16_t[chain.size()*header_info.sectorSize*header_info.secPerCluster];
@@ -160,7 +158,7 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(unsigne
 // 	return chainBuffer;
 // }
 
-std::vector<int> Filesystem::FAT16::walkSectors(uint16_t startSector) {
+std::vector<int> FAT16::walkSectors(uint16_t startSector) {
 	this->getFAT();
 
 	std::vector<uint16_t> chain = this->fat.walk(startSector);
@@ -178,10 +176,14 @@ std::vector<int> Filesystem::FAT16::walkSectors(uint16_t startSector) {
 	return sectors;
 }
 
-std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(char* path) {
+std::vector<DirectoryEntry> FAT16::readDirectory(char* path) {
 	std::vector<std::string> path_tokens = std::vector<std::string>();
 	std::string str = path;
 	size_t current_sec = 512; // 512 = root dir table sector
+
+	if(str[0] == '/') {
+		str = str.substr(1, str.size()-1);
+	}
 
 	// split "path" into tokens delimited by '/' and then extracts out each folder, 
 	for (auto i = strtok(str.data(), "/"); i != nullptr; i = strtok(nullptr, "/")) {
@@ -206,7 +208,7 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(char* p
 				// Folder not found :(
 				terminal_printf("Error: directory not found\n");
 				
-				return std::vector<Filesystem::DirectoryEntry>();
+				return std::vector<DirectoryEntry>();
 			}
 		}
 	}
@@ -215,9 +217,37 @@ std::vector<Filesystem::DirectoryEntry> Filesystem::FAT16::readDirectory(char* p
 	return this->readDirectory(current_sec);
 }
 
-uint8_t* Filesystem::FAT16::read_u8(size_t numBytes, size_t offset) {
+uint8_t* FAT16::read_u8(size_t numBytes, size_t offset) {
 	// uint8_t* read_bytes = new uint8_t[num_bytes];
 	// return read_bytes;
 
 	return device->read_u8(1, offset / ATA_BLOCKSIZE);
+}
+
+
+FileEntry FAT16::readFile(char* path) {
+	std::string p = path;
+	std::string f = path;
+
+	size_t slash = p.find_last_of("/")+1;
+
+	p = p.substr(0, slash); // path element
+	f = f.substr(slash);	// file element
+
+	bcprintf("%s -- %s\n", (char*)p, (char*)f);
+
+	for(DirectoryEntry entry : this->readDirectory((char*)p)) {
+		if(std::string(entry.name) == (char*)f) {
+			FileEntry fe;
+			fe.size = entry.fsize;
+			fe.location = entry.location;
+			fe.name = new char[strlen(entry.name)];
+
+			memcpy(fe.name, entry.name, strlen(entry.name));
+
+			return fe;
+		}
+	}
+
+	return FileEntry();
 }

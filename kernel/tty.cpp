@@ -58,8 +58,11 @@ void terminal_putchar(char c, Graphics::RGB colour) {
 		return;
 	}
 
-	if(c == '\r') 
+	if(c == '\r') {
+		// support carriage return
+		terminal_column = 0;
 		return;
+	}
 
 	if(c == '\t') {
 		// support tabs

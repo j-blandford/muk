@@ -39,6 +39,13 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_ph
     // IRQ1
     keyboard_install();
 
+    
+    std::string test = "lol/lolll /hello world";
+
+    size_t last_test = test.find_last_of("/");    
+    bcprintf("test.size()=%d\n", test.size());
+    bcprintf("last_test=%d (exp=10)\n",last_test);
+
     Filesystem::initialise();
 
     // this loads our driver threads into the scheduler
@@ -47,9 +54,9 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t k_phys_start, uint32_t k_ph
     start_display_driver(mb_info);
 
     // this line starts to run the threads and drivers, the LAST thing to enable!!!
+    // the first interrupt that gets called switches the context to a kidle() thread
     interrupts_enable();
 
-    // This does nothing apart from stop our kmain function from returning
-    // Every process is now a thread (running "asynchronously")
+    // shouldn't run because of the scheduler
     while(true) { }
 }

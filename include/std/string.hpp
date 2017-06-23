@@ -16,7 +16,7 @@ namespace std {
 		size_type length;               // length of the string
 		char* buff;              // pointer to strorage
 	public:
-		static const size_type npos = -1; // maximum size_t value
+		static constexpr size_type npos = -1; // maximum size_t value
 		
 		// Constructors
 		string() : length(0), buff(NULL) { }
@@ -47,8 +47,9 @@ namespace std {
 
 			if(pos1+count1 > this->size() || count1 == std::string::npos) 
 				count1 = this->size() - pos1;
-
+				
 			for(size_type p = 0; p < std::min<size_type>(count1, str.size()); p++) {
+				// this effectively performs the action of traits_type::compare()
 				if((int)this->data(p + pos1) > (int)str.data(p)) {
 					++result;
 					break;
@@ -60,6 +61,21 @@ namespace std {
 			}
 
 			return result;
+		}
+
+		size_type find_last_of( const string& str, size_type pos = npos ) const {
+			if(pos == npos) 
+				pos = this->size();
+
+			// work backwards from the end
+			for(size_type i = pos-1; i > 0; i--) {
+				if(this->compare(i, str.size(), str) == 0) {
+					return i;
+				}
+			} 
+
+			// the substring wasnt found
+			return npos;
 		}
 
 		size_type find( const string& str, size_type pos = 0 ) const {

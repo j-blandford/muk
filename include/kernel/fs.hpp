@@ -58,6 +58,21 @@ namespace Filesystem {
 		}
 	};
 
+	
+	struct FileEntry {
+		static constexpr size_t nfile = -1; // no file found
+
+		char* name;
+
+		size_t location;
+		size_t size;
+
+		FileEntry() 
+		: size(nfile)
+		, location(nfile) { }
+
+	};
+
     // This is a generic interface for all filesystem devices. To add your own device, 
     // just fulfill the 4 function pointers and you're set!
     class IDevice {
